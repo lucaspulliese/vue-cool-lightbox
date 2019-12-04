@@ -22,7 +22,7 @@ export default {
 ```
 
 ## Demo
-The live demo is available here: [https://codepen.io/lucaspulliese/pen/povJzxq](https://codepen.io/lucaspulliese/pen/povJzxq).
+The live demo is available here: [https://lucaspulliese.github.io/vue-cool-lightbox/](https://lucaspulliese.github.io/vue-cool-lightbox/).
 
 ## Usage
 

@@ -5,9 +5,10 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "npm run build:unpkg & npm run build:es & npm run build:umd",
-    "build:umd": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format umd --file dist/vue-cool-lightbox.umd.js",
-    "build:es": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format es --file dist/vue-cool-lightbox.esm.js",
-    "build:unpkg": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format iife --file dist/vue-cool-lightbox.min.js",
+    "build:demo": "vue-cli-service build --dest build",
+    "build:umd": "cross-env NODE_ENV=production rollup --config build-scripts/rollup.config.js --format umd --file dist/vue-cool-lightbox.umd.js",
+    "build:es": "cross-env NODE_ENV=production rollup --config build-scripts/rollup.config.js --format es --file dist/vue-cool-lightbox.esm.js",
+    "build:unpkg": "cross-env NODE_ENV=production rollup --config build-scripts/rollup.config.js --format iife --file dist/vue-cool-lightbox.min.js",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
