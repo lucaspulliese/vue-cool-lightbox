@@ -28,27 +28,11 @@ export default {
     return {
       items: [
         {
-          src: '/ffffff404.png',
-          title: 'Que onda señor Bush'
+          src: 'https://cosmos-images2.imgix.net/file/spina/photo/20565/191010_nature.jpg?ixlib=rails-2.1.4&auto=format&ch=Width%2CDPR&fit=max&w=835',
         },
         {
-          src: '/ffffff.png',
+          src: 'https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/nature-quotes-1557340276.jpg?crop=0.666xw:1.00xh;0.168xw,0&resize=640:*',
         },
-        {
-          src: 'https://www.youtube.com/watch?v=_sI_Ps7JSEk',
-          title: 'Que onda señor Bush',
-          description: 'Que onda señor Bush'
-        },
-        {
-          src: 'http://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_320x180.mp4',
-          title: 'Que onda señor Bush',
-          description: 'Que onda señor Bush'
-        },
-        {
-          src: 'https://vimeo.com/191947042',
-          title: 'Que onda señor Bush',
-          description: 'Que onda señor Bush'
-        }
       ],
       index: null
     };
@@ -58,23 +42,20 @@ export default {
   },
   methods: {
     setIndex(index) {
-      //console.log(index);
       this.index = index
     }
   }
 };
 </script>
 
-<style lang="scss">
+<style>
 .images-wrapper {
   display: flex;
-  align-items: center;
-  .image {
-    width: 300px;
-    height: 200px;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat
-  }
+}
+
+.image {
+  height: 300px;
+  width: 300px;
+  display: block;
 }
 </style>

@@ -1,9 +1,9 @@
-import component from "./components/CoolLightBox.vue";
+import CoolLightBox from "./components/CoolLightBox.vue";
 
 function install(Vue) {
   if (install.installed) return;
   install.installed = true;
-  Vue.component("CoolLightBox", component);
+  Vue.component("CoolLightBox", CoolLightBox);
 }
 
 const plugin = {
@@ -21,6 +21,6 @@ if (GlobalVue) {
   GlobalVue.use(plugin);
 }
 
-component.install = install;
+CoolLightBox.install = install;
 
-export default component;
+export default CoolLightBox;

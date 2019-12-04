@@ -22,7 +22,7 @@ export default {
 ```
 
 ## Demo
-The live demo is available here: [https://jsfiddle.net/lucaspulliese/p1h392yv/](https://jsfiddle.net/lucaspulliese/p1h392yv/).
+The live demo is available here: [https://codepen.io/lucaspulliese/pen/povJzxq](https://codepen.io/lucaspulliese/pen/povJzxq).
 
 ## Usage
 
