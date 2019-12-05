@@ -23,9 +23,9 @@
 
       <div class="cool-lightbox__wrapper">
         <div class="cool-lightbox__slide">
-          <transition name="slide-change" mode="out-in">
+          <transition name="cool-lightbox-slide-change" mode="out-in">
             <div v-if="!videoUrl" key="image" :style="imgWrapperStyle" class="cool-lightbox__slide__img">
-              <transition name="slide-change" mode="out-in">
+              <transition name="cool-lightbox-slide-change" mode="out-in">
               <img 
                 :src="itemSrc" 
                 :key="itemSrc"
@@ -42,7 +42,7 @@
           
 
             <div v-else key="video" class="cool-lightbox__iframe">
-              <transition name="slide-change" mode="out-in">
+              <transition name="cool-lightbox-slide-change" mode="out-in">
                 <iframe :src="videoUrl" v-if="!isMp4" :style="aspectRatioVideo" :key="videoUrl" frameborder="0" 
                   allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
                   allowfullscreen>
@@ -66,11 +66,11 @@
 
       <transition name="modal">
         <div v-show="isObject && (items[imgIndex].title || items[imgIndex].description)" key="caption-block" class="cool-lightbox-caption">
-          <transition name="slide-change" mode="out-in">
+          <transition name="cool-lightbox-slide-change" mode="out-in">
             <h6 key="title" v-if="isObject && items[imgIndex].title">{{ items[imgIndex].title }}</h6>
           </transition>
 
-          <transition name="slide-change" mode="out-in">
+          <transition name="cool-lightbox-slide-change" mode="out-in">
             <p key="description" v-if="isObject && items[imgIndex].description">{{ items[imgIndex].description }}</p>
           </transition>
         </div>
@@ -164,6 +164,7 @@ export default {
 
         // remove scroll
         document.getElementsByTagName('body')[0].style = 'overflow: hidden';
+        document.getElementsByTagName('html')[0].style = 'overflow: hidden';
       } else {
 
         this.isVisible = false
@@ -172,7 +173,8 @@ export default {
         window.removeEventListener('keydown', this.eventListener)
 
         // remove styles avoid scroll
-        document.getElementsByTagName('body')[0].style = '';
+        document.getElementsByTagName('body')[0].style.overflow = '';
+        document.getElementsByTagName('html')[0].style.overflow = '';
 
         // remove click event
         window.removeEventListener('click', this.showButtons)
@@ -214,8 +216,8 @@ export default {
 
     // show buttons event
     showButtons(e) {
-      var noRedirect = '.cool-lightbox-button *';
-      if (!event.target.matches(noRedirect)) {
+      var elements = '.cool-lightbox-button, .cool-lightbox-button *';
+      if (!event.target.matches(elements)) {
         const self = this
         setTimeout(function() {
           self.buttonsVisible = !self.buttonsVisible
@@ -576,6 +578,7 @@ $breakpoints: (
   top: 0;
   padding: 60px 0;
   display: flex;
+  z-index: 9999999;
   align-items: center;
   justify-content: center;
   right: 0;
@@ -691,7 +694,6 @@ $breakpoints: (
       max-width: 100%;
       max-height: 100%;
       margin: auto;
-      transition: all .4s ease;
       box-shadow: 0 0 1.5rem rgba(0,0,0,.45);
     }
   }
@@ -752,7 +754,7 @@ $breakpoints: (
   position: absolute;
   transition: opacity .25s ease,visibility 0s ease .25s;
   z-index: 99997;
-  background: linear-gradient(0deg,rgba(0,0,0,.85) 0,rgba(0,0,0,.3) 50%,rgba(0,0,0,.15) 65%,rgba(0,0,0,.075) 75.5%,rgba(0,0,0,.037) 82.85%,rgba(0,0,0,.019) 88%,transparent);
+  background: linear-gradient(0deg,rgba(0,0,0,.70) 0,rgba(0,0,0,.3) 50%,rgba(0,0,0,.15) 65%,rgba(0,0,0,.075) 75.5%,rgba(0,0,0,.037) 82.85%,rgba(0,0,0,.019) 88%,transparent);
   @include breakpoint(phone) {
     padding: 25px 30px 22px 30px;
   }
@@ -774,17 +776,17 @@ $breakpoints: (
 }
 
 .cool-lightbox-modal-enter-active, .cool-lightbox-modal-leave-active {
-  transition: opacity .4s
+  transition: opacity .35s
 }
 .cool-lightbox-modal-enter, .cool-lightbox-modal-leave-to {
   opacity: 0
 }
 
-.slide-change-enter-active, .slide-change-leave-active {
-  transition: opacity 0.23s;
+.cool-lightbox-slide-change-enter-active, .cool-lightbox-slide-change-leave-active {
+  transition: opacity 0.33s;
 }
 
-.slide-change-enter, .slide-change-leave-to  {
+.cool-lightbox-slide-change-enter, .cool-lightbox-slide-change-leave-to  {
   opacity: 0;
 }
 </style>

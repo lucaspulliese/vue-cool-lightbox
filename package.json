@@ -1,6 +1,6 @@
 {
   "name": "vue-cool-lightbox",
-  "version": "0.0.4",
+  "version": "0.0.6",
   "private": false,
   "scripts": {
     "serve": "vue-cli-service serve",
