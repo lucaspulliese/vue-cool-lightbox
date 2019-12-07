@@ -48,7 +48,7 @@
                   allowfullscreen>
                 </iframe>
 
-                <video class="fancybox-video" v-if="isMp4" :style="aspectRatioVideo" :key="videoUrl" controls="" controlslist="nodownload" poster="https://peach.blender.org/wp-content/uploads/bird1.jpg">
+                <video class="fancybox-video" v-if="isMp4" :style="aspectRatioVideo" :key="videoUrl" controls="" controlslist="nodownload" poster="">
                   <source :src="videoUrl" type="video/mp4">
                   Sorry, your browser doesn't support embedded videos, 
                   <a :href="videoUrl">download</a> 
@@ -745,7 +745,7 @@ $breakpoints: (
   font-weight: 400;
   left: 0;
   line-height: 1.5;
-  padding: 18px 28px 14px 24px;
+  padding: 18px 28px 16px 24px;
   pointer-events: none;
   right: 0;
   text-align: center;
@@ -754,23 +754,25 @@ $breakpoints: (
   position: absolute;
   transition: opacity .25s ease,visibility 0s ease .25s;
   z-index: 99997;
-  background: linear-gradient(0deg,rgba(0,0,0,.70) 0,rgba(0,0,0,.3) 50%,rgba(0,0,0,.15) 65%,rgba(0,0,0,.075) 75.5%,rgba(0,0,0,.037) 82.85%,rgba(0,0,0,.019) 88%,transparent);
+  background: linear-gradient(0deg,rgba(0,0,0,.75) 0,rgba(0,0,0,.3) 50%,rgba(0,0,0,.15) 65%,rgba(0,0,0,.075) 75.5%,rgba(0,0,0,.037) 82.85%,rgba(0,0,0,.019) 88%,transparent);
   @include breakpoint(phone) {
-    padding: 25px 30px 22px 30px;
+    padding: 23px 30px 25px 30px;
   }
   h6 {
     font-size: 14px;
-    margin: 0 0 8px 0;
+    margin: 0 0 6px 0;
+    line-height: 130%;
     @include breakpoint(phone) {
       font-size: 18px;
-      margin: 0 0 15px 0;
+      margin: 0 0 7px 0;
     }
   }
   p {
     font-size: 12px;
     line-height: 130%;
+    opacity: 0.9;
     @include breakpoint(phone) {
-      font-size: 16px;
+      font-size: 15px;
     }
   }
 }
