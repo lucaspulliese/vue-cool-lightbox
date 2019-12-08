@@ -756,23 +756,23 @@ $breakpoints: (
   z-index: 99997;
   background: linear-gradient(0deg,rgba(0,0,0,.75) 0,rgba(0,0,0,.3) 50%,rgba(0,0,0,.15) 65%,rgba(0,0,0,.075) 75.5%,rgba(0,0,0,.037) 82.85%,rgba(0,0,0,.019) 88%,transparent);
   @include breakpoint(phone) {
-    padding: 23px 30px 25px 30px;
+    padding: 22px 30px 23px 30px;
   }
   h6 {
-    font-size: 14px;
+    font-size: 13px;
     margin: 0 0 6px 0;
     line-height: 130%;
     @include breakpoint(phone) {
-      font-size: 18px;
-      margin: 0 0 7px 0;
+      font-size: 14px;
+      margin: 0 0 6px 0;
     }
   }
   p {
-    font-size: 12px;
+    font-size: 11px;
     line-height: 130%;
-    opacity: 0.9;
+    color: #ccc;
     @include breakpoint(phone) {
-      font-size: 15px;
+      font-size: 13px;
     }
   }
 }

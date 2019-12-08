@@ -79,7 +79,7 @@ export default {
 };
 </script>
 ```
-Or `items` could be just an array:
+Or `items` can be just an array:
 ```javascript
 items: [
   'http://example.com/image.jpg',
@@ -93,7 +93,7 @@ items: [
 
 | Attribute | required | type | Description |
 |:------| :------: | :------: |:------|
-| src | yes | string |media source, it could be an image or a Youtube / Vimeo / Mp4 video |
+| src | yes | string |media source, it can be an image or a Youtube / Vimeo / Mp4 video |
 | title | no | string | the image title |
 | description | no | string | the image description |
 
