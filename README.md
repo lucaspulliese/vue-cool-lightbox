@@ -21,8 +21,8 @@ export default {
 }
 ```
 
-## Demo
-The live demo is available here: [https://lucaspulliese.github.io/vue-cool-lightbox/](https://lucaspulliese.github.io/vue-cool-lightbox/).
+## Examples
+You can check the examples here (the page is under construction): [https://vue-cool-lightbox.lucaspulliese.com/](https://vue-cool-lightbox.lucaspulliese.com/).
 
 ## Usage
 
