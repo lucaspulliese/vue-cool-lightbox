@@ -1,7 +1,10 @@
 {
   "name": "vue-cool-lightbox",
-  "version": "0.0.9",
+  "description": "A Vue.js package to display an image gallery lightbox inspired by fancybox",
+  "version": "0.0.10",
   "private": false,
+  "author": "Lucas Pulliese <lucaspulliese10@gmail.com>",
+  "license": "MIT",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "npm run build:unpkg & npm run build:es & npm run build:umd",
@@ -11,6 +14,22 @@
     "build:unpkg": "cross-env NODE_ENV=production rollup --config build-scripts/rollup.config.js --format iife --file dist/vue-cool-lightbox.min.js",
     "lint": "vue-cli-service lint"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lucaspulliese/vue-cool-lightbox"
+  },
+  "keywords": [
+    "vue",
+    "vuejs",
+    "lightbox",
+    "gallery",
+    "image gallery",
+    "image lightbox"
+  ],
+  "bugs": {
+    "url": "https://github.com/lucaspulliese/vue-cool-lightbox/issues"
+  },
+  "homepage": "https://vue-cool-lightbox.lucaspulliese.com",
   "dependencies": {
     "core-js": "^3.3.2",
     "vue": "^2.6.10"

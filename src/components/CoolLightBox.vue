@@ -759,20 +759,20 @@ $breakpoints: (
     padding: 22px 30px 23px 30px;
   }
   h6 {
-    font-size: 13px;
+    font-size: 14px;
     margin: 0 0 6px 0;
     line-height: 130%;
     @include breakpoint(phone) {
-      font-size: 14px;
+      font-size: 16px;
       margin: 0 0 6px 0;
     }
   }
   p {
-    font-size: 11px;
+    font-size: 13px;
     line-height: 130%;
     color: #ccc;
     @include breakpoint(phone) {
-      font-size: 13px;
+      font-size: 15px;
     }
   }
 }
