@@ -1,6 +1,10 @@
 <template>
   <transition name="cool-lightbox-modal">
-    <div class="cool-lightbox" v-bind:class="lightboxClasses" v-if="isVisible" v-bind:style="{ 'padding-bottom': paddingBottom+'px'  }">
+    <div class="cool-lightbox" 
+      v-bind:class="lightboxClasses" 
+      v-if="isVisible" 
+      @click="closeModal"
+      v-bind:style="{ 'padding-bottom': paddingBottom+'px'  }">
 
       <div class="cool-lightbox__navigation">
         <button class="cool-lightbox-button cool-lightbox-button--prev" :class="buttonsClasses" v-show="hasPrevious || loop" @click="onPrevClick">
@@ -28,7 +32,7 @@
               <transition name="cool-lightbox-slide-change" mode="out-in">
               <img 
                 :src="itemSrc" 
-                :key="itemSrc"
+                :key="imgIndex"
                 draggable="false"
                 
                 @click="zoomImage"
@@ -43,12 +47,12 @@
 
             <div v-else key="video" class="cool-lightbox__iframe">
               <transition name="cool-lightbox-slide-change" mode="out-in">
-                <iframe :src="videoUrl" v-if="!isMp4" :style="aspectRatioVideo" :key="videoUrl" frameborder="0" 
+                <iframe class="cool-lightbox-video" :src="videoUrl" v-if="!isMp4" :style="aspectRatioVideo" :key="videoUrl" frameborder="0" 
                   allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
                   allowfullscreen>
                 </iframe>
 
-                <video class="fancybox-video" v-if="isMp4" :style="aspectRatioVideo" :key="videoUrl" controls="" controlslist="nodownload" poster="">
+                <video class="cool-lightbox-video" v-if="isMp4" :style="aspectRatioVideo" :key="videoUrl" controls="" controlslist="nodownload" poster="">
                   <source :src="videoUrl" type="video/mp4">
                   Sorry, your browser doesn't support embedded videos, 
                   <a :href="videoUrl">download</a> 
@@ -215,7 +219,7 @@ export default {
   methods: {
 
     // show buttons event
-    showButtons(e) {
+    showButtons(event) {
       var elements = '.cool-lightbox-button, .cool-lightbox-button *';
       if (!event.target.matches(elements)) {
         const self = this
@@ -293,12 +297,18 @@ export default {
       if(this.isZooming) {
         this.scale = 1.6
 
+        // hide buttons
+        this.buttonsVisible = false
+
         // fix drag transition problems
         setTimeout(function() {
           thisContext.transition = 'all .0s ease'
         }, 100)
 
       } else {
+
+        // show buttons 
+        this.buttonsVisible = true
         this.resetZoom()
       }
     },
@@ -308,6 +318,7 @@ export default {
       this.scale = 1
       this.left = 0
       this.top = 0
+      this.buttonsVisible = true
       this.canZoom = false
       this.isZooming = false
       this.transition = 'all .3s ease'
@@ -380,6 +391,15 @@ export default {
       this.$emit("close");
     },
 
+    // close event click outside
+    closeModal(event) {
+      var elements = '.cool-lightbox-button, .cool-lightbox-button *, .cool-lightbox__slide__img *, .cool-lightbox-video';
+      if (!event.target.matches(elements)) {
+        this.imgIndex = null;
+        this.$emit("close");
+      }
+    },
+
     // next slide event
     onNextClick() {
       if(this.hasNext) {
@@ -415,6 +435,7 @@ export default {
       if(this.isObject && (this.items[this.imgIndex].title || this.items[this.imgIndex].descripcion)) {
         const el = document.getElementsByClassName('cool-lightbox-caption');
         if(el.length > 0) {
+          console.log(el[0].offsetHeight)
           this.paddingBottom = el[0].offsetHeight
         } 
       } else {
@@ -536,9 +557,9 @@ export default {
     // Images wrapper styles to use drag and zoom
     imgWrapperStyle() {
       return {
-        transform: 'translate(-50%, -50%) scale('+this.scale+')',
-        top: `calc(50% + ${this.top}px)`,
-        left: `calc(50% + ${this.left}px)`,
+        transform: 'translate3d(calc(-50% + '+this.left+'px), calc(-50% + '+this.top+'px), 0px) scale3d('+this.scale+', '+this.scale+', '+this.scale+')',
+        top: `50%`,
+        left: `50%`,
         transition: this.transition,
       }
     }
@@ -599,6 +620,9 @@ $breakpoints: (
         cursor: -moz-grab;
         cursor: -webkit-grab; 
       }
+    }
+    .cool-lightbox-caption {
+      opacity: 0;
     }
   }
   * {
@@ -686,7 +710,9 @@ $breakpoints: (
       width: 100%;
       left: 50%;
       top: 50%;
-      transform: translate(-50%, -50%) scale(1);
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      transform: translate3d(-50%, -50%, 0px) scale3d(1, 1, 1);
       transition: all .3s ease;
       display: flex;
     }
@@ -744,6 +770,7 @@ $breakpoints: (
   font-size: 14px;
   font-weight: 400;
   left: 0;
+  opacity: 1;
   line-height: 1.5;
   padding: 18px 28px 16px 24px;
   pointer-events: none;
@@ -785,7 +812,7 @@ $breakpoints: (
 }
 
 .cool-lightbox-slide-change-enter-active, .cool-lightbox-slide-change-leave-active {
-  transition: opacity 0.33s;
+  transition: opacity 0.31s;
 }
 
 .cool-lightbox-slide-change-enter, .cool-lightbox-slide-change-leave-to  {
