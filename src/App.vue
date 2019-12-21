@@ -3,7 +3,6 @@
     <CoolLightBox 
       :items="items" 
       :index="index"
-      loop
       @close="index = null">
     </CoolLightBox>
 
@@ -30,13 +29,13 @@ export default {
         {
           title: 'Rocky mountain under blue and white sky',
           description: 'Photo by Guillaume Briard',
-          src: 'https://upload.wikimedia.org/wikipedia/commons/4/42/Shaqi_jrvej.jpg',
+          src: '/obra-1-single.jpg',
         },
         {
-          src: '/video.mp4',
+          src: '/obra-2.jpg',
         },
         {
-          src: 'https://upload.wikimedia.org/wikipedia/commons/4/42/Shaqi_jrvej.jpg'
+          src: '/picture-hero.jpg'
         }
       ],
       index: null

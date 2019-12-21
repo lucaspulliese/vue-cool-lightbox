@@ -6,6 +6,8 @@
       @click="closeModal"
       v-bind:style="{ 'padding-bottom': paddingBottom+'px'  }">
 
+      <div class="cool-lightbox__progressbar" :style="stylesInterval"></div>
+
       <div class="cool-lightbox__navigation">
         <button class="cool-lightbox-button cool-lightbox-button--prev" :class="buttonsClasses" v-show="hasPrevious || loop" @click="onPrevClick">
           <slot name="icon-previous">
@@ -82,6 +84,15 @@
       </transition>
       
       <div class="cool-lightbox-toolbar" :class="buttonsClasses">
+        <button class="cool-lightbox-toolbar__btn" @click="togglePlaySlideshow">
+          <svg xmlns="http://www.w3.org/2000/svg" v-if="!isPlayingSlideShow" viewBox="0 0 24 24">
+            <path d="M6.5 5.4v13.2l11-6.6z"></path>
+          </svg>
+          <svg xmlns="http://www.w3.org/2000/svg" v-else viewBox="0 0 24 24">
+            <path d="M8.33 5.75h2.2v12.5h-2.2V5.75zm5.15 0h2.2v12.5h-2.2V5.75z"></path>
+          </svg>
+        </button>
+
         <button class="cool-lightbox-toolbar__btn" @click="close">
           <slot name="close">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -108,11 +119,13 @@ export default {
       isVisible: false,
       paddingBottom: false,
 
+      // aspect ratio in videos
       aspectRatioVideo: {
         width: 'auto',
         height: 'auto',
       },
 
+      // props to bind styles
       buttonsVisible: true,
       scale: 1,
       top: 0,
@@ -123,11 +136,17 @@ export default {
       canZoom: false,
       isZooming: false,
       transition: 'all .3s ease',
+
+      // slideshow playing data
+      isPlayingSlideShow: false,
+      intervalProgress: null,
+      stylesInterval: {
+        'display': 'block'
+      }
     };
   },
 
   props: {
-
     index: {
       required: true
     },
@@ -142,7 +161,6 @@ export default {
       default: false,
     }
   },
-
 
   watch: {
     index(prev, val) {
@@ -171,7 +189,9 @@ export default {
         document.getElementsByTagName('html')[0].style = 'overflow: hidden';
       } else {
 
+        // hide and stop slideshow
         this.isVisible = false
+        this.stopSlideShow()
 
         // remove events listener
         window.removeEventListener('keydown', this.eventListener)
@@ -218,9 +238,59 @@ export default {
 
   methods: {
 
+    // toggle play slideshow event
+    togglePlaySlideshow() {
+      if(!this.hasNext && !this.loop) {
+        return false
+      }
+      this.isPlayingSlideShow = !this.isPlayingSlideShow
+
+      // if is playing move if not stop it
+      if(this.isPlayingSlideShow) {
+        this.move()
+      } else {
+        this.stopSlideShow()
+      }
+    },
+
+    stopSlideShow() {
+      this.isPlayingSlideShow = false
+      clearInterval(this.intervalProgress);
+      this.stylesInterval = {
+        'transform': 'scaleX(0)',
+        'transition': 'none',
+      }
+    },
+
+    move() {
+      const self = this
+      this.progressWidth = 100;
+      this.intervalProgress = setInterval(frame, 3000);
+      self.stylesInterval = {
+        'transform': 'scaleX(1)',
+      }
+      function frame() {
+        self.stylesInterval = {
+          'transform': 'scaleX(0)',
+          'transition': 'none',
+        }
+        
+        self.onNextClick(true)
+        if(!self.hasNext && !self.loop) {
+          self.stopSlideShow()
+        } else {
+          setTimeout(function() {
+            self.stylesInterval = {
+              'transform': 'scaleX(1)',
+            }
+          }, 1)
+        }
+      }
+    }, 
+
     // show buttons event
     showButtons(event) {
-      var elements = '.cool-lightbox-button, .cool-lightbox-button *';
+      var elements = '.cool-lightbox-button, .cool-lightbox-button *, .cool-lightbox-toolbar__btn, .cool-lightbox-toolbar__btn *';
       if (!event.target.matches(elements)) {
         const self = this
         setTimeout(function() {
@@ -273,7 +343,7 @@ export default {
 
     // zoom image event
     zoomImage() {
-      if(window.innerWidth < 600) {
+      if(window.innerWidth < 700) {
         return false
       }
 
@@ -364,7 +434,7 @@ export default {
 
       const thisContext = this
       let el = document.getElementsByClassName('cool-lightbox__slide');
-      if(window.innerWidth < 600) {
+      if(window.innerWidth < 700) {
 
         let width = el[0].clientWidth
         let height = Math.round((width/16)*9);
@@ -393,7 +463,11 @@ export default {
 
     // close event click outside
     closeModal(event) {
-      var elements = '.cool-lightbox-button, .cool-lightbox-button *, .cool-lightbox__slide__img *, .cool-lightbox-video';
+      if(window.innerWidth < 700) {
+        return false;
+      }
+
+      var elements = '.cool-lightbox-button, .cool-lightbox-toolbar__btn, .cool-lightbox-toolbar__btn *, .cool-lightbox-button *, .cool-lightbox__slide__img *, .cool-lightbox-video';
       if (!event.target.matches(elements)) {
         this.imgIndex = null;
         this.$emit("close");
@@ -401,7 +475,11 @@ export default {
     },
 
     // next slide event
-    onNextClick() {
+    onNextClick(isFromSlideshow = false) {
+      if(!isFromSlideshow) {
+        this.stopSlideShow()
+      }
+
       if(this.hasNext) {
         this.onIndexChange(this.imgIndex + 1)
       } else {
@@ -414,6 +492,7 @@ export default {
 
     // prev slide event
     onPrevClick() {
+      this.stopSlideShow();
       if(this.hasPrevious) {
         this.onIndexChange(this.imgIndex - 1)
       } else {
@@ -435,7 +514,6 @@ export default {
       if(this.isObject && (this.items[this.imgIndex].title || this.items[this.imgIndex].descripcion)) {
         const el = document.getElementsByClassName('cool-lightbox-caption');
         if(el.length > 0) {
-          console.log(el[0].offsetHeight)
           this.paddingBottom = el[0].offsetHeight
         } 
       } else {
@@ -605,6 +683,19 @@ $breakpoints: (
   right: 0;
   transition: all .3s ease;
   background: rgba(30, 30, 30, .9);
+  .cool-lightbox__progressbar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    z-index: 500;
+    transform-origin: 0;
+    background: red;
+    transform: scaleX(0);
+    transition: transform 3s linear;
+    display: block;
+  }
   &.cool-lightbox--can-zoom {
     .cool-lightbox__slide {
       img {
@@ -737,8 +828,7 @@ $breakpoints: (
     visibility: hidden;
   }
   .cool-lightbox-toolbar__btn {
-    background:
-  rgba(30,30,30,.6);
+    background: rgba(30,30,30,.6);
     border: 0;
     border-radius: 0;
     box-shadow: none;
@@ -750,8 +840,8 @@ $breakpoints: (
     transition: color .2s;
     vertical-align: top;
     visibility: inherit;
-    width: 36px;
-    height: 36px;
+    width: 40px;
+    height: 40px;
     color: #ccc;
     @include breakpoint(phone) {
       width: 44px;
@@ -812,7 +902,7 @@ $breakpoints: (
 }
 
 .cool-lightbox-slide-change-enter-active, .cool-lightbox-slide-change-leave-active {
-  transition: opacity 0.31s;
+  transition: opacity 0.27s;
 }
 
 .cool-lightbox-slide-change-enter, .cool-lightbox-slide-change-leave-to  {
