@@ -84,7 +84,7 @@
       </transition>
       
       <div class="cool-lightbox-toolbar" :class="buttonsClasses">
-        <button class="cool-lightbox-toolbar__btn" @click="togglePlaySlideshow">
+        <button v-if="this.slideshow" class="cool-lightbox-toolbar__btn" @click="togglePlaySlideshow">
           <svg xmlns="http://www.w3.org/2000/svg" v-if="!isPlayingSlideShow" viewBox="0 0 24 24">
             <path d="M6.5 5.4v13.2l11-6.6z"></path>
           </svg>
@@ -147,6 +147,7 @@ export default {
   },
 
   props: {
+
     index: {
       required: true
     },
@@ -159,6 +160,21 @@ export default {
     loop: {
       type: Boolean,
       default: false,
+    },
+
+    slideshow: {
+      type: Boolean,
+      default: true,
+    },
+
+    slideshowColorBar: {
+      type: String,
+      default: '#fa4242',
+    },
+
+    slideshowDuration: {
+      type: Number,
+      default: 3000,
     }
   },
 
@@ -240,6 +256,10 @@ export default {
 
     // toggle play slideshow event
     togglePlaySlideshow() {
+      if(!this.slideshow) {
+        return false
+      }
+
       if(!this.hasNext && !this.loop) {
         return false
       }
@@ -265,9 +285,11 @@ export default {
     move() {
       const self = this
       this.progressWidth = 100;
-      this.intervalProgress = setInterval(frame, 3000);
+      this.intervalProgress = setInterval(frame, this.slideshowDuration);
       self.stylesInterval = {
         'transform': 'scaleX(1)',
+        'background': this.slideshowColorBar,
+        'transition-duration': this.slideshowDuration+'ms',
       }
       function frame() {
         self.stylesInterval = {
@@ -282,6 +304,8 @@ export default {
           setTimeout(function() {
             self.stylesInterval = {
               'transform': 'scaleX(1)',
+              'background': self.slideshowColorBar,
+              'transition-duration': self.slideshowDuration+'ms',
             }
           }, 1)
         }
