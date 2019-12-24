@@ -530,7 +530,7 @@ export default {
     // index change
     onIndexChange(index) {
       this.imgIndex = index
-      this.$emit('onChange')
+      this.$emit('on-change', index)
     },
 
     // caption size 
