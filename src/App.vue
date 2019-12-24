@@ -35,7 +35,7 @@ export default {
           src: '/obra-2.jpg',
         },
         {
-          src: '/picture-hero.jpg'
+          src: 'https://www.youtube.com/watch?v=NvEGPTdNlS0'
         }
       ],
       index: null

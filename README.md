@@ -101,9 +101,12 @@ items: [
 
 | Attribute | type | Description | Default
 |:------| :------: | :------: |:------|
-| items| Array | Array of images/videos|  |
-| index| Number | Index of items to open |  |
-| loop | Boolean| Enables looping through items | false | 
+| items | Array | Array of images/videos|  |
+| index | Number | Index of items to open |  |
+| loop | Boolean| Enables looping through items | true | 
+| slideshow | Boolean | Enables lighbox slideshow | true | 
+| slideshowColorBar | String | Color of the slideshow progress bar | '#fa4242' | 
+| slideshowDuration | Number | Duration of slides when slideshow is running (in ms) | 3000 | 
 
 ### Slots Supported
 
@@ -111,7 +114,7 @@ items: [
 |:------ |:------|
 | icon-previous | Previous icon |
 | icon-next | Next icon |
-| iclose | Close icon |
+| close | Close icon |
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.

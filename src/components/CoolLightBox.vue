@@ -159,7 +159,7 @@ export default {
 
     loop: {
       type: Boolean,
-      default: false,
+      default: true,
     },
 
     slideshow: {
@@ -845,6 +845,7 @@ $breakpoints: (
   top: 0;
   right: 0;
   opacity: 1;
+  display: flex;
   transition: all .3s ease;
   visibility: visible;
   &.hidden {
