@@ -17,7 +17,7 @@
           </slot>
         </button>
 
-        <button class="cool-lightbox-button cool-lightbox-button--next" :class="buttonsClasses" v-show="hasNext || loop" @click="onNextClick">
+        <button class="cool-lightbox-button cool-lightbox-button--next" :class="buttonsClasses" v-show="hasNext || loop" @click="onNextClick(false)">
           <slot name="icon-next">
             <div>
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.4 12.97l-2.68 2.72 1.34 1.38L19 12l-4.94-5.07-1.34 1.38 2.68 2.72H5v1.94z"></path></svg>
@@ -285,7 +285,8 @@ export default {
     move() {
       const self = this
       this.progressWidth = 100;
-      this.intervalProgress = setInterval(frame, this.slideshowDuration);
+      this.intervalProgress = setInterval(frame, this.slideshowDuration + 90);
+      
       self.stylesInterval = {
         'transform': 'scaleX(1)',
         'background': this.slideshowColorBar,
@@ -307,7 +308,7 @@ export default {
               'background': self.slideshowColorBar,
               'transition-duration': self.slideshowDuration+'ms',
             }
-          }, 1)
+          }, 50)
         }
       }
     }, 
@@ -389,6 +390,7 @@ export default {
 
       // check if is zooming
       if(this.isZooming) {
+        this.stopSlideShow()
         this.scale = 1.6
 
         // hide buttons
@@ -412,10 +414,13 @@ export default {
       this.scale = 1
       this.left = 0
       this.top = 0
-      this.buttonsVisible = true
       this.canZoom = false
       this.isZooming = false
       this.transition = 'all .3s ease'
+      
+      if(window.innerWidth >= 700) {
+        this.buttonsVisible = true
+      }
     },
 
     // check if the image is bigger than the viewport
@@ -482,6 +487,7 @@ export default {
     // close event
     close() {
       this.imgIndex = null;
+      this.stopSlideShow();
       this.$emit("close");
     },
 

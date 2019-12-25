@@ -32,6 +32,9 @@ export default {
           src: '/obra-1-single.jpg',
         },
         {
+          src: 'https://www.youtube.com/watch?v=NvEGPTdNlS0'
+        },
+        {
           src: '/obra-2.jpg',
         },
         {
