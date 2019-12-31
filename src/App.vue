@@ -6,6 +6,13 @@
       @close="index = null">
     </CoolLightBox>
 
+    <CoolLightBoxSingle
+      thumb="https://via.placeholder.com/315x200"
+      full="https://via.placeholder.com/945x600"
+      :full-width="945"
+      :full-height="600"
+    />
+
     <div class="images-wrapper">
       <div
         class="image"
@@ -20,6 +27,7 @@
 
 <script>
 import CoolLightBox from './components/CoolLightBox.vue'
+import CoolLightBoxSingle from './components/CoolLightBoxSingle.vue'
 
 export default {
   name: "app",
@@ -41,11 +49,18 @@ export default {
           src: 'https://www.youtube.com/watch?v=NvEGPTdNlS0'
         }
       ],
-      index: null
+      item: {
+        title: 'Rocky mountain under blue and white sky',
+        description: 'Photo by Guillaume Briard',
+        src: '/obra-1-single.jpg',
+      },
+      
+      index: null,
     };
   },
   components: {
-    CoolLightBox
+    CoolLightBox,
+    CoolLightBoxSingle
   },
   methods: {
     setIndex(index) {

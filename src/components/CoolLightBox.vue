@@ -84,7 +84,7 @@
       </transition>
       
       <div class="cool-lightbox-toolbar" :class="buttonsClasses">
-        <button v-if="this.slideshow" class="cool-lightbox-toolbar__btn" @click="togglePlaySlideshow">
+        <button v-if="this.slideshow && items.length > 1" class="cool-lightbox-toolbar__btn" @click="togglePlaySlideshow">
           <svg xmlns="http://www.w3.org/2000/svg" v-if="!isPlayingSlideShow" viewBox="0 0 24 24">
             <path d="M6.5 5.4v13.2l11-6.6z"></path>
           </svg>
@@ -203,6 +203,10 @@ export default {
         // remove scroll
         document.getElementsByTagName('body')[0].style = 'overflow: hidden';
         document.getElementsByTagName('html')[0].style = 'overflow: hidden';
+
+        // emit opened event
+        this.$emit('opened', prev)
+        
       } else {
 
         // hide and stop slideshow
@@ -446,12 +450,6 @@ export default {
         
         if(height > heightWrapperImage) {
           thisContext.canZoom = true
-
-          thisContext.imgFullSize = {
-            height: height+'px',
-            width: width+'px'
-          }
-
         } else { 
           thisContext.canZoom = false
         }
