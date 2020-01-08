@@ -180,6 +180,11 @@ export default {
     srcName: {
       type: String,
       default: 'src',
+    },
+
+    overlayColor: {
+      type: String,
+      default: 'rgba(30, 30, 30, .9)'
     }
   },
 
@@ -580,7 +585,8 @@ export default {
     // lightbox styles
     lightboxStyles() {
       return { 
-        'padding-bottom': this.paddingBottom+'px'  
+        'padding-bottom': this.paddingBottom+'px',
+        'background-color': this.overlayColor,
       }
     },
 
@@ -726,7 +732,6 @@ $breakpoints: (
   justify-content: center;
   right: 0;
   transition: all .3s ease;
-  background: rgba(30, 30, 30, .9);
   .cool-lightbox__progressbar {
     position: absolute;
     top: 0;
@@ -735,7 +740,6 @@ $breakpoints: (
     height: 2px;
     z-index: 500;
     transform-origin: 0;
-    background: red;
     transform: scaleX(0);
     transition: transform 3s linear;
     display: block;
