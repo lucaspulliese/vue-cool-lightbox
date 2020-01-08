@@ -4,7 +4,7 @@
       v-bind:class="lightboxClasses" 
       v-if="isVisible" 
       @click="closeModal"
-      v-bind:style="{ 'padding-bottom': paddingBottom+'px'  }">
+      v-bind:style="lightboxStyles">
 
       <div class="cool-lightbox__progressbar" :style="stylesInterval"></div>
 
@@ -175,8 +175,12 @@ export default {
     slideshowDuration: {
       type: Number,
       default: 3000,
-    }
+    },
     
+    srcName: {
+      type: String,
+      default: 'src',
+    }
   },
 
   watch: {
@@ -573,6 +577,13 @@ export default {
 
   computed: {
 
+    // lightbox styles
+    lightboxStyles() {
+      return { 
+        'padding-bottom': this.paddingBottom+'px'  
+      }
+    },
+
     // get item src
     itemSrc() {
       if(this.imgIndex === null) {
@@ -581,7 +592,7 @@ export default {
 
       const item = this.items[this.imgIndex]
       if(this.isObject) {
-        return item.src
+        return item[this.srcName]
       }
 
       return item
