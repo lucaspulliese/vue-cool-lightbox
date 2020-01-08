@@ -11,7 +11,7 @@
       <div class="cool-lightbox__navigation">
         <button class="cool-lightbox-button cool-lightbox-button--prev" :class="buttonsClasses" v-show="hasPrevious || loop" @click="onPrevClick">
           <slot name="icon-previous">
-            <div>
+            <div class="cool-lightbox-button__icon">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11.28 15.7l-1.34 1.37L5 12l4.94-5.07 1.34 1.38-2.68 2.72H19v1.94H8.6z"></path></svg>
             </div>
           </slot>
@@ -19,7 +19,7 @@
 
         <button class="cool-lightbox-button cool-lightbox-button--next" :class="buttonsClasses" v-show="hasNext || loop" @click="onNextClick(false)">
           <slot name="icon-next">
-            <div>
+            <div class="cool-lightbox-button__icon">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.4 12.97l-2.68 2.72 1.34 1.38L19 12l-4.94-5.07-1.34 1.38 2.68 2.72H5v1.94z"></path></svg>
             </div>
           </slot>
@@ -176,6 +176,7 @@ export default {
       type: Number,
       default: 3000,
     }
+    
   },
 
   watch: {
@@ -202,7 +203,6 @@ export default {
 
         // remove scroll
         document.getElementsByTagName('body')[0].style = 'overflow: hidden';
-        document.getElementsByTagName('html')[0].style = 'overflow: hidden';
       } else {
 
         // hide and stop slideshow
@@ -214,7 +214,6 @@ export default {
 
         // remove styles avoid scroll
         document.getElementsByTagName('body')[0].style.overflow = '';
-        document.getElementsByTagName('html')[0].style.overflow = '';
 
         // remove click event
         window.removeEventListener('click', this.showButtons)
@@ -230,11 +229,13 @@ export default {
 
       this.$nextTick(() => {
 
-        // add caption padding to Lightbox wrapper
-        this.addCaptionPadding()
+        if(prev !== null) {
+          // add caption padding to Lightbox wrapper
+          this.addCaptionPadding()
 
-        // check if use can zoom
-        this.checkZoom()
+          // check if user can zoom
+          this.checkZoom()
+        }
 
         // reset zoom
         this.resetZoom()
@@ -273,6 +274,7 @@ export default {
       }
     },
 
+    // stop slideshow
     stopSlideShow() {
       this.isPlayingSlideShow = false
       clearInterval(this.intervalProgress);
@@ -282,6 +284,7 @@ export default {
       }
     },
 
+    // move event in zoom
     move() {
       const self = this
       this.progressWidth = 100;
@@ -785,9 +788,16 @@ $breakpoints: (
     &:hover {
       color: #fff;
     }
-    div {
+    > .cool-lightbox-button__icon {
       padding: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       background: rgba(30,30,30,.6);
+      > svg {
+        width: 100%;
+        height: 100%;
+      }
     }
     &.cool-lightbox-button--prev {
       left: 0;
@@ -864,7 +874,9 @@ $breakpoints: (
     border-radius: 0;
     box-shadow: none;
     cursor: pointer;
-    display: inline-block;
+    justify-content: center;
+    align-items: center;
+    display: inline-flex;
     margin: 0;
     padding: 9px;
     position: relative;
@@ -878,6 +890,10 @@ $breakpoints: (
       width: 44px;
       height: 44px;
       padding: 10px;
+    }
+    > svg {
+      width: 100%;
+      height: 100%;
     }
     &:hover {
       color: #FFFFFF;

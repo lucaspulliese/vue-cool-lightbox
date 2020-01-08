@@ -58,11 +58,19 @@ export default {
 <style>
 .images-wrapper {
   display: flex;
+  height: 100000px;
 }
 
 .image {
   height: 300px;
   width: 300px;
   display: block;
+  background-color: red;
+}
+
+body,
+html {
+  height: 100%; /* REMOVING THIS FIXES THE ISSUE */
+  scroll-behavior: smooth;
 }
 </style>
