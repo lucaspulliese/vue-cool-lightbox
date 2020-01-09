@@ -105,8 +105,10 @@ items: [
 | index | Number | Index of items to open |  |
 | loop | Boolean| Enables looping through items | true | 
 | slideshow | Boolean | Enables lighbox slideshow | true | 
-| slideshowColorBar | String | Color of the slideshow progress bar | '#fa4242' | 
+| slideshowColorBar | String | Color of the slideshow progress bar | #fa4242 | 
 | slideshowDuration | Number | Duration of slides when slideshow is running (in ms) | 3000 | 
+| srcName | String | Name of the prop to use as image/video url | src | 
+| overlayColor | String | Overlay color | rgba(30, 30, 30, .9) | 
 
 ### Slots Supported
 
