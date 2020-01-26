@@ -22,7 +22,7 @@
               <path d="M6.5 5.4v13.2l11-6.6z"></path>
             </svg>
 
-            <img :src="itemThumb(getItemSrc(itemIndex))" alt="" />
+            <img :src="itemThumb(getItemSrc(itemIndex), itemIndex)" alt="" />
           </button>
         </div>
       </div>
@@ -220,6 +220,11 @@ export default {
       type: String,
       default: 'src',
     },
+    
+    srcThumb: {
+      type: String,
+      default: 'thumb',
+    },
 
     overlayColor: {
       type: String,
@@ -310,7 +315,12 @@ export default {
   methods: {
 
     // get video url
-    itemThumb(itemUrl) {
+    itemThumb(itemUrl, itemIndex) {
+      
+      var thumb = this.getItemThumb(itemIndex)
+      if(thumb !== undefined && thumb !== null) {
+        return thumb
+      }
 
       var youtubeID = this.getYoutubeID(itemUrl)
       if(youtubeID) {
@@ -334,6 +344,19 @@ export default {
       const item = this.items[imgIndex]
       if(this.isObject) {
         return item[this.srcName]
+      }
+
+      return item
+    },
+    
+    getItemThumb(imgIndex) {
+      if(imgIndex === null) {
+        return false
+      }
+
+      const item = this.items[imgIndex]
+      if(this.isObject) {
+        return item[this.srcThumb]
       }
 
       return item
