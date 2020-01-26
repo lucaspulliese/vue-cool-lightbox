@@ -22,7 +22,7 @@ export default {
 ```
 
 ## Examples
-You can check the examples here (the page is under construction): [https://vue-cool-lightbox.lucaspulliese.com/](https://vue-cool-lightbox.lucaspulliese.com/).
+You can see the full documentation here: [https://vue-cool-lightbox.lucaspulliese.com/](https://vue-cool-lightbox.lucaspulliese.com/).
 
 ## Usage
 
@@ -96,6 +96,7 @@ items: [
 | src | yes | string |media source, it can be an image or a Youtube / Vimeo / Mp4 video |
 | title | no | string | the image title |
 | description | no | string | the image description |
+| thumb | no | string | thumb url used in thumbs block |
 
 ### Props Supported
 
@@ -108,6 +109,7 @@ items: [
 | slideshowColorBar | String | Color of the slideshow progress bar | #fa4242 | 
 | slideshowDuration | Number | Duration of slides when slideshow is running (in ms) | 3000 | 
 | srcName | String | Name of the prop to use as image/video url | src | 
+| srcThumb | String | Name of the prop to use as image/video thumb | thumb | 
 | overlayColor | String | Overlay color | rgba(30, 30, 30, .9) | 
 
 ### Slots Supported
