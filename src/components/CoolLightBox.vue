@@ -316,9 +316,9 @@ export default {
 
     // get video url
     itemThumb(itemUrl, itemIndex) {
-      
+
       var thumb = this.getItemThumb(itemIndex)
-      if(thumb !== undefined && thumb !== null) {
+      if(thumb) {
         return thumb
       }
 
@@ -342,7 +342,7 @@ export default {
       }
 
       const item = this.items[imgIndex]
-      if(this.isObject) {
+      if(this.checkIfIsObject(imgIndex)) {
         return item[this.srcName]
       }
 
@@ -355,8 +355,12 @@ export default {
       }
 
       const item = this.items[imgIndex]
-      if(this.isObject) {
+      if(this.checkIfIsObject(imgIndex)) {
         return item[this.srcThumb]
+      } 
+
+      if(this.isVideo(item)) {
+        return false
       }
 
       return item
@@ -734,6 +738,15 @@ export default {
       }
 
       return false
+    },
+
+    // check if item is object
+    checkIfIsObject(itemIndex) {
+      const item = this.items[itemIndex]
+      if(typeof item === 'object' && item !== null) {
+        return true
+      }
+      return false;
     },
 
     // arrows and escape events
