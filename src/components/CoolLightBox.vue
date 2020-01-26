@@ -11,9 +11,18 @@
           <button 
             v-for="(item, itemIndex) in items"
             :key="itemIndex"
-            @click="setIndex(itemIndex)"
+            :class="{ 
+              active: itemIndex === imgIndex,
+              'is-video': isVideo(getItemSrc(itemIndex)) 
+            }"
+            @click="imgIndex = itemIndex"
             class="cool-lightbox__thumb">
-            <img :src="getItemSrc(itemIndex)" alt="" />
+
+            <svg class="cool-lightbox__thumb__icon" xmlns="http://www.w3.org/2000/svg" v-if="isVideo(getItemSrc(itemIndex))" viewBox="0 0 24 24">
+              <path d="M6.5 5.4v13.2l11-6.6z"></path>
+            </svg>
+
+            <img :src="itemThumb(getItemSrc(itemIndex))" alt="" />
           </button>
         </div>
       </div>
@@ -299,6 +308,22 @@ export default {
   },
 
   methods: {
+
+    // get video url
+    itemThumb(itemUrl) {
+
+      var youtubeID = this.getYoutubeID(itemUrl)
+      if(youtubeID) {
+        return 'https://img.youtube.com/vi/'+youtubeID+'/mqdefault.jpg'
+      }
+
+      var vimeoID = this.getVimeoID(itemUrl)
+      if(vimeoID) {
+        return false
+      }
+
+      return itemUrl
+    },
     
     // get item src
     getItemSrc(imgIndex) {
@@ -559,7 +584,7 @@ export default {
         return false;
       }
 
-      var elements = '.cool-lightbox-button, .cool-lightbox-toolbar__btn, .cool-lightbox-toolbar__btn *, .cool-lightbox-button *, .cool-lightbox__slide__img *, .cool-lightbox-video';
+      var elements = '.cool-lightbox-thumbs, .cool-lightbox-thumbs *, .cool-lightbox-button, .cool-lightbox-toolbar__btn, .cool-lightbox-toolbar__btn *, .cool-lightbox-button *, .cool-lightbox__slide__img *, .cool-lightbox-video';
       if (!event.target.matches(elements)) {
         this.imgIndex = null;
         this.$emit("close");
@@ -611,6 +636,81 @@ export default {
       } else {
         this.paddingBottom = 60
       }
+    },
+
+    // check if is video
+    isVideo(itemSrc) {
+
+      if(this.getYoutubeUrl(itemSrc) || this.getVimeoUrl(itemSrc) || this.checkIsMp4(itemSrc)) {
+        return true
+      }
+
+      return false
+    },
+    
+    // getYoutube ID
+    getYoutubeID(url) {
+      // youtube data
+      const youtubeRegex = /^(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/;
+      const ytId = (url.match(youtubeRegex)) ? RegExp.$1 : false;
+
+      if(ytId) {
+        return ytId
+      }
+
+      return false
+    },
+
+    // get youtube url
+    getYoutubeUrl(url) {
+
+      // youtube data
+      const youtubeRegex = /^(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/;
+      const ytId = (url.match(youtubeRegex)) ? RegExp.$1 : false;
+
+      // if is youtube video
+      if(ytId) {
+        return 'https://www.youtube.com/embed/'+ytId
+      }
+
+      return false
+    },
+
+    // vimeo ID
+    getVimeoID(url) {
+      
+      // if is vimeo video
+      const result = url.match(/(?:www\.|player\.)?vimeo.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|album\/(?:\d+)\/video\/|video\/|)(\d+)(?:[a-zA-Z0-9_\-]+)?/i);
+      if(result !== null) {
+        return result[1]
+      }
+
+      return false
+    },
+
+    // get vimeo url
+    getVimeoUrl(url) {
+
+      // if is vimeo video
+      const result = url.match(/(?:www\.|player\.)?vimeo.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|album\/(?:\d+)\/video\/|video\/|)(\d+)(?:[a-zA-Z0-9_\-]+)?/i);
+      if(result !== null) {
+        return '//player.vimeo.com/video/'+result[1]+'?hd=1&show_title=1&show_byline=1&show_portrait=0&fullscreen=1'
+      }
+
+      return false
+    },
+
+    checkIsMp4(url) {
+      if(this.imgIndex === null) {
+        return false
+      }
+
+      const str = new String(url);
+      if(str.endsWith('.mp4')){
+        return url
+      }
+
+      return false
     },
 
     // arrows and escape events
@@ -674,21 +774,18 @@ export default {
         return false
       }
 
-      // youtube data
+      var urlReturn
       const url = this.itemSrc
-      const youtubeRegex = /^(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/;
-      const ytId = (url.match(youtubeRegex)) ? RegExp.$1 : false;
 
-      // if is youtube video
-      if(ytId) {
-        return 'https://www.youtube.com/embed/'+ytId
+      urlReturn = this.getYoutubeUrl(url) 
+      if(urlReturn) {
+        return urlReturn
       }
-
-      // if is vimeo video
-      const result = url.match(/(?:www\.|player\.)?vimeo.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|album\/(?:\d+)\/video\/|video\/|)(\d+)(?:[a-zA-Z0-9_\-]+)?/i);
-      if(result !== null) {
-        return '//player.vimeo.com/video/'+result[1]+'?hd=1&show_title=1&show_byline=1&show_portrait=0&fullscreen=1'
-      }
+      
+      urlReturn = this.getVimeoUrl(url)
+      if(urlReturn) {
+        return urlReturn
+      } 
 
       if(this.isMp4) {
         return url
@@ -790,28 +887,115 @@ $breakpoints: (
   .cool-lightbox-thumbs {
     position: absolute;
     height: 100vh;
-    overflow: auto;
-    width: 212px;
-    right: -212px;
+    overflow-y: auto;
+    width: 102px;
+    right: -102px;
     top: 0;
+    overflow-x: hidden;
     transition: all .3s ease;
     background-color: #ddd;
+    scrollbar-width: thin;
+    scrollbar-color: #fa4242 rgba(175, 175, 175, 0.9);
+    &::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    &::-webkit-scrollbar-button {
+      width: 0px;
+      height: 0px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: #fa4242;
+      border: 0px none #ffffff;
+      border-radius: 50px;
+    }
+    &::-webkit-scrollbar-thumb:hover {
+      background: #ffffff;
+    }
+    &::-webkit-scrollbar-thumb:active {
+      background: #000000;
+    }
+    &::-webkit-scrollbar-track {
+      background: #e1e1e1;
+      border: 0px none #ffffff;
+      border-radius: 8px;
+    }
+    &::-webkit-scrollbar-track:hover {
+      background: #666666;
+    }
+    &::-webkit-scrollbar-track:active {
+      background: #333333;
+    }
+    &::-webkit-scrollbar-corner {
+      background: transparent;
+    }
+    @include breakpoint(phone) {
+      width: 212px;
+      right: -212px;
+    }
     .cool-lightbox-thumbs__list {
       display: flex;
       flex-wrap: wrap;
       padding: 2px;
-      margin-right: -2px;
+      padding-right: 0;
       .cool-lightbox__thumb {
         background-color: black;
-        width: calc(100%/2 - 2px);
+        width: 100%;
         margin-right: 2px;
         margin-bottom: 2px;
         display: block;
         height: 75px;
+        position: relative;
+        @include breakpoint(phone) {
+          width: calc(100%/2 - 2px);
+        }
+        &:before {
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          opacity: 0;
+          content: '';
+          z-index: 150;
+          transition: all .3s ease;
+          position: absolute;
+          visibility: hidden;
+          border: 3px solid #fa4242;
+        }
         img {
           width: 100%;
           height: 100%;
           object-fit: cover;
+        }
+        &.is-video {
+          .cool-lightbox__thumb__icon {
+            position: absolute;
+            z-index: 100;
+            top: 50%;
+            left: 50%;
+            width: 25px;
+            height: 25px;
+            transform: translate(-50%,-50%);
+            path {
+              fill: #FFF;
+            }
+          }
+          &:after {
+            content: '';
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 50;
+            position: absolute;
+            background: rgba(0,0,0, 0.6);
+          }
+        }
+        &.active, &:hover {
+          &:before {
+            opacity: 1;
+            visibility: visible;
+          }
         }
       }
     }
@@ -823,6 +1007,7 @@ $breakpoints: (
     top: 0;
     left: 0;
     right: 0;
+    overflow: hidden;
     transition: all .3s ease;
   }
   .cool-lightbox__progressbar {
@@ -859,7 +1044,10 @@ $breakpoints: (
   }
   &.cool-lightbox--show-thumbs {
     .cool-lightbox__inner {
-      right: 212px;
+      right: 102px;
+      @include breakpoint(phone) {
+        right: 212px;
+      }
     }
     .cool-lightbox-thumbs {
       right: 0;
