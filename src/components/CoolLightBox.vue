@@ -61,8 +61,7 @@
                   draggable="false"
                   
                   @click="zoomImage"
-                  
-                  @load="imageLoading = false"
+                  @load="imageLoaded"
                   @mousedown="handleMouseDown($event)"
                   @mouseup="handleMouseUp($event)"
                   @mousemove="handleMouseMove($event)"
@@ -286,7 +285,9 @@ export default {
 
           // if is an image change imageLoading to true
           if(!this.videoUrl) {
-            this.imageLoading = true
+            if(!this.is_cached(this.itemSrc)) {
+              this.imageLoading = true
+            }
           }
 
           // add caption padding to Lightbox wrapper
@@ -313,6 +314,18 @@ export default {
   },
 
   methods: {
+    // check if the image is
+    is_cached(src) {
+      var image = new Image();
+      image.src = src;
+
+      return image.complete;
+    },
+
+    // image loaded event
+    imageLoaded() {
+      this.imageLoading = false
+    },
 
     // get video url
     itemThumb(itemUrl, itemIndex) {
@@ -677,6 +690,7 @@ export default {
     
     // getYoutube ID
     getYoutubeID(url) {
+      
       // youtube data
       const youtubeRegex = /^(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/;
       const ytId = (url.match(youtubeRegex)) ? RegExp.$1 : false;
@@ -692,8 +706,7 @@ export default {
     getYoutubeUrl(url) {
 
       // youtube data
-      const youtubeRegex = /^(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/;
-      const ytId = (url.match(youtubeRegex)) ? RegExp.$1 : false;
+      const ytId = this.getYoutubeID(url)
 
       // if is youtube video
       if(ytId) {
