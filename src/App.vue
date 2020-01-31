@@ -29,13 +29,13 @@ export default {
         {
           title: 'Rocky mountain under blue and white sky',
           description: 'Photo by Guillaume Briard',
-          src: '/obra-1-single.jpg',
+          src: 'https://www.cheatsheet.com/wp-content/uploads/2019/04/Planet-Earth.jpg',
         },
         {
           src: 'https://www.youtube.com/watch?v=NvEGPTdNlS0'
         },
         {
-          src: '/obra-2.jpg',
+          src: 'https://www.cheatsheet.com/wp-content/uploads/2019/04/Planet-Earth.jpg',
         },
         {
           src: 'https://www.youtube.com/watch?v=NvEGPTdNlS0'
