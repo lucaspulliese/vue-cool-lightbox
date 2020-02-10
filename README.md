@@ -100,7 +100,7 @@ items: [
 
 ### Props Supported
 
-| Attribute | type | Description | Default
+| Attribute | type | Description | Default |
 |:------| :------: | :------: |:------|
 | items | Array | Array of images/videos|  |
 | index | Number | Index of items to open |  |
@@ -111,14 +111,23 @@ items: [
 | srcName | String | Name of the prop to use as image/video url | src | 
 | srcThumb | String | Name of the prop to use as image/video thumb | thumb | 
 | overlayColor | String | Overlay color | rgba(30, 30, 30, .9) | 
+| zIndex | Number | .cool-lightbox z-index | 9999 | 
 
 ### Slots Supported
 
-| Name| Description 
+| Name| Description |
 |:------ |:------|
 | icon-previous | Previous icon |
 | icon-next | Next icon |
 | close | Close icon |
+
+### Events Supported
+
+| Name | Attributes | Listen to | Description |
+|:------ |:------| :------ |:------|
+| OnChange | (indexItem) | @on-change | Emitted when the lightbox changes the item index |
+| OnOpen | (indexItem) | @on-open | Emitted when the lightbox is opened |
+| Close | (indexItem) | @close | Emitted when the lightbox is closed |
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.

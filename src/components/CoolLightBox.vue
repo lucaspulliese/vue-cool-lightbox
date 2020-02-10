@@ -287,7 +287,7 @@ export default {
       this.$nextTick(() => {
 
         if(prev !== null & val === null) {
-          this.$emit("onOpen", prev);
+          this.$emit("on-open", prev);
         }
 
         if(prev !== null) {
@@ -622,9 +622,9 @@ export default {
 
     // close event
     close() {
-      this.imgIndex = null;
       this.stopSlideShow();
-      this.$emit("close");
+      this.$emit("close", this.imgIndex);
+      this.imgIndex = null;
     },
 
     // close event click outside
@@ -635,8 +635,7 @@ export default {
 
       var elements = '.cool-lightbox-thumbs, .cool-lightbox-thumbs *, .cool-lightbox-button, .cool-lightbox-toolbar__btn, .cool-lightbox-toolbar__btn *, .cool-lightbox-button *, .cool-lightbox__slide__img *, .cool-lightbox-video';
       if (!event.target.matches(elements)) {
-        this.imgIndex = null;
-        this.$emit("close");
+        this.close()
       }
     },
 
