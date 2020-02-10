@@ -1,10 +1,10 @@
 # Vue-cool-lightbox
 
-Vue-cool-lightbox is a Vue.js lightbox component without any dependencies, inspired by [fancybox](http://fancyapps.com/fancybox/3/) with zoom and videos supported
+Vue-cool-lightbox is a pretty Vue.js lightbox component without any dependencies, inspired by [fancybox](http://fancyapps.com/fancybox/3/) with zoom and videos supported
 
 ## Installation
 
-Use the node package manager to install vue-cool-lightbox.
+Use node package manager to install vue-cool-lightbox.
 
 ```bash
 npm install --save vue-cool-lightbox

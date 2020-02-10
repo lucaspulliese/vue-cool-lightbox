@@ -228,6 +228,11 @@ export default {
     overlayColor: {
       type: String,
       default: 'rgba(30, 30, 30, .9)'
+    },
+
+    zIndex: {
+      type: Number,
+      default: 9999,
     }
   },
 
@@ -280,6 +285,10 @@ export default {
       this.imgIndex = prev;
 
       this.$nextTick(() => {
+
+        if(prev !== null & val === null) {
+          this.$emit("onOpen", prev);
+        }
 
         if(prev !== null) {
 
@@ -784,6 +793,7 @@ export default {
     // lightbox styles
     lightboxStyles() {
       return { 
+        'z-index': this.zIndex,
         'background-color': this.overlayColor,
       }
     },
@@ -928,7 +938,6 @@ $breakpoints: (
   bottom: 0;
   top: 0;
   display: flex;
-  z-index: 9999999;
   align-items: center;
   justify-content: center;
   right: 0;
