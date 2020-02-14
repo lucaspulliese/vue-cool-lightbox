@@ -1,7 +1,7 @@
 {
   "name": "vue-cool-lightbox",
   "description": "A pretty Vue.js component to display an image gallery lightbox inspired by fancybox",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "private": false,
   "author": "Lucas Pulliese <lucaspulliese10@gmail.com>",
   "license": "MIT",
@@ -31,34 +31,36 @@
   },
   "homepage": "https://vue-cool-lightbox.lucaspulliese.com",
   "dependencies": {
-    "core-js": "^3.3.2",
     "vue": "^2.6.10"
   },
   "main": "dist/vue-cool-lightbox.umd.js",
   "module": "dist/vue-cool-lightbox.esm.js",
   "unpkg": "dist/vue-cool-lightbox.min.js",
+  "style": "./dist/vue-cool-lightbox.min.css",
   "browser": {
     "./sfc": "src/components/vue-cool-lightbox.vue"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "^4.0.0",
-    "@vue/cli-plugin-eslint": "^4.0.0",
-    "@vue/cli-service": "^4.0.0",
+    "@vue/cli-plugin-babel": "^4.2.2",
+    "@vue/cli-plugin-eslint": "^4.2.2",
+    "@vue/cli-service": "^4.2.2",
     "babel-eslint": "^10.0.3",
+    "cross-env": "^5.2.0",
     "eslint": "^5.16.0",
     "eslint-plugin-vue": "^5.0.0",
-    "node-sass": "^4.12.0",
-    "sass-loader": "^8.0.0",
-    "vue-template-compiler": "^2.6.10",
-    "cross-env": "^5.2.0",
     "minimist": "^1.2.0",
+    "node-sass": "^4.13.1",
     "rollup": "^1.14.4",
     "rollup-plugin-buble": "^0.19.6",
     "rollup-plugin-commonjs": "^9.3.4",
     "rollup-plugin-replace": "^2.2.0",
     "rollup-plugin-uglify-es": "0.0.1",
     "rollup-plugin-vue": "^4.7.2",
-    "serialize-javascript": ">=2.1.1"
+    "sass-loader": "^8.0.0",
+    "serialize-javascript": ">=2.1.1",
+    "core-js": "^3.3.2",
+    "rollup-plugin-css-only": "^2.0.0",
+    "vue-template-compiler": "^2.6.10"
   },
   "eslintConfig": {
     "root": false,
