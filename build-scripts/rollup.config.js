@@ -7,31 +7,82 @@ import minimist from "minimist";
 
 const argv = minimist(process.argv.slice(2));
 
-const config = {
-  input: "src/index.js",
-  output: {
-    name: "CoolLightBox",
-    exports: "named"
-  },
-  plugins: [
-    replace({
-      "process.env.NODE_ENV": JSON.stringify("production")
-    }),
-    commonjs(),
-    vue({
-      css: true,
-      compileTemplate: true,
-      template: {
-        isProduction: true,
-      }
-    }),
-    buble()
-  ]
-};
+var config;
 
 // Only minify browser (iife) version
 if (argv.format === "iife") {
-  config.plugins.push(uglify());
+  config = {
+    input: "src/index.js",
+    output: {
+      name: "CoolLightBox",
+      exports: "named"
+    },
+    plugins: [
+      replace({
+        "process.env.NODE_ENV": JSON.stringify("production")
+      }),
+      uglify(),
+      commonjs(),
+      vue({
+        css: true,
+        compileTemplate: true,
+        template: {
+          isProduction: true,
+        }
+      }),
+      buble()
+    ]
+  };
+}
+
+if (argv.format === "es") {
+  config = {
+    input: "src/index.js",
+    output: {
+      name: "CoolLightBox",
+      exports: "named"
+    },
+    plugins: [
+      replace({
+        "process.env.NODE_ENV": JSON.stringify("production")
+      }),
+      commonjs(),
+      vue({
+        css: true,
+        compileTemplate: true,
+        template: {
+          isProduction: true,
+        }
+      }),
+      buble()
+    ]
+  };
+}
+
+// Only add SSR to umd version
+if (argv.format === "umd") {
+  config = {
+    input: "src/index.js",
+    output: {
+      name: "CoolLightBox",
+      exports: "named"
+    },
+    plugins: [
+      replace({
+        "process.env.NODE_ENV": JSON.stringify("production")
+      }),
+      commonjs(),
+      vue({
+        css: true,
+        compileTemplate: true,
+        template: {
+          optimizeSSR: true,
+          isProduction: true
+        }
+      }),
+      buble()
+    ]
+  };
 }
 
 export default config;
