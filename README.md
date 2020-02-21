@@ -112,6 +112,7 @@ items: [
 | srcThumb | String | Name of the prop to use as image/video thumb | thumb | 
 | overlayColor | String | Overlay color | rgba(30, 30, 30, .9) | 
 | zIndex | Number | .cool-lightbox z-index | 9999 | 
+| gallery | Boolean | Enable/disable gallery | true | 
 
 ### Slots Supported
 

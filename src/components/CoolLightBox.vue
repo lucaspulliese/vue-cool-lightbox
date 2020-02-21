@@ -6,7 +6,7 @@
       @click="closeModal"
       v-bind:style="lightboxStyles">
 
-      <div class="cool-lightbox-thumbs">
+      <div v-if="gallery" class="cool-lightbox-thumbs">
         <div class="cool-lightbox-thumbs__list">
           <button 
             type="button"
@@ -118,7 +118,7 @@
             </svg>
           </button>
 
-          <button type="button" @click="showThumbs = !showThumbs" v-if="items.length > 1" class="cool-lightbox-toolbar__btn">
+          <button type="button" @click="showThumbs = !showThumbs" v-if="items.length > 1 && gallery" class="cool-lightbox-toolbar__btn">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
               <path d="M14.59 14.59h3.76v3.76h-3.76v-3.76zm-4.47 
               0h3.76v3.76h-3.76v-3.76zm-4.47 0h3.76v3.76H5.65v-3.76zm8.94-4.47h3.76v3.76h-3.76v-3.76zm-4.47 
@@ -234,7 +234,12 @@ export default {
     zIndex: {
       type: Number,
       default: 9999,
-    }
+    },
+
+    gallery: {
+      type: Boolean,
+      default: true,
+    },
   },
 
   watch: {
