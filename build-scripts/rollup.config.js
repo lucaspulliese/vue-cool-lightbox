@@ -1,9 +1,19 @@
+/**************************************************************************
+ * IMPORTS
+ ***************************************************************************/
+
 import vue from "rollup-plugin-vue";
 import buble from "rollup-plugin-buble";
 import commonjs from "rollup-plugin-commonjs";
 import replace from "rollup-plugin-replace";
 import uglify from "rollup-plugin-uglify-es";
 import minimist from "minimist";
+import css from 'rollup-plugin-css-only';
+
+/**************************************************************************
+ * ROLLUP CONFIGURATION
+ * https://rollupjs.org/guide/en/
+ ***************************************************************************/
 
 const argv = minimist(process.argv.slice(2));
 
@@ -23,8 +33,9 @@ if (argv.format === "iife") {
       }),
       uglify(),
       commonjs(),
+      css({ output: 'dist/vue-cool-lightbox.min.css'}),
       vue({
-        css: true,
+        css: false,
         compileTemplate: true,
         template: {
           isProduction: true,
@@ -47,8 +58,9 @@ if (argv.format === "es") {
         "process.env.NODE_ENV": JSON.stringify("production")
       }),
       commonjs(),
+      css({ output: 'dist/vue-cool-lightbox.min.css'}),
       vue({
-        css: true,
+        css: false,
         compileTemplate: true,
         template: {
           isProduction: true,
@@ -71,9 +83,10 @@ if (argv.format === "umd") {
       replace({
         "process.env.NODE_ENV": JSON.stringify("production")
       }),
+      css({ output: 'dist/vue-cool-lightbox.min.css'}),
       commonjs(),
       vue({
-        css: true,
+        css: false,
         compileTemplate: true,
         template: {
           optimizeSSR: true,

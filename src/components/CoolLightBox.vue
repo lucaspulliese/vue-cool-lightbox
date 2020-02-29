@@ -68,8 +68,13 @@
                   @mousemove="handleMouseMove($event)"
                   />
                 </transition>
-
-                <div v-show="imageLoading" class="cool-lightbox-loading"></div>
+                
+                <div v-show="imageLoading" class="cool-lightbox-loading-wrapper">
+                  <slot name="loading">
+                    <div class="cool-lightbox-loading"></div>
+                  </slot>
+                </div>
+                <!--/loading-wrapper-->
               </div>
               <!--/imgs-slide-->
             
@@ -1326,21 +1331,23 @@ $breakpoints: (
   opacity: 0;
 }
 
-.cool-lightbox-loading {
-  animation: cool-lightbox-rotate 1s linear infinite;
-  background: transparent;
-  border: 4px solid #888;
-  border-bottom-color: #fff;
-  border-radius: 50%;
-  height: 50px;
-  left: 50%;
-  margin: -25px 0 0 -25px;
-  opacity: .7;
-  padding: 0;
-  position: absolute;
+.cool-lightbox-loading-wrapper {
   top: 50%;
-  width: 50px;
-  z-index: 500;
+  left: 50%;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  .cool-lightbox-loading {
+    animation: cool-lightbox-rotate 1s linear infinite;
+    background: transparent;
+    border: 4px solid #888;
+    border-bottom-color: #fff;
+    border-radius: 50%;
+    height: 50px;
+    opacity: .7;
+    padding: 0;
+    width: 50px;
+    z-index: 500;
+  }
 }
 
 @keyframes cool-lightbox-rotate {

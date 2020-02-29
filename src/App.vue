@@ -32,7 +32,7 @@ export default {
           src: 'https://www.cheatsheet.com/wp-content/uploads/2019/04/Planet-Earth.jpg',
         },
         {
-          src: 'https://www.youtube.com/watch?v=NvEGPTdNlS0'
+          src: 'https://upload.wikimedia.org/wikipedia/commons/b/b2/Rote_Ruhrarmee_1920.jpg'
         },
         {
           src: 'https://www.cheatsheet.com/wp-content/uploads/2019/04/Planet-Earth.jpg',

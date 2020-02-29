@@ -1,7 +1,7 @@
 {
   "name": "vue-cool-lightbox",
   "description": "A pretty Vue.js component to display an image gallery lightbox inspired by fancybox",
-  "version": "1.0.13",
+  "version": "1.1.0",
   "private": false,
   "author": "Lucas Pulliese <lucaspulliese10@gmail.com>",
   "license": "MIT",
@@ -44,6 +44,7 @@
     "@vue/cli-plugin-eslint": "^4.2.2",
     "@vue/cli-service": "^4.2.2",
     "babel-eslint": "^10.0.3",
+    "core-js": "^3.3.2",
     "cross-env": "^5.2.0",
     "eslint": "^5.16.0",
     "eslint-plugin-vue": "^5.0.0",
@@ -52,12 +53,12 @@
     "rollup": "^1.14.4",
     "rollup-plugin-buble": "^0.19.6",
     "rollup-plugin-commonjs": "^9.3.4",
+    "rollup-plugin-css-only": "^2.0.0",
     "rollup-plugin-replace": "^2.2.0",
     "rollup-plugin-uglify-es": "0.0.1",
     "rollup-plugin-vue": "^4.7.2",
     "sass-loader": "^8.0.0",
     "serialize-javascript": ">=2.1.1",
-    "core-js": "^3.3.2",
     "vue-template-compiler": "^2.6.10"
   },
   "eslintConfig": {
