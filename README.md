@@ -124,6 +124,7 @@ items: [
 | icon-previous | Previous icon |
 | icon-next | Next icon |
 | close | Close icon |
+| loading | Loading animation |
 
 ### Events Supported
 
