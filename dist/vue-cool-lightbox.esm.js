@@ -146,11 +146,32 @@
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 var script = {
 
   data: function data() {
     return {
+      // swipe data
+      initialMouseX: 0,
+      endMouseX: 0,
+      IsSwipping: false,
+      isDraggingSwipe: false,
+
       // styles data
       imgIndex: this.index,
       isVisible: false,
@@ -158,7 +179,7 @@ var script = {
       imageLoading: false,
       showThumbs: false,
 
-      // aspect ratio in videos
+      // aspect ratio videos
       aspectRatioVideo: {
         width: 'auto',
         height: 'auto',
@@ -186,7 +207,6 @@ var script = {
   },
 
   props: {
-
     index: {
       required: true
     },
@@ -323,14 +343,67 @@ var script = {
     }, 
   },
 
-  mounted: function mounted() {
-  },
-
-  destroyed: function destroyed() {
-  },
-
   methods: {
-    // check if the image is
+    // start swipe event
+    startSwipe: function startSwipe(event) {
+      this.isDraggingSwipe = true;
+      this.initialMouseX = this.getMouseXPosFromEvent(event);
+    },
+
+    continueSwipe: function continueSwipe(event) {
+      if(this.isDraggingSwipe) {
+        this.IsSwipping = true;
+
+        if(event.type === 'touchmove') {
+          this.endMouseX = this.getMouseXPosFromEvent(event);
+        }
+      }
+    },
+    
+    // end swipe event
+    endSwipe: function endSwipe(event) {
+      var self = this;
+      this.isDraggingSwipe = false;
+
+      // touch end fixes
+      if(event.type !== 'touchend') {
+        this.endMouseX = this.getMouseXPosFromEvent(event);
+      } else {
+        if(this.endMouseX === 0) {
+          return;
+        }
+      }
+
+      if((this.endMouseX - this.initialMouseX === 0) || this.isZooming) {
+        return;
+      } 
+
+      // if the swipe is to the left
+      if((this.endMouseX - this.initialMouseX) < -50) {
+        this.onNextClick();
+      } 
+
+      // if the swipe is to the right
+      if((this.endMouseX - this.initialMouseX) > 50) {
+        this.onPrevClick();
+      }
+
+      setTimeout(function() {
+        self.IsSwipping = false;
+        self.initialMouseX = 0;
+        self.endMouseX = 0;
+      }, 10);
+    },
+
+    // function that return x position from event
+    getMouseXPosFromEvent: function getMouseXPosFromEvent(event) {
+      if(event.type.indexOf('mouse') !== -1){
+          return event.clientX;
+      }
+      return event.touches[0].clientX;
+    },
+
+    // check if the image is cached
     is_cached: function is_cached(src) {
       var image = new Image();
       image.src = src;
@@ -561,6 +634,8 @@ var script = {
       this.isZooming = false;
       this.transition = 'all .3s ease';
       
+      this.initialMouseX = false;
+
       if(window.innerWidth >= 700) {
         this.buttonsVisible = true;
       }
@@ -638,6 +713,10 @@ var script = {
     // close event click outside
     closeModal: function closeModal(event) {
       if(window.innerWidth < 700) {
+        return false;
+      }
+
+      if(this.IsSwipping) {
         return false;
       }
 
@@ -883,6 +962,7 @@ var script = {
         'cool-lightbox--can-zoom': this.canZoom,
         'cool-lightbox--is-zooming': this.isZooming,
         'cool-lightbox--show-thumbs': this.showThumbs,
+        'cool-lightbox--is-swipping': this.isDraggingSwipe,
       }
     },
 
@@ -1006,7 +1086,7 @@ var __vue_script__ = script;
 var __vue_render__ = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('transition',{attrs:{"name":"cool-lightbox-modal"}},[(_vm.isVisible)?_c('div',{staticClass:"cool-lightbox",class:_vm.lightboxClasses,style:(_vm.lightboxStyles),on:{"click":_vm.closeModal}},[(_vm.gallery)?_c('div',{staticClass:"cool-lightbox-thumbs"},[_c('div',{staticClass:"cool-lightbox-thumbs__list"},_vm._l((_vm.items),function(item,itemIndex){return _c('button',{key:itemIndex,staticClass:"cool-lightbox__thumb",class:{ 
             active: itemIndex === _vm.imgIndex,
             'is-video': _vm.isVideo(_vm.getItemSrc(itemIndex)) 
-          },attrs:{"type":"button"},on:{"click":function($event){_vm.imgIndex = itemIndex;}}},[(_vm.isVideo(_vm.getItemSrc(itemIndex)))?_c('svg',{staticClass:"cool-lightbox__thumb__icon",attrs:{"xmlns":"http://www.w3.org/2000/svg","viewBox":"0 0 24 24"}},[_c('path',{attrs:{"d":"M6.5 5.4v13.2l11-6.6z"}})]):_vm._e(),_vm._v(" "),_c('img',{attrs:{"src":_vm.itemThumb(_vm.getItemSrc(itemIndex), itemIndex),"alt":""}})])}),0)]):_vm._e(),_vm._v(" "),_c('div',{staticClass:"cool-lightbox__inner",style:(_vm.innerStyles)},[_c('div',{staticClass:"cool-lightbox__progressbar",style:(_vm.stylesInterval)}),_vm._v(" "),_c('div',{staticClass:"cool-lightbox__navigation"},[_c('button',{directives:[{name:"show",rawName:"v-show",value:((_vm.hasPrevious || _vm.loop) && _vm.items.length > 1),expression:"(hasPrevious || loop) && items.length > 1"}],staticClass:"cool-lightbox-button cool-lightbox-button--prev",class:_vm.buttonsClasses,attrs:{"type":"button"},on:{"click":_vm.onPrevClick}},[_vm._t("icon-previous",[_c('div',{staticClass:"cool-lightbox-button__icon"},[_c('svg',{attrs:{"xmlns":"http://www.w3.org/2000/svg","viewBox":"0 0 24 24"}},[_c('path',{attrs:{"d":"M11.28 15.7l-1.34 1.37L5 12l4.94-5.07 1.34 1.38-2.68 2.72H19v1.94H8.6z"}})])])])],2),_vm._v(" "),_c('button',{directives:[{name:"show",rawName:"v-show",value:((_vm.hasNext || _vm.loop) && _vm.items.length > 1),expression:"(hasNext || loop) && items.length > 1"}],staticClass:"cool-lightbox-button cool-lightbox-button--next",class:_vm.buttonsClasses,attrs:{"type":"button"},on:{"click":function($event){return _vm.onNextClick(false)}}},[_vm._t("icon-next",[_c('div',{staticClass:"cool-lightbox-button__icon"},[_c('svg',{attrs:{"xmlns":"http://www.w3.org/2000/svg","viewBox":"0 0 24 24"}},[_c('path',{attrs:{"d":"M15.4 12.97l-2.68 2.72 1.34 1.38L19 12l-4.94-5.07-1.34 1.38 2.68 2.72H5v1.94z"}})])])])],2)]),_vm._v(" "),_c('div',{staticClass:"cool-lightbox__wrapper"},[_c('div',{staticClass:"cool-lightbox__slide"},[_c('transition',{attrs:{"name":"cool-lightbox-slide-change","mode":"out-in"}},[(!_vm.videoUrl)?_c('div',{key:"image",staticClass:"cool-lightbox__slide__img",style:(_vm.imgWrapperStyle)},[_c('transition',{attrs:{"name":"cool-lightbox-slide-change","mode":"out-in"}},[_c('img',{key:_vm.imgIndex,attrs:{"src":_vm.itemSrc,"draggable":"false"},on:{"click":_vm.zoomImage,"load":_vm.imageLoaded,"mousedown":function($event){return _vm.handleMouseDown($event)},"mouseup":function($event){return _vm.handleMouseUp($event)},"mousemove":function($event){return _vm.handleMouseMove($event)}}})]),_vm._v(" "),_c('div',{directives:[{name:"show",rawName:"v-show",value:(_vm.imageLoading),expression:"imageLoading"}],staticClass:"cool-lightbox-loading"})],1):_c('div',{key:"video",staticClass:"cool-lightbox__iframe"},[_c('transition',{attrs:{"name":"cool-lightbox-slide-change","mode":"out-in"}},[(!_vm.isMp4)?_c('iframe',{key:_vm.videoUrl,staticClass:"cool-lightbox-video",style:(_vm.aspectRatioVideo),attrs:{"src":_vm.videoUrl,"frameborder":"0","allow":"accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture","allowfullscreen":""}}):_vm._e(),_vm._v(" "),(_vm.isMp4)?_c('video',{key:_vm.videoUrl,staticClass:"cool-lightbox-video",style:(_vm.aspectRatioVideo),attrs:{"controls":"","controlslist":"nodownload","poster":""}},[_c('source',{attrs:{"src":_vm.videoUrl,"type":"video/mp4"}}),_vm._v("\n                  Sorry, your browser doesn't support embedded videos\n                ")]):_vm._e()])],1)])],1)]),_vm._v(" "),_c('transition',{attrs:{"name":"modal"}},[_c('div',{directives:[{name:"show",rawName:"v-show",value:(_vm.isObject && (_vm.items[_vm.imgIndex].title || _vm.items[_vm.imgIndex].description)),expression:"isObject && (items[imgIndex].title || items[imgIndex].description)"}],key:"caption-block",staticClass:"cool-lightbox-caption"},[_c('transition',{attrs:{"name":"cool-lightbox-slide-change","mode":"out-in"}},[(_vm.isObject && _vm.items[_vm.imgIndex].title)?_c('h6',{key:"title"},[_vm._v(_vm._s(_vm.items[_vm.imgIndex].title))]):_vm._e()]),_vm._v(" "),_c('transition',{attrs:{"name":"cool-lightbox-slide-change","mode":"out-in"}},[(_vm.isObject && _vm.items[_vm.imgIndex].description)?_c('p',{key:"description"},[_vm._v(_vm._s(_vm.items[_vm.imgIndex].description))]):_vm._e()])],1)]),_vm._v(" "),_c('div',{staticClass:"cool-lightbox-toolbar",class:_vm.buttonsClasses},[(this.slideshow && _vm.items.length > 1)?_c('button',{staticClass:"cool-lightbox-toolbar__btn",attrs:{"type":"button"},on:{"click":_vm.togglePlaySlideshow}},[(!_vm.isPlayingSlideShow)?_c('svg',{attrs:{"xmlns":"http://www.w3.org/2000/svg","viewBox":"0 0 24 24"}},[_c('path',{attrs:{"d":"M6.5 5.4v13.2l11-6.6z"}})]):_c('svg',{attrs:{"xmlns":"http://www.w3.org/2000/svg","viewBox":"0 0 24 24"}},[_c('path',{attrs:{"d":"M8.33 5.75h2.2v12.5h-2.2V5.75zm5.15 0h2.2v12.5h-2.2V5.75z"}})])]):_vm._e(),_vm._v(" "),(_vm.items.length > 1 && _vm.gallery)?_c('button',{staticClass:"cool-lightbox-toolbar__btn",attrs:{"type":"button"},on:{"click":function($event){_vm.showThumbs = !_vm.showThumbs;}}},[_c('svg',{attrs:{"xmlns":"http://www.w3.org/2000/svg","viewBox":"0 0 24 24"}},[_c('path',{attrs:{"d":"M14.59 14.59h3.76v3.76h-3.76v-3.76zm-4.47 \n            0h3.76v3.76h-3.76v-3.76zm-4.47 0h3.76v3.76H5.65v-3.76zm8.94-4.47h3.76v3.76h-3.76v-3.76zm-4.47 \n            0h3.76v3.76h-3.76v-3.76zm-4.47 0h3.76v3.76H5.65v-3.76zm8.94-4.47h3.76v3.76h-3.76V5.65zm-4.47 \n            0h3.76v3.76h-3.76V5.65zm-4.47 0h3.76v3.76H5.65V5.65z"}})])]):_vm._e(),_vm._v(" "),_c('button',{staticClass:"cool-lightbox-toolbar__btn",attrs:{"type":"button"},on:{"click":_vm.close}},[_vm._t("close",[_c('svg',{attrs:{"xmlns":"http://www.w3.org/2000/svg","viewBox":"0 0 24 24"}},[_c('path',{attrs:{"d":"M12 10.6L6.6 5.2 5.2 6.6l5.4 5.4-5.4 5.4 1.4 1.4 5.4-5.4 5.4 5.4 1.4-1.4-5.4-5.4 5.4-5.4-1.4-1.4-5.4 5.4z"}})])])],2)])],1)]):_vm._e()])};
+          },attrs:{"type":"button"},on:{"click":function($event){_vm.imgIndex = itemIndex;}}},[(_vm.isVideo(_vm.getItemSrc(itemIndex)))?_c('svg',{staticClass:"cool-lightbox__thumb__icon",attrs:{"xmlns":"http://www.w3.org/2000/svg","viewBox":"0 0 24 24"}},[_c('path',{attrs:{"d":"M6.5 5.4v13.2l11-6.6z"}})]):_vm._e(),_vm._v(" "),_c('img',{attrs:{"src":_vm.itemThumb(_vm.getItemSrc(itemIndex), itemIndex),"alt":""}})])}),0)]):_vm._e(),_vm._v(" "),_c('div',{staticClass:"cool-lightbox__inner",style:(_vm.innerStyles)},[_c('div',{staticClass:"cool-lightbox__progressbar",style:(_vm.stylesInterval)}),_vm._v(" "),_c('div',{staticClass:"cool-lightbox__navigation"},[_c('button',{directives:[{name:"show",rawName:"v-show",value:((_vm.hasPrevious || _vm.loop) && _vm.items.length > 1),expression:"(hasPrevious || loop) && items.length > 1"}],staticClass:"cool-lightbox-button cool-lightbox-button--prev",class:_vm.buttonsClasses,attrs:{"type":"button"},on:{"click":_vm.onPrevClick}},[_vm._t("icon-previous",[_c('div',{staticClass:"cool-lightbox-button__icon"},[_c('svg',{attrs:{"xmlns":"http://www.w3.org/2000/svg","viewBox":"0 0 24 24"}},[_c('path',{attrs:{"d":"M11.28 15.7l-1.34 1.37L5 12l4.94-5.07 1.34 1.38-2.68 2.72H19v1.94H8.6z"}})])])])],2),_vm._v(" "),_c('button',{directives:[{name:"show",rawName:"v-show",value:((_vm.hasNext || _vm.loop) && _vm.items.length > 1),expression:"(hasNext || loop) && items.length > 1"}],staticClass:"cool-lightbox-button cool-lightbox-button--next",class:_vm.buttonsClasses,attrs:{"type":"button"},on:{"click":function($event){return _vm.onNextClick(false)}}},[_vm._t("icon-next",[_c('div',{staticClass:"cool-lightbox-button__icon"},[_c('svg',{attrs:{"xmlns":"http://www.w3.org/2000/svg","viewBox":"0 0 24 24"}},[_c('path',{attrs:{"d":"M15.4 12.97l-2.68 2.72 1.34 1.38L19 12l-4.94-5.07-1.34 1.38 2.68 2.72H5v1.94z"}})])])])],2)]),_vm._v(" "),_c('div',{staticClass:"cool-lightbox__wrapper"},[_c('div',{staticClass:"cool-lightbox__slide",on:{"touchstart":_vm.startSwipe,"touchmove":_vm.continueSwipe,"touchend":_vm.endSwipe}},[_c('transition',{attrs:{"name":"cool-lightbox-slide-change","mode":"out-in"}},[(!_vm.videoUrl)?_c('div',{key:"image",staticClass:"cool-lightbox__slide__img",style:(_vm.imgWrapperStyle)},[_c('transition',{attrs:{"name":"cool-lightbox-slide-change","mode":"out-in"}},[_c('img',{key:_vm.imgIndex,attrs:{"src":_vm.itemSrc,"draggable":"false"},on:{"click":_vm.zoomImage,"load":_vm.imageLoaded,"mousedown":function($event){return _vm.handleMouseDown($event)},"mouseup":function($event){return _vm.handleMouseUp($event)},"mousemove":function($event){return _vm.handleMouseMove($event)}}})]),_vm._v(" "),_c('div',{directives:[{name:"show",rawName:"v-show",value:(_vm.imageLoading),expression:"imageLoading"}],staticClass:"cool-lightbox-loading-wrapper"},[_vm._t("loading",[_c('div',{staticClass:"cool-lightbox-loading"})])],2)],1):_c('div',{key:"video",staticClass:"cool-lightbox__iframe"},[_c('transition',{attrs:{"name":"cool-lightbox-slide-change","mode":"out-in"}},[(!_vm.isMp4)?_c('iframe',{key:_vm.videoUrl,staticClass:"cool-lightbox-video",style:(_vm.aspectRatioVideo),attrs:{"src":_vm.videoUrl,"frameborder":"0","allow":"accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture","allowfullscreen":""}}):_vm._e(),_vm._v(" "),(_vm.isMp4)?_c('video',{key:_vm.videoUrl,staticClass:"cool-lightbox-video",style:(_vm.aspectRatioVideo),attrs:{"controls":"","controlslist":"nodownload","poster":""}},[_c('source',{attrs:{"src":_vm.videoUrl,"type":"video/mp4"}}),_vm._v("\n                  Sorry, your browser doesn't support embedded videos\n                ")]):_vm._e()])],1)])],1)]),_vm._v(" "),_c('transition',{attrs:{"name":"modal"}},[_c('div',{directives:[{name:"show",rawName:"v-show",value:(_vm.isObject && (_vm.items[_vm.imgIndex].title || _vm.items[_vm.imgIndex].description)),expression:"isObject && (items[imgIndex].title || items[imgIndex].description)"}],key:"caption-block",staticClass:"cool-lightbox-caption"},[_c('transition',{attrs:{"name":"cool-lightbox-slide-change","mode":"out-in"}},[(_vm.isObject && _vm.items[_vm.imgIndex].title)?_c('h6',{key:"title"},[_vm._v(_vm._s(_vm.items[_vm.imgIndex].title))]):_vm._e()]),_vm._v(" "),_c('transition',{attrs:{"name":"cool-lightbox-slide-change","mode":"out-in"}},[(_vm.isObject && _vm.items[_vm.imgIndex].description)?_c('p',{key:"description"},[_vm._v(_vm._s(_vm.items[_vm.imgIndex].description))]):_vm._e()])],1)]),_vm._v(" "),_c('div',{staticClass:"cool-lightbox-toolbar",class:_vm.buttonsClasses},[(this.slideshow && _vm.items.length > 1)?_c('button',{staticClass:"cool-lightbox-toolbar__btn",attrs:{"type":"button"},on:{"click":_vm.togglePlaySlideshow}},[(!_vm.isPlayingSlideShow)?_c('svg',{attrs:{"xmlns":"http://www.w3.org/2000/svg","viewBox":"0 0 24 24"}},[_c('path',{attrs:{"d":"M6.5 5.4v13.2l11-6.6z"}})]):_c('svg',{attrs:{"xmlns":"http://www.w3.org/2000/svg","viewBox":"0 0 24 24"}},[_c('path',{attrs:{"d":"M8.33 5.75h2.2v12.5h-2.2V5.75zm5.15 0h2.2v12.5h-2.2V5.75z"}})])]):_vm._e(),_vm._v(" "),(_vm.items.length > 1 && _vm.gallery)?_c('button',{staticClass:"cool-lightbox-toolbar__btn",attrs:{"type":"button"},on:{"click":function($event){_vm.showThumbs = !_vm.showThumbs;}}},[_c('svg',{attrs:{"xmlns":"http://www.w3.org/2000/svg","viewBox":"0 0 24 24"}},[_c('path',{attrs:{"d":"M14.59 14.59h3.76v3.76h-3.76v-3.76zm-4.47 \n            0h3.76v3.76h-3.76v-3.76zm-4.47 0h3.76v3.76H5.65v-3.76zm8.94-4.47h3.76v3.76h-3.76v-3.76zm-4.47 \n            0h3.76v3.76h-3.76v-3.76zm-4.47 0h3.76v3.76H5.65v-3.76zm8.94-4.47h3.76v3.76h-3.76V5.65zm-4.47 \n            0h3.76v3.76h-3.76V5.65zm-4.47 0h3.76v3.76H5.65V5.65z"}})])]):_vm._e(),_vm._v(" "),_c('button',{staticClass:"cool-lightbox-toolbar__btn",attrs:{"type":"button"},on:{"click":_vm.close}},[_vm._t("close",[_c('svg',{attrs:{"xmlns":"http://www.w3.org/2000/svg","viewBox":"0 0 24 24"}},[_c('path',{attrs:{"d":"M12 10.6L6.6 5.2 5.2 6.6l5.4 5.4-5.4 5.4 1.4 1.4 5.4-5.4 5.4 5.4 1.4-1.4-5.4-5.4 5.4-5.4-1.4-1.4-5.4 5.4z"}})])])],2)])],1)]):_vm._e()])};
 var __vue_staticRenderFns__ = [];
 
   /* style */

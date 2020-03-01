@@ -14,6 +14,9 @@ and use the lightbox:
 ```javascript
 import CoolLightBox from 'vue-cool-lightbox'
 
+/* New step! For version >= 1.1.0 add Vue CoolLightBox CSS. Can be added as a static asset or inside a component */
+import 'vue-cool-lightbox/dist/vue-cool-lightbox.min.css'
+
 export default {
   components: {
     CoolLightBox,
