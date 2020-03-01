@@ -52,7 +52,12 @@
         <!--/cool-lightbox__navigation-->
 
         <div class="cool-lightbox__wrapper">
-          <div class="cool-lightbox__slide">
+          <div 
+            class="cool-lightbox__slide"
+            @touchstart="startSwipe"
+            @touchmove="continueSwipe"
+            @touchend="endSwipe"
+          >
             <transition name="cool-lightbox-slide-change" mode="out-in">
               <div v-if="!videoUrl" key="image" :style="imgWrapperStyle" class="cool-lightbox__slide__img">
                 <transition name="cool-lightbox-slide-change" mode="out-in">
@@ -78,10 +83,15 @@
               </div>
               <!--/imgs-slide-->
             
-
               <div v-else key="video" class="cool-lightbox__iframe">
                 <transition name="cool-lightbox-slide-change" mode="out-in">
-                  <iframe class="cool-lightbox-video" :src="videoUrl" v-if="!isMp4" :style="aspectRatioVideo" :key="videoUrl" frameborder="0" 
+                  <iframe
+                    class="cool-lightbox-video" 
+                    :src="videoUrl" 
+                    v-if="!isMp4" 
+                    :style="aspectRatioVideo" 
+                    :key="videoUrl" 
+                    frameborder="0" 
                     allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
                     allowfullscreen>
                   </iframe>
@@ -156,6 +166,12 @@ export default {
 
   data() {
     return {
+      // swipe data
+      initialMouseX: 0,
+      endMouseX: 0,
+      IsSwipping: false,
+      isDraggingSwipe: false,
+
       // styles data
       imgIndex: this.index,
       isVisible: false,
@@ -163,7 +179,7 @@ export default {
       imageLoading: false,
       showThumbs: false,
 
-      // aspect ratio in videos
+      // aspect ratio videos
       aspectRatioVideo: {
         width: 'auto',
         height: 'auto',
@@ -191,7 +207,6 @@ export default {
   },
 
   props: {
-
     index: {
       required: true
     },
@@ -328,14 +343,67 @@ export default {
     }, 
   },
 
-  mounted() {
-  },
-
-  destroyed() {
-  },
-
   methods: {
-    // check if the image is
+    // start swipe event
+    startSwipe(event) {
+      this.isDraggingSwipe = true
+      this.initialMouseX = this.getMouseXPosFromEvent(event);
+    },
+
+    continueSwipe(event) {
+      if(this.isDraggingSwipe) {
+        this.IsSwipping = true
+
+        if(event.type === 'touchmove') {
+          this.endMouseX = this.getMouseXPosFromEvent(event);
+        }
+      }
+    },
+    
+    // end swipe event
+    endSwipe(event) {
+      const self = this
+      this.isDraggingSwipe = false
+
+      // touch end fixes
+      if(event.type !== 'touchend') {
+        this.endMouseX = this.getMouseXPosFromEvent(event);
+      } else {
+        if(this.endMouseX === 0) {
+          return;
+        }
+      }
+
+      if((this.endMouseX - this.initialMouseX === 0) || this.isZooming) {
+        return;
+      } 
+
+      // if the swipe is to the left
+      if((this.endMouseX - this.initialMouseX) < -50) {
+        this.onNextClick();
+      } 
+
+      // if the swipe is to the right
+      if((this.endMouseX - this.initialMouseX) > 50) {
+        this.onPrevClick();
+      }
+
+      setTimeout(function() {
+        self.IsSwipping = false
+        self.initialMouseX = 0
+        self.endMouseX = 0
+      }, 10)
+    },
+
+    // function that return x position from event
+    getMouseXPosFromEvent(event) {
+      if(event.type.indexOf('mouse') !== -1){
+          return event.clientX;
+      }
+      return event.touches[0].clientX;
+    },
+
+    // check if the image is cached
     is_cached(src) {
       var image = new Image();
       image.src = src;
@@ -566,6 +634,8 @@ export default {
       this.isZooming = false
       this.transition = 'all .3s ease'
       
+      this.initialMouseX = false
+
       if(window.innerWidth >= 700) {
         this.buttonsVisible = true
       }
@@ -643,6 +713,10 @@ export default {
     // close event click outside
     closeModal(event) {
       if(window.innerWidth < 700) {
+        return false;
+      }
+
+      if(this.IsSwipping) {
         return false;
       }
 
@@ -886,6 +960,7 @@ export default {
         'cool-lightbox--can-zoom': this.canZoom,
         'cool-lightbox--is-zooming': this.isZooming,
         'cool-lightbox--show-thumbs': this.showThumbs,
+        'cool-lightbox--is-swipping': this.isDraggingSwipe,
       }
     },
 
@@ -1091,6 +1166,11 @@ $breakpoints: (
     transform: scaleX(0);
     transition: transform 3s linear;
     display: block;
+  }
+  &.cool-lightbox--is-swipping {
+    iframe {
+      pointer-events: none;
+    }
   }
   &.cool-lightbox--can-zoom {
     .cool-lightbox__slide {
