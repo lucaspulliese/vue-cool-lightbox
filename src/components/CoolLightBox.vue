@@ -14,12 +14,12 @@
             :key="itemIndex"
             :class="{ 
               active: itemIndex === imgIndex,
-              'is-video': isVideo(getItemSrc(itemIndex)) 
+              'is-video': getVideoUrl(getItemSrc(itemIndex)) 
             }"
             @click="imgIndex = itemIndex"
             class="cool-lightbox__thumb">
 
-            <svg class="cool-lightbox__thumb__icon" xmlns="http://www.w3.org/2000/svg" v-if="isVideo(getItemSrc(itemIndex))" viewBox="0 0 24 24">
+            <svg class="cool-lightbox__thumb__icon" xmlns="http://www.w3.org/2000/svg" v-if="getVideoUrl(getItemSrc(itemIndex))" viewBox="0 0 24 24">
               <path d="M6.5 5.4v13.2l11-6.6z"></path>
             </svg>
 
@@ -27,9 +27,19 @@
           </button>
         </div>
       </div>
+      <!--/cool-lightbox-thumbs-->
 
-      <div class="cool-lightbox__inner" 
-        :style="innerStyles">
+      <div 
+        class="cool-lightbox__inner" 
+        :style="innerStyles"
+
+        @mousedown="startSwipe"
+        @mousemove="continueSwipe"
+        @mouseup="endSwipe"
+        @touchstart="startSwipe"
+        @touchmove="continueSwipe"
+        @touchend="endSwipe"
+        >
         <div class="cool-lightbox__progressbar" :style="stylesInterval"></div>
 
         <div class="cool-lightbox__navigation">
@@ -51,23 +61,78 @@
         </div>
         <!--/cool-lightbox__navigation-->
 
-        <div class="cool-lightbox__wrapper">
+        <div v-if="effect === 'swipe'" 
+          class="cool-lightbox__wrapper cool-lightbox__wrapper--swipe"
+          :style="{
+            transform: 'translate3d('+xSwipeWrapper+'px, 0, 0)',
+            transition: swipeAnimation
+          }"
+          >
           <div 
+            v-for="(item, itemIndex) in items"
+            :key="itemIndex"
             class="cool-lightbox__slide"
-            @touchstart="startSwipe"
-            @touchmove="continueSwipe"
-            @touchend="endSwipe"
+            :class="{ 'cool-lightbox__slide--current': itemIndex === imgIndex }"
+          >
+            <div v-if="!getVideoUrl(getItemSrc(itemIndex))" key="image" :style="imgWrapperStyle" class="cool-lightbox__slide__img">
+              <img 
+                :src="getItemSrc(itemIndex)" 
+                :key="itemIndex"
+                draggable="false"
+
+                @load="imageLoaded"
+                @click="zoomImage"
+                @mousedown="handleMouseDown($event)"
+                @mouseup="handleMouseUp($event)"
+                @mousemove="handleMouseMove($event)"
+                />
+              
+              <div v-show="imageLoading" class="cool-lightbox-loading-wrapper">
+                <slot name="loading">
+                  <div class="cool-lightbox-loading"></div>
+                </slot>
+              </div>
+              <!--/loading-wrapper-->
+            </div>
+            <!--/imgs-slide-->
+          
+            <div v-else key="video" class="cool-lightbox__iframe">
+              <iframe
+                class="cool-lightbox-video" 
+                :src="getVideoUrl(getItemSrc(itemIndex))" 
+                v-if="!checkIsMp4(getItemSrc(itemIndex))" 
+                :style="aspectRatioVideo" 
+                :key="itemIndex" 
+                frameborder="0" 
+                allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
+                allowfullscreen>
+              </iframe>
+
+              <video class="cool-lightbox-video" v-if="checkIsMp4(getItemSrc(itemIndex))" :style="aspectRatioVideo" :key="videoUrl" controls="" controlslist="nodownload" poster="">
+                <source :src="checkIsMp4(getItemSrc(itemIndex))" type="video/mp4">
+                Sorry, your browser doesn't support embedded videos
+              </video> 
+            </div>
+            <!--/cool-lightbox__iframe-->
+          </div>
+          <!--/cool-lightbox__slide-->
+        </div>
+        <!--/cool-lightbox-wrapper-->
+          
+        <div v-if="effect === 'fade'" class="cool-lightbox__wrapper">
+          <div 
+            class="cool-lightbox__slide cool-lightbox__slide--current"
           >
             <transition name="cool-lightbox-slide-change" mode="out-in">
-              <div v-if="!videoUrl" key="image" :style="imgWrapperStyle" class="cool-lightbox__slide__img">
+              <div v-if="!getVideoUrl(getItemSrc(imgIndex))" key="image" :style="imgWrapperStyle" class="cool-lightbox__slide__img">
                 <transition name="cool-lightbox-slide-change" mode="out-in">
                 <img 
-                  :src="itemSrc" 
+                  :src="getItemSrc(imgIndex)" 
                   :key="imgIndex"
                   draggable="false"
-                  
-                  @click="zoomImage"
+
                   @load="imageLoaded"
+                  @click="zoomImage"
                   @mousedown="handleMouseDown($event)"
                   @mouseup="handleMouseUp($event)"
                   @mousemove="handleMouseMove($event)"
@@ -87,8 +152,8 @@
                 <transition name="cool-lightbox-slide-change" mode="out-in">
                   <iframe
                     class="cool-lightbox-video" 
-                    :src="videoUrl" 
-                    v-if="!isMp4" 
+                    :src="getVideoUrl(getItemSrc(imgIndex))" 
+                    v-if="!checkIsMp4(getItemSrc(imgIndex))" 
                     :style="aspectRatioVideo" 
                     :key="videoUrl" 
                     frameborder="0" 
@@ -96,8 +161,8 @@
                     allowfullscreen>
                   </iframe>
 
-                  <video class="cool-lightbox-video" v-if="isMp4" :style="aspectRatioVideo" :key="videoUrl" controls="" controlslist="nodownload" poster="">
-                    <source :src="videoUrl" type="video/mp4">
+                  <video class="cool-lightbox-video" v-if="checkIsMp4(getItemSrc(imgIndex))" :style="aspectRatioVideo" :key="videoUrl" controls="" controlslist="nodownload" poster="">
+                    <source :src="checkIsMp4(getItemSrc(imgIndex))" type="video/mp4">
                     Sorry, your browser doesn't support embedded videos
                   </video> 
                 </transition>
@@ -111,13 +176,13 @@
         <!--/cool-lightbox__wrapper-->
 
         <transition name="modal">
-          <div v-show="isObject && (items[imgIndex].title || items[imgIndex].description)" key="caption-block" class="cool-lightbox-caption">
+          <div v-show="checkIfIsObject(imgIndex) && (items[imgIndex].title || items[imgIndex].description)" key="caption-block" class="cool-lightbox-caption">
             <transition name="cool-lightbox-slide-change" mode="out-in">
-              <h6 key="title" v-if="isObject && items[imgIndex].title">{{ items[imgIndex].title }}</h6>
+              <h6 key="title" v-if="checkIfIsObject(imgIndex) && items[imgIndex].title">{{ items[imgIndex].title }}</h6>
             </transition>
 
             <transition name="cool-lightbox-slide-change" mode="out-in">
-              <p key="description" v-if="isObject && items[imgIndex].description">{{ items[imgIndex].description }}</p>
+              <p key="description" v-if="checkIfIsObject(imgIndex) && items[imgIndex].description">{{ items[imgIndex].description }}</p>
             </transition>
           </div>
           <!--/cool-lightbox-caption-->
@@ -151,7 +216,7 @@
             </slot>
           </button>
         </div>
-        <!--/cool-liughtbox--toolbar-->
+        <!--/cool-lightbox--toolbar-->
       </div>
       <!--/cool-lightbox-inner-->
 
@@ -171,6 +236,11 @@ export default {
       endMouseX: 0,
       IsSwipping: false,
       isDraggingSwipe: false,
+
+      // swipe effect
+      xSwipeWrapper: 0,
+      swipeAnimation: null,
+      swipeInterval: null,
 
       // styles data
       imgIndex: this.index,
@@ -209,6 +279,11 @@ export default {
   props: {
     index: {
       required: true
+    },
+
+    effect: {
+      type: String,
+      default: 'swipe'
     },
 
     items: {
@@ -268,6 +343,11 @@ export default {
 
       if(prev !== null) {
 
+        // swipe effect case remove loop
+        if(this.effect === 'swipe') {
+          this.loop = false
+        }
+
         // add img index
         this.imgIndex = prev
         this.isVisible = true
@@ -307,12 +387,15 @@ export default {
     
     imgIndex(prev, val) {
       const thisContext = this
-
-      // add img index
-      this.imgIndex = prev;
-
+      
+      // when animation is loaded
       this.$nextTick(() => {
 
+        if(this.effect === 'swipe') {
+          const windowWidth = window.innerWidth
+          this.xSwipeWrapper = -prev*windowWidth
+        }
+        
         if(prev !== null & val === null) {
           this.$emit("on-open", prev);
         }
@@ -320,8 +403,8 @@ export default {
         if(prev !== null) {
 
           // if is an image change imageLoading to true
-          if(!this.videoUrl) {
-            if(!this.is_cached(this.itemSrc)) {
+          if(!this.getVideoUrl(this.getItemSrc(prev))) {
+            if(!this.is_cached(this.getItemSrc(prev))) {
               this.imageLoading = true
             }
           }
@@ -336,32 +419,77 @@ export default {
         // reset zoom
         this.resetZoom()
 
-        if(this.videoUrl) {
+        // setAspectRatioVideo when is swipe
+        if(this.effect === 'swipe') {
           this.setAspectRatioVideo();
+        } else {
+
+          if(this.getVideoUrl(this.getItemSrc(prev))) {
+            this.setAspectRatioVideo();
+          }
         }
+
       })
     }, 
   },
 
   methods: {
+    // check if event is arrow button or toolbar button
+    checkIfIsButton(eventEmit) {
+      var elements = '.cool-lightbox-button, .cool-lightbox-button *, .cool-lightbox-toolbar__btn, .cool-lightbox-toolbar__btn *';
+      if (event.target.matches(elements)) {
+        return true
+      }
+
+      return false
+    },
+
     // start swipe event
     startSwipe(event) {
+      if(this.checkIfIsButton(event)) {
+        return false;
+      }
+
+      // set starts X to 0
+      this.startsX = 0
+
+      // clear interval
+      clearInterval(this.swipeInterval)
+      this.swipeAnimation = null
+
+      // starts swipe
       this.isDraggingSwipe = true
+      this.startsX = this.getMouseXPosFromEvent(event)
       this.initialMouseX = this.getMouseXPosFromEvent(event);
     },
 
+    // continue swipe event
     continueSwipe(event) {
       if(this.isDraggingSwipe) {
         this.IsSwipping = true
+        const currentPosX = this.getMouseXPosFromEvent(event)
+        const windowWidth = window.innerWidth
 
+        // swipe wrapper
+        this.xSwipeWrapper = -(windowWidth*this.imgIndex) + currentPosX - this.startsX
+
+        // mobile case
         if(event.type === 'touchmove') {
           this.endMouseX = this.getMouseXPosFromEvent(event);
         }
       }
     },
-    
+
     // end swipe event
     endSwipe(event) {
+      if(this.checkIfIsButton(event) && this.initialMouseX === 0) {
+        return false;
+      }
+
+      if(this.startsX === 0) {
+        return false
+      }
+
       const self = this
       this.isDraggingSwipe = false
 
@@ -377,22 +505,47 @@ export default {
       if((this.endMouseX - this.initialMouseX === 0) || this.isZooming) {
         return;
       } 
+      
+      clearInterval(this.swipeInterval)
+      this.swipeAnimation = null
 
-      // if the swipe is to the left
-      if((this.endMouseX - this.initialMouseX) < -50) {
-        this.onNextClick();
-      } 
+      // animation swipe
+      this.swipeAnimation = 'all .15s linear';
+      this.swipeInterval = setInterval(interval, 150);
 
-      // if the swipe is to the right
-      if((this.endMouseX - this.initialMouseX) > 50) {
-        this.onPrevClick();
+      function interval() {
+        self.swipeAnimation = null
       }
 
+      // reset swipe data
       setTimeout(function() {
         self.IsSwipping = false
         self.initialMouseX = 0
         self.endMouseX = 0
       }, 10)
+      
+      // if the swipe is to the right
+      if((this.endMouseX - this.initialMouseX) < -80) {
+        return this.swipeToRight()
+      } 
+
+      // if the swipe is to the left
+      if((this.endMouseX - this.initialMouseX) > 80) {
+        return this.swipeToLeft();
+      }
+      
+      const windowWidth = window.innerWidth
+      this.xSwipeWrapper = -this.imgIndex*windowWidth
+    },
+    
+    // swipe to left effect
+    swipeToLeft() {
+      this.changeIndexToPrev()
+    },
+    
+    // swipe to right effect
+    swipeToRight() {
+      this.changeIndexToNext()
     },
 
     // function that return x position from event
@@ -531,8 +684,7 @@ export default {
 
     // show buttons event
     showButtons(event) {
-      var elements = '.cool-lightbox-button, .cool-lightbox-button *, .cool-lightbox-toolbar__btn, .cool-lightbox-toolbar__btn *';
-      if (!event.target.matches(elements)) {
+      if (!this.checkIfIsButton(event)) {
         const self = this
         setTimeout(function() {
           self.buttonsVisible = !self.buttonsVisible
@@ -634,8 +786,7 @@ export default {
       this.isZooming = false
       this.transition = 'all .3s ease'
       
-      this.initialMouseX = false
-
+      this.initialMouseX = 0
       if(window.innerWidth >= 700) {
         this.buttonsVisible = true
       }
@@ -680,7 +831,7 @@ export default {
     setAspectRatioVideo() {
 
       const thisContext = this
-      let el = document.getElementsByClassName('cool-lightbox__slide');
+      let el = document.getElementsByClassName('cool-lightbox__inner');
       if(window.innerWidth < 700) {
 
         let width = el[0].clientWidth
@@ -731,7 +882,19 @@ export default {
       if(!isFromSlideshow) {
         this.stopSlideShow()
       }
+      
+      this.changeIndexToNext()
+    },
 
+    // prev slide event
+    onPrevClick() {
+      this.stopSlideShow();
+
+      this.changeIndexToPrev();
+    },
+
+    // change to next index
+    changeIndexToNext() {
       if(this.hasNext) {
         this.onIndexChange(this.imgIndex + 1)
       } else {
@@ -742,9 +905,8 @@ export default {
       }
     },
 
-    // prev slide event
-    onPrevClick() {
-      this.stopSlideShow();
+    // change to prev index
+    changeIndexToPrev() {
       if(this.hasPrevious) {
         this.onIndexChange(this.imgIndex - 1)
       } else {
@@ -763,7 +925,7 @@ export default {
 
     // caption size 
     addCaptionPadding() {
-      if(this.isObject && (this.items[this.imgIndex].title || this.items[this.imgIndex].descripcion)) {
+      if(this.checkIfIsObject(this.imgIndex) && (this.items[this.imgIndex].title || this.items[this.imgIndex].descripcion)) {
         const el = document.getElementsByClassName('cool-lightbox-caption');
         if(el.length > 0) {
           this.paddingBottom = el[0].offsetHeight
@@ -774,10 +936,22 @@ export default {
     },
 
     // check if is video
-    isVideo(itemSrc) {
+    getVideoUrl(itemSrc) {
 
-      if(this.getYoutubeUrl(itemSrc) || this.getVimeoUrl(itemSrc) || this.checkIsMp4(itemSrc)) {
-        return true
+      const youtubeUrl = this.getYoutubeUrl(itemSrc)
+      const vimeoUrl = this.getVimeoUrl(itemSrc)
+      const mp4Url = this.checkIsMp4(itemSrc)
+
+      if(youtubeUrl) {
+        return youtubeUrl
+      }
+
+      if(vimeoUrl) {
+        return vimeoUrl
+      }
+
+      if(mp4Url) {
+        return mp4Url
       }
 
       return false
@@ -785,7 +959,7 @@ export default {
     
     // getYoutube ID
     getYoutubeID(url) {
-      
+
       // youtube data
       const youtubeRegex = /^(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/;
       const ytId = (url.match(youtubeRegex)) ? RegExp.$1 : false;
@@ -897,20 +1071,11 @@ export default {
       }
 
       const item = this.items[this.imgIndex]
-      if(this.isObject) {
+      if(this.checkIfIsObject(this.imgIndex)) {
         return item[this.srcName]
       }
 
       return item
-    },
-
-    // check if the item is an object (maybe has caption)
-    isObject() {
-      const item = this.items[this.imgIndex]
-      if(typeof item === 'object' && item !== null) {
-        return true
-      }
-      return false;
     },
 
     // get video url 
@@ -1171,6 +1336,13 @@ $breakpoints: (
     iframe {
       pointer-events: none;
     }
+    .cool-lightbox__slide {
+      transition: none;
+      &.cool-lightbox__slide--hide, &.cool-lightbox__slide--hide {
+        display: flex;
+        z-index: 50;
+      }
+    }
   }
   &.cool-lightbox--can-zoom {
     .cool-lightbox__slide {
@@ -1283,12 +1455,40 @@ $breakpoints: (
   .cool-lightbox__wrapper {
     width: 100%;
     height: 100%;
+    position: relative;
+    &.cool-lightbox__wrapper--swipe {
+      display: flex;
+      align-items: center;
+      .cool-lightbox__slide {
+        flex-shrink: 0;
+        display: flex;
+        position: relative;
+        height: 100%;
+        opacity: 0.4;
+        transition: opacity .3s linear;
+        &.cool-lightbox__slide--current {
+          opacity: 1;
+        }
+      }
+    }
   }
   .cool-lightbox__slide {
     width: 100%;
-    height: 100%;
-    display: flex;
-    position: relative;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    transition: transform .15s ease;
+    display: none;
+    position: absolute;
+    &.cool-lightbox__slide--current {
+      display: flex;
+    }
+      &.cool-lightbox__slide--prev, &.cool-lightbox__slide--next {
+        display: flex;
+        z-index: 50;
+      }
     .cool-lightbox__slide__img {
       position: absolute;
       height: 100%;
