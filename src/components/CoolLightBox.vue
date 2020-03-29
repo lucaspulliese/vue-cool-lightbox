@@ -33,7 +33,7 @@
         class="cool-lightbox__inner" 
         :style="innerStyles"
 
-        @mousedown="startSwipe"
+        @mousedown="startSwipe" 
         @mousemove="continueSwipe"
         @mouseup="endSwipe"
         @touchstart="startSwipe"
@@ -71,6 +71,7 @@
           <div 
             v-for="(item, itemIndex) in items"
             :key="itemIndex"
+            ref="items"
             class="cool-lightbox__slide"
             :class="{ 'cool-lightbox__slide--current': itemIndex === imgIndex }"
           >
@@ -81,10 +82,14 @@
                 draggable="false"
 
                 @load="imageLoaded"
-                @click="zoomImage"
+                @click="zoomImage(itemIndex)"
                 @mousedown="handleMouseDown($event)"
                 @mouseup="handleMouseUp($event)"
                 @mousemove="handleMouseMove($event)"
+
+                @touchstart="handleMouseDown($event)"
+                @touchmove="handleMouseMove($event)"
+                @touchend="handleMouseUp($event)"
                 />
               
               <div v-show="imageLoading" class="cool-lightbox-loading-wrapper">
@@ -208,7 +213,7 @@
             </svg>
           </button>
           
-          <button type="button" @click="fullScreenMode" class="cool-lightbox-toolbar__btn" title="Fullscreen">
+          <button type="button" @click="toggleFullScreenMode" class="cool-lightbox-toolbar__btn" title="Fullscreen">
             <svg width="20px" height="20px" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
               <path d="M4.5 11H3v4h4v-1.5H4.5V11zM3 7h1.5V4.5H7V3H3v4zm10.5 6.5H11V15h4v-4h-1.5v2.5zM11 3v1.5h2.5V7H15V3h-4z"></path>
             </svg>
@@ -239,7 +244,10 @@ export default {
     return {
       // swipe data
       initialMouseX: 0,
+      initialMouseY: 0,
       endMouseX: 0,
+      endMouseY: 0,
+      swipeType: 'horizontal',
       IsSwipping: false,
       isDraggingSwipe: false,
 
@@ -255,6 +263,7 @@ export default {
       paddingBottom: false,
       imageLoading: false,
       showThumbs: false,
+      isFullScreenMode: false,
 
       // aspect ratio videos
       aspectRatioVideo: {
@@ -400,6 +409,17 @@ export default {
         this.isVisible = false
         this.stopSlideShow()
 
+        // set starts X to 0
+        this.startsX = 0
+
+        // clear interval
+        clearInterval(this.swipeInterval)
+        this.swipeAnimation = null
+
+        // finish swipe
+        this.isDraggingSwipe = false
+        this.isZooming = true
+
         // remove events listener
         window.removeEventListener('keydown', this.eventListener)
 
@@ -461,6 +481,28 @@ export default {
   },
 
   methods: {
+    toggleFullScreenMode() {
+      if(this.isFullScreenMode) {
+        this.closeFullscreen()
+      } else {
+        this.fullScreenMode()
+      }
+
+      this.isFullScreenMode = !this.isFullScreenMode
+    },
+
+    closeFullscreen() {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.mozCancelFullScreen) { /* Firefox */
+        document.mozCancelFullScreen();
+      } else if (document.webkitExitFullscreen) { /* Chrome, Safari and Opera */
+        document.webkitExitFullscreen();
+      } else if (document.msExitFullscreen) { /* IE/Edge */
+        document.msExitFullscreen();
+      }
+    },
+
     fullScreenMode() {
       /* Get the documentElement (<html>) to display the page in fullscreen */
       var elem = document.documentElement;
@@ -487,12 +529,14 @@ export default {
 
     // start swipe event
     startSwipe(event) {
-      if(this.checkIfIsButton(event)) {
+      if(this.isZooming) {
         return false;
       }
 
-      // set starts X to 0
-      this.startsX = 0
+      // check if is some button
+      if(this.checkIfIsButton(event)) {
+        return false;
+      }
 
       // clear interval
       clearInterval(this.swipeInterval)
@@ -500,8 +544,8 @@ export default {
 
       // starts swipe
       this.isDraggingSwipe = true
-      this.startsX = this.getMouseXPosFromEvent(event)
       this.initialMouseX = this.getMouseXPosFromEvent(event);
+      this.initialMouseY = this.getMouseYPosFromEvent(event);
     },
 
     // continue swipe event
@@ -512,9 +556,9 @@ export default {
         const windowWidth = this.lightboxInnerWidth
 
         // swipe wrapper
-        this.xSwipeWrapper = -(windowWidth*this.imgIndex) + currentPosX - this.startsX
+        this.xSwipeWrapper = -(windowWidth*this.imgIndex) + currentPosX - this.initialMouseX - 30*this.imgIndex
 
-        // mobile case
+        // mobile caseS
         if(event.type === 'touchmove') {
           this.endMouseX = this.getMouseXPosFromEvent(event);
         }
@@ -527,10 +571,11 @@ export default {
         return false;
       }
 
-      if(this.startsX === 0) {
+      if(this.initialMouseX === 0) {
         return false
       }
 
+      // event check is dragging and swipe
       const self = this
       this.isDraggingSwipe = false
 
@@ -547,16 +592,8 @@ export default {
         return;
       } 
       
-      clearInterval(this.swipeInterval)
-      this.swipeAnimation = null
-
-      // animation swipe
-      this.swipeAnimation = 'all .15s linear';
-      this.swipeInterval = setInterval(interval, 150);
-
-      function interval() {
-        self.swipeAnimation = null
-      }
+      // set swipe animation
+      this.setSwipeAnimation()
 
       // reset swipe data
       setTimeout(function() {
@@ -566,23 +603,23 @@ export default {
       }, 10)
       
       // if the swipe is to the right
-      if((this.endMouseX - this.initialMouseX) < -80) {
+      if((this.endMouseX - this.initialMouseX) < -40) {
         return this.swipeToRight()
       } 
 
       // if the swipe is to the left
-      if((this.endMouseX - this.initialMouseX) > 80) {
+      if((this.endMouseX - this.initialMouseX) > 40) {
         return this.swipeToLeft();
       }
       
       const windowWidth = this.lightboxInnerWidth
-      this.xSwipeWrapper = -this.imgIndex*windowWidth
+      this.xSwipeWrapper = -this.imgIndex*windowWidth - 30*this.imgIndex
     },
     
     // swipe to left effect
     swipeToLeft() {
       if(!this.hasPrevious) {
-        return this.xSwipeWrapper = -this.imgIndex*this.lightboxInnerWidth
+        return this.xSwipeWrapper = -this.imgIndex*this.lightboxInnerWidth - 30*this.imgIndex
       }
 
       this.changeIndexToPrev()
@@ -591,7 +628,7 @@ export default {
     // swipe to right effect
     swipeToRight() {
       if(!this.hasNext) {
-        return this.xSwipeWrapper = -this.imgIndex*this.lightboxInnerWidth
+        return this.xSwipeWrapper = -this.imgIndex*this.lightboxInnerWidth - 30*this.imgIndex
       }
 
       this.changeIndexToNext()
@@ -603,6 +640,14 @@ export default {
           return event.clientX;
       }
       return event.touches[0].clientX;
+    },
+    
+    // function that return Y position from event
+    getMouseYPosFromEvent(event) {
+      if(event.type.indexOf('mouse') !== -1){
+          return event.clientY;
+      }
+      return event.touches[0].clientY;
     },
 
     // check if the image is cached
@@ -779,12 +824,15 @@ export default {
         this.lastX = e.clientX
         this.lastY = e.clientY
         this.canZoom = false
+        
+        const item = e.target.parentNode
+        item.style.transform  = 'translate3d(calc(-50% + '+this.left+'px), calc(-50% + '+this.top+'px), 0px) scale3d(1.6, 1.6, 1.6)';
       }
       e.stopPropagation()
     },
 
     // zoom image event
-    zoomImage() {
+    zoomImage(indexImage) {
       if(window.innerWidth < 700) {
         return false
       }
@@ -793,6 +841,14 @@ export default {
         return false
       }
 
+      if(this.IsSwipping) {
+        return false
+      }
+
+      // item zoom
+      const item = this.$refs.items[indexImage].childNodes[0]
+
+      // zoom variables
       const isZooming = this.isZooming
       const thisContext = this
 
@@ -808,7 +864,9 @@ export default {
       // check if is zooming
       if(this.isZooming) {
         this.stopSlideShow()
-        this.scale = 1.6
+
+        // add scale
+        item.style.transform  = 'translate3d(calc(-50%), calc(-50%), 0px) scale3d(1.6, 1.6, 1.6)';
 
         // hide buttons
         this.buttonsVisible = false
@@ -826,11 +884,6 @@ export default {
       }
     },
 
-    // resize window event
-    resizeWindow() {
-
-    },
-
     // Reset zoom data
     resetZoom() {
       this.scale = 1
@@ -839,10 +892,18 @@ export default {
       this.canZoom = false
       this.isZooming = false
       this.transition = 'all .3s ease'
-      
-      this.initialMouseX = 0
-      if(window.innerWidth >= 700) {
-        this.buttonsVisible = true
+
+      // only if index is not null
+      if(this.imgIndex) {
+
+        // reset styles
+        const item = this.$refs.items[this.imgIndex].childNodes[0]
+        item.style.transform  = 'translate3d(calc(-50% + '+this.left+'px), calc(-50% + '+this.top+'px), 0px) scale3d(1, 1, 1)';
+
+        this.initialMouseX = 0
+        if(window.innerWidth >= 700) {
+          this.buttonsVisible = true
+        }
       }
     },
 
@@ -931,18 +992,35 @@ export default {
       }
     },
 
+    // set swipe animation
+    setSwipeAnimation() {
+      const self = this
+      clearInterval(this.swipeInterval)
+      this.swipeAnimation = null
+
+      // animation swipe
+      this.swipeAnimation = 'all .3s ease';
+      this.swipeInterval = setInterval(interval, 330);
+
+      function interval() {
+        self.swipeAnimation = null
+      }
+    },
+
     // next slide event
     onNextClick(isFromSlideshow = false) {
       if(!isFromSlideshow) {
         this.stopSlideShow()
       }
-      
+
+      this.setSwipeAnimation()
       this.changeIndexToNext()
     },
 
     // prev slide event
     onPrevClick() {
       this.stopSlideShow();
+      this.setSwipeAnimation()
       this.changeIndexToPrev();
     },
 
@@ -981,7 +1059,7 @@ export default {
     setXPosition(index) {
 
       // set x position
-      this.xSwipeWrapper = -index*this.lightboxInnerWidth
+      this.xSwipeWrapper = -index*this.lightboxInnerWidth-30*index
     },
 
     // index change
@@ -1116,6 +1194,16 @@ export default {
   },
 
   computed: {
+    
+    // Images wrapper styles to use drag and zoom
+    imgWrapperStyle() {
+      return {
+        top: `50%`,
+        left: `50%`,
+        transition: this.transition,
+      }
+    },
+
     // lightbox styles
     lightboxStyles() {
       return { 
@@ -1169,17 +1257,7 @@ export default {
     // check if the slide has previous element 
     hasPrevious() {
       return (this.imgIndex - 1 >= 0)
-    },  
-
-    // Images wrapper styles to use drag and zoom
-    imgWrapperStyle() {
-      return {
-        transform: 'translate3d(calc(-50% + '+this.left+'px), calc(-50% + '+this.top+'px), 0px) scale3d('+this.scale+', '+this.scale+', '+this.scale+')',
-        top: `50%`,
-        left: `50%`,
-        transition: this.transition,
-      }
-    }
+    },
   }
 };
 </script>
@@ -1506,16 +1584,16 @@ $breakpoints: (
     left: 0;
     right: 0;
     z-index: 100;
-    transition: transform .15s ease;
     display: none;
     position: absolute;
+    margin-right: 30px;
+    &:last-of-type {
+      margin-right: 0;
+    }
+    transition: transform .3s ease;
     &.cool-lightbox__slide--current {
       display: flex;
     }
-      &.cool-lightbox__slide--prev, &.cool-lightbox__slide--next {
-        display: flex;
-        z-index: 50;
-      }
     .cool-lightbox__slide__img {
       position: absolute;
       height: 100%;
