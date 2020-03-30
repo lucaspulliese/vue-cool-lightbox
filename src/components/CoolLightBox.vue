@@ -64,7 +64,7 @@
         <div v-if="effect === 'swipe'" 
           class="cool-lightbox__wrapper cool-lightbox__wrapper--swipe"
           :style="{
-            transform: 'translate3d('+xSwipeWrapper+'px, 0, 0)',
+            transform: 'translate3d('+xSwipeWrapper+'px, '+ySwipeWrapper+'px, 0)',
             transition: swipeAnimation
           }"
           >
@@ -198,8 +198,11 @@
             <svg xmlns="http://www.w3.org/2000/svg" v-if="!isPlayingSlideShow" viewBox="0 0 24 24">
               <path d="M6.5 5.4v13.2l11-6.6z"></path>
             </svg>
-            <svg xmlns="http://www.w3.org/2000/svg" v-else viewBox="0 0 24 24">
-              <path d="M8.33 5.75h2.2v12.5h-2.2V5.75zm5.15 0h2.2v12.5h-2.2V5.75z"></path>
+
+            <svg v-else xmlns="http://www.w3.org/2000/svg">
+              <g>
+                <rect id="svg_4" height="11.97529" width="11.728392" y="6.030873" x="6.259265" stroke-width="1.5" stroke="#000" fill="#000000"/>
+              </g>
             </svg>
           </button>
 
@@ -247,12 +250,13 @@ export default {
       initialMouseY: 0,
       endMouseX: 0,
       endMouseY: 0,
-      swipeType: 'horizontal',
+      swipeType: null,
       IsSwipping: false,
       isDraggingSwipe: false,
 
       // swipe effect
       xSwipeWrapper: 0,
+      ySwipeWrapper: 0,
       swipeAnimation: null,
       swipeInterval: null,
       lightboxInnerWidth: null,
@@ -356,17 +360,19 @@ export default {
   watch: {
     showThumbs(prev, val) {
       let widthGalleryBlock = 212;
-      if(window.innerWidth < 700) {
+      let swipeAnimation = 'all .3s ease'
+      if(window.innerWidth < 767) {
         widthGalleryBlock = 102
+        swipeAnimation = null
       }
 
       const self = this
-      this.swipeAnimation = 'all .3s ease'
+      this.swipeAnimation = swipeAnimation
 
       if(prev) {
-        this.xSwipeWrapper = -this.imgIndex*window.innerWidth + widthGalleryBlock*this.imgIndex
+        this.xSwipeWrapper = -this.imgIndex*(window.innerWidth - widthGalleryBlock) - 30*this.imgIndex
       } else {
-        this.xSwipeWrapper = -this.imgIndex*window.innerWidth
+        this.xSwipeWrapper = -this.imgIndex*window.innerWidth - 30*this.imgIndex
       }
 
       setTimeout(function() {
@@ -378,6 +384,11 @@ export default {
       const self = this
 
       if(prev !== null) {
+        
+        // swipe type
+        this.swipeType = null
+        this.initialMouseY = 0
+        this.ySwipeWrapper = 0
 
         // swipe effect case remove loop
         if(this.effect === 'swipe') {
@@ -411,6 +422,8 @@ export default {
 
         // set starts X to 0
         this.startsX = 0
+        this.initialMouseY = 0
+        this.swipeType = null
 
         // clear interval
         clearInterval(this.swipeInterval)
@@ -465,6 +478,10 @@ export default {
 
         // reset zoom
         this.resetZoom()
+
+        // reset swipe type
+        this.swipeType = null
+        this.ySwipeWrapper = 0
 
         // setAspectRatioVideo when is swipe
         if(this.effect === 'swipe') {
@@ -553,14 +570,36 @@ export default {
       if(this.isDraggingSwipe) {
         this.IsSwipping = true
         const currentPosX = this.getMouseXPosFromEvent(event)
+        const currentPosY = this.getMouseYPosFromEvent(event)
         const windowWidth = this.lightboxInnerWidth
 
-        // swipe wrapper
-        this.xSwipeWrapper = -(windowWidth*this.imgIndex) + currentPosX - this.initialMouseX - 30*this.imgIndex
+        // diffs
+        const diffX = Math.abs(currentPosX - this.initialMouseX)
+        const diffY = Math.abs(currentPosY - this.initialMouseY)
+
+        // swipe type
+        if(this.swipeType == null) {
+          if(diffY > 5 || diffX > 5) {
+            if(diffY > diffX) {
+              this.swipeType = 'v'
+            } else {
+              this.swipeType = 'h'
+            }
+          }
+        }
+
+        // swipe
+        if(this.swipeType == 'h') {
+          // swipe wrapper
+          this.xSwipeWrapper = -(windowWidth*this.imgIndex) + currentPosX - this.initialMouseX - 30*this.imgIndex 
+        } else {
+          this.ySwipeWrapper = currentPosY - this.initialMouseY
+        }
 
         // mobile caseS
         if(event.type === 'touchmove') {
           this.endMouseX = this.getMouseXPosFromEvent(event);
+          this.endMouseY = this.getMouseYPosFromEvent(event);
         }
       }
     },
@@ -571,24 +610,32 @@ export default {
         return false;
       }
 
-      if(this.initialMouseX === 0) {
-        return false
-      }
-
       // event check is dragging and swipe
       const self = this
+      const swipeType = this.swipeType
       this.isDraggingSwipe = false
+      
+      // horizontal swipe type
+      if(this.initialMouseX === 0 && swipeType == 'h') {
+        return false
+      }
 
       // touch end fixes
       if(event.type !== 'touchend') {
         this.endMouseX = this.getMouseXPosFromEvent(event);
+        this.endMouseY = this.getMouseYPosFromEvent(event);
       } else {
         if(this.endMouseX === 0) {
           return;
         }
       }
 
-      if((this.endMouseX - this.initialMouseX === 0) || this.isZooming) {
+      // check if is dragged 
+      if(
+        ((this.endMouseX - this.initialMouseX === 0) && swipeType == 'h') || 
+        this.isZooming ||
+        ((this.endMouseY - this.initialMouseY === 0) && swipeType == 'v')
+      ) {
         return;
       } 
       
@@ -601,16 +648,32 @@ export default {
         self.initialMouseX = 0
         self.endMouseX = 0
       }, 10)
-      
-      // if the swipe is to the right
-      if((this.endMouseX - this.initialMouseX) < -40) {
-        return this.swipeToRight()
-      } 
 
-      // if the swipe is to the left
-      if((this.endMouseX - this.initialMouseX) > 40) {
-        return this.swipeToLeft();
+      // type of swipe
+      if(this.swipeType === 'h') {
+
+        // if the swipe is to the right
+        if((this.endMouseX - this.initialMouseX) < -40) {
+          return this.swipeToRight()
+        } 
+
+        // if the swipe is to the left
+        if((this.endMouseX - this.initialMouseX) > 40) {
+          return this.swipeToLeft();
+        }
       }
+
+
+      if(this.swipeType === 'v') {
+        const diffY = Math.abs(this.endMouseY - this.initialMouseY)
+
+        // diff Y
+        if(diffY >= 90) {
+          this.close()
+        } else {
+          this.ySwipeWrapper = 0
+        }
+      } 
       
       const windowWidth = this.lightboxInnerWidth
       this.xSwipeWrapper = -this.imgIndex*windowWidth - 30*this.imgIndex
@@ -891,6 +954,7 @@ export default {
       this.top = 0
       this.canZoom = false
       this.isZooming = false
+      this.swipeType = null
       this.transition = 'all .3s ease'
 
       // only if index is not null
@@ -971,6 +1035,7 @@ export default {
     // close event
     close() {
       this.stopSlideShow();
+      this.swipeType = null;
       this.$emit("close", this.imgIndex);
       this.showThumbs = false;
       this.imgIndex = null;
@@ -986,7 +1051,7 @@ export default {
         return false;
       }
 
-      var elements = '.cool-lightbox-thumbs, .cool-lightbox-thumbs *, .cool-lightbox-button, .cool-lightbox-toolbar__btn, .cool-lightbox-toolbar__btn *, .cool-lightbox-button *, .cool-lightbox__slide__img *, .cool-lightbox-video';
+      var elements = '.cool-lightbox-thumbs, svg, path, rect, .cool-lightbox-thumbs *, .cool-lightbox-button, .cool-lightbox-toolbar__btn, .cool-lightbox-toolbar__btn *, .cool-lightbox-button *, .cool-lightbox__slide__img *, .cool-lightbox-video';
       if (!event.target.matches(elements)) {
         this.close()
       }
@@ -1305,10 +1370,13 @@ $breakpoints: (
     right: -102px;
     top: 0;
     overflow-x: hidden;
-    transition: all .3s ease;
+    transition: none;
     background-color: #ddd;
     scrollbar-width: thin;
     scrollbar-color: #fa4242 rgba(175, 175, 175, 0.9);
+    @include breakpoint(phone) {
+      transition: all .3s ease;
+    }
     &::-webkit-scrollbar {
       width: 6px;
       height: 6px;
@@ -1421,7 +1489,10 @@ $breakpoints: (
     left: 0;
     right: 0;
     overflow: hidden;
-    transition: all .3s ease;
+    transition: none;
+    @include breakpoint(phone) {
+      transition: all .3s ease;
+    }
   }
   .cool-lightbox__progressbar {
     position: absolute;
@@ -1492,7 +1563,7 @@ $breakpoints: (
     outline: none;
   }
   svg {
-    path {
+    path, rect {
       fill: currentColor;
     }
   }
