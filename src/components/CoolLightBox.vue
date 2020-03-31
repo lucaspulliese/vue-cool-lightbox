@@ -972,17 +972,16 @@ export default {
       this.isZooming = false
       this.swipeType = null
       this.transition = 'all .3s ease'
-      
-      let item;
-      if(this.effect == 'swipe') {
-        item = this.$refs.items[this.imgIndex].childNodes[0]
-      } else {
-        item = this.$refs.items.childNodes[0]
-      }
 
       // only if index is not null
       if(this.imgIndex != null) {
         
+        let item;
+        if(this.effect == 'swipe') {
+          item = this.$refs.items[this.imgIndex].childNodes[0]
+        } else {
+          item = this.$refs.items.childNodes[0]
+        }
         // reset styles
         item.style.transform  = 'translate3d(calc(-50% + '+this.left+'px), calc(-50% + '+this.top+'px), 0px) scale3d(1, 1, 1)';
 
@@ -1033,9 +1032,12 @@ export default {
 
       const thisContext = this
       let el = document.getElementsByClassName('cool-lightbox__inner');
+      el = el[0]
+
+      let computedStyle = getComputedStyle(el)
       if(window.innerWidth < 700) {
 
-        let width = el[0].clientWidth
+        let width = el.clientWidth
         let height = Math.round((width/16)*9);
 
         this.aspectRatioVideo.height = height+'px'
@@ -1044,7 +1046,9 @@ export default {
       } else {
         
         setTimeout(function() {
-          let height = el[0].clientHeight
+          let height = el.clientHeight;
+          height -= parseFloat(computedStyle.paddingTop) + parseFloat(computedStyle.paddingBottom);
+
           let width = (height/9)*16;
 
           thisContext.aspectRatioVideo.height = height+'px'

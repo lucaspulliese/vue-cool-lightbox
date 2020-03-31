@@ -978,17 +978,16 @@
         this.isZooming = false;
         this.swipeType = null;
         this.transition = 'all .3s ease';
-        
-        var item;
-        if(this.effect == 'swipe') {
-          item = this.$refs.items[this.imgIndex].childNodes[0];
-        } else {
-          item = this.$refs.items.childNodes[0];
-        }
 
         // only if index is not null
         if(this.imgIndex != null) {
           
+          var item;
+          if(this.effect == 'swipe') {
+            item = this.$refs.items[this.imgIndex].childNodes[0];
+          } else {
+            item = this.$refs.items.childNodes[0];
+          }
           // reset styles
           item.style.transform  = 'translate3d(calc(-50% + '+this.left+'px), calc(-50% + '+this.top+'px), 0px) scale3d(1, 1, 1)';
 
@@ -1039,9 +1038,12 @@
 
         var thisContext = this;
         var el = document.getElementsByClassName('cool-lightbox__inner');
+        el = el[0];
+
+        var computedStyle = getComputedStyle(el);
         if(window.innerWidth < 700) {
 
-          var width = el[0].clientWidth;
+          var width = el.clientWidth;
           var height = Math.round((width/16)*9);
 
           this.aspectRatioVideo.height = height+'px';
@@ -1050,7 +1052,9 @@
         } else {
           
           setTimeout(function() {
-            var height = el[0].clientHeight;
+            var height = el.clientHeight;
+            height -= parseFloat(computedStyle.paddingTop) + parseFloat(computedStyle.paddingBottom);
+
             var width = (height/9)*16;
 
             thisContext.aspectRatioVideo.height = height+'px';
@@ -1466,7 +1470,7 @@
     /* scoped */
     var __vue_scope_id__ = undefined;
     /* module identifier */
-    var __vue_module_identifier__ = "data-v-63b978fc";
+    var __vue_module_identifier__ = "data-v-f83fb30a";
     /* functional template */
     var __vue_is_functional_template__ = false;
     /* style inject */
