@@ -43,7 +43,7 @@
         <div class="cool-lightbox__progressbar" :style="stylesInterval"></div>
 
         <div class="cool-lightbox__navigation">
-          <button type="button" class="cool-lightbox-button cool-lightbox-button--prev" title="Previous" :class="buttonsClasses" v-show="(hasPrevious || loop) && items.length > 1" @click="onPrevClick">
+          <button type="button" class="cool-lightbox-button cool-lightbox-button--prev" title="Previous" :class="buttonsClasses" v-show="(hasPrevious || loopData) && items.length > 1" @click="onPrevClick">
             <slot name="icon-previous">
               <div class="cool-lightbox-button__icon">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11.28 15.7l-1.34 1.37L5 12l4.94-5.07 1.34 1.38-2.68 2.72H19v1.94H8.6z"></path></svg>
@@ -51,7 +51,7 @@
             </slot>
           </button>
 
-          <button type="button" class="cool-lightbox-button cool-lightbox-button--next" title="Next" :class="buttonsClasses" v-show="(hasNext || loop) && items.length > 1" @click="onNextClick(false)">
+          <button type="button" class="cool-lightbox-button cool-lightbox-button--next" title="Next" :class="buttonsClasses" v-show="(hasNext || loopData) && items.length > 1" @click="onNextClick(false)">
             <slot name="icon-next">
               <div class="cool-lightbox-button__icon">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.4 12.97l-2.68 2.72 1.34 1.38L19 12l-4.94-5.07-1.34 1.38 2.68 2.72H5v1.94z"></path></svg>
@@ -126,6 +126,7 @@
           
         <div v-if="effect === 'fade'" class="cool-lightbox__wrapper">
           <div 
+            ref="items"
             class="cool-lightbox__slide cool-lightbox__slide--current"
           >
             <transition name="cool-lightbox-slide-change" mode="out-in">
@@ -216,7 +217,7 @@
             </svg>
           </button>
           
-          <button type="button" @click="toggleFullScreenMode" class="cool-lightbox-toolbar__btn" title="Fullscreen">
+          <button type="button" v-if="fullScreen" @click="toggleFullScreenMode" class="cool-lightbox-toolbar__btn" title="Fullscreen">
             <svg width="20px" height="20px" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
               <path d="M4.5 11H3v4h4v-1.5H4.5V11zM3 7h1.5V4.5H7V3H3v4zm10.5 6.5H11V15h4v-4h-1.5v2.5zM11 3v1.5h2.5V7H15V3h-4z"></path>
             </svg>
@@ -290,6 +291,7 @@ export default {
       // slideshow playing data
       isPlayingSlideShow: false,
       intervalProgress: null,
+      loopData: false,
       stylesInterval: {
         'display': 'block'
       }
@@ -355,6 +357,11 @@ export default {
       type: Boolean,
       default: true,
     },
+
+    fullScreen: {
+      type: Boolean,
+      default: false,
+    }
   },
 
   watch: {
@@ -389,10 +396,13 @@ export default {
         this.swipeType = null
         this.initialMouseY = 0
         this.ySwipeWrapper = 0
+        
+        // set loop from data
+        this.loopData = this.loop
 
         // swipe effect case remove loop
         if(this.effect === 'swipe') {
-          this.loop = false
+          this.loopData = false
         }
 
         // add img index
@@ -675,6 +685,7 @@ export default {
         }
       } 
       
+      this.swipeType = null
       const windowWidth = this.lightboxInnerWidth
       this.xSwipeWrapper = -this.imgIndex*windowWidth - 30*this.imgIndex
     },
@@ -771,7 +782,7 @@ export default {
         return item[this.srcThumb]
       } 
 
-      if(this.isVideo(item)) {
+      if(this.getVideoUrl(item)) {
         return false
       }
 
@@ -784,7 +795,7 @@ export default {
         return false
       }
 
-      if(!this.hasNext && !this.loop) {
+      if(!this.hasNext && !this.loopData) {
         return false
       }
       this.isPlayingSlideShow = !this.isPlayingSlideShow
@@ -825,7 +836,7 @@ export default {
         }
         
         self.onNextClick(true)
-        if(!self.hasNext && !self.loop) {
+        if(!self.hasNext && !self.loopData) {
           self.stopSlideShow()
         } else {
           setTimeout(function() {
@@ -909,8 +920,13 @@ export default {
       }
 
       // item zoom
-      const item = this.$refs.items[indexImage].childNodes[0]
-
+      let item;
+      if(this.effect == 'swipe') {
+        item = this.$refs.items[this.imgIndex].childNodes[0]
+      } else {
+        item = this.$refs.items.childNodes[0]
+      }
+      
       // zoom variables
       const isZooming = this.isZooming
       const thisContext = this
@@ -956,12 +972,18 @@ export default {
       this.isZooming = false
       this.swipeType = null
       this.transition = 'all .3s ease'
+      
+      let item;
+      if(this.effect == 'swipe') {
+        item = this.$refs.items[this.imgIndex].childNodes[0]
+      } else {
+        item = this.$refs.items.childNodes[0]
+      }
 
       // only if index is not null
-      if(this.imgIndex) {
-
+      if(this.imgIndex != null) {
+        
         // reset styles
-        const item = this.$refs.items[this.imgIndex].childNodes[0]
         item.style.transform  = 'translate3d(calc(-50% + '+this.left+'px), calc(-50% + '+this.top+'px), 0px) scale3d(1, 1, 1)';
 
         this.initialMouseX = 0
@@ -1074,6 +1096,10 @@ export default {
 
     // next slide event
     onNextClick(isFromSlideshow = false) {
+      if(this.isZooming) {
+        return false;
+      }
+
       if(!isFromSlideshow) {
         this.stopSlideShow()
       }
@@ -1084,6 +1110,10 @@ export default {
 
     // prev slide event
     onPrevClick() {
+      if(this.isZooming) {
+        return false;
+      }
+      
       this.stopSlideShow();
       this.setSwipeAnimation()
       this.changeIndexToPrev();
@@ -1095,7 +1125,7 @@ export default {
         this.onIndexChange(this.imgIndex + 1)
       } else {
         // only if has loop prop
-        if(this.loop) {
+        if(this.loopData) {
           this.onIndexChange(0)
         }
       }
@@ -1107,7 +1137,7 @@ export default {
         this.onIndexChange(this.imgIndex - 1)
       } else {
         // only if has loop prop
-        if(this.loop) {
+        if(this.loopData) {
           this.onIndexChange(this.items.length - 1)
         }
       }
@@ -1615,9 +1645,14 @@ $breakpoints: (
   .cool-lightbox__iframe {
     width: 100%;
     display: flex;
+    top: 50%;
+    left: 50%;
     align-items: center;
     justify-content: center;
     position: relative;
+    transform: translate3d(-50%, -50%, 0px) scale3d(1, 1, 1);
+    .cool-lightbox-video {
+    }
     iframe {
       //position: absolute;
       width: 100%;

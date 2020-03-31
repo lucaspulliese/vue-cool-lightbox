@@ -1,6 +1,8 @@
 # Vue-cool-lightbox
 
-Vue-cool-lightbox is a pretty Vue.js lightbox component without any dependencies, inspired by [fancybox](http://fancyapps.com/fancybox/3/) with zoom and videos supported
+Vue-cool-lightbox is a pretty Vue.js lightbox component without any dependencies, inspired by [fancybox](http://fancyapps.com/fancybox/3/) with zoom, swipe, captions and videos supported.
+
+![Vue CoolLightbox screenshot](http://lucaspulliese.com/wp-content/themes/theme/images/screenshot-vue-cool-lightbox.jpg)
 
 ## Installation
 
@@ -13,8 +15,6 @@ npm install --save vue-cool-lightbox
 and use the lightbox:
 ```javascript
 import CoolLightBox from 'vue-cool-lightbox'
-
-/* New step! For version >= 1.1.0 add Vue CoolLightBox CSS. Can be added as a static asset or inside a component */
 import 'vue-cool-lightbox/dist/vue-cool-lightbox.min.css'
 
 export default {
@@ -107,6 +107,8 @@ items: [
 |:------| :------: | :------: |:------|
 | items | Array | Array of images/videos|  |
 | index | Number | Index of items to open |  |
+| effect | String | Effect on slide, could be swipe or fade | swipe |
+| fullScreen | Boolean | Allow users to fullscreen mode | false |
 | loop | Boolean| Enables looping through items | true | 
 | slideshow | Boolean | Enables lighbox slideshow | true | 
 | slideshowColorBar | String | Color of the slideshow progress bar | #fa4242 | 
