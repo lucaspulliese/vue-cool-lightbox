@@ -1,7 +1,7 @@
 <template>
   <transition name="cool-lightbox-modal">
     <div class="cool-lightbox" 
-      v-bind:class="lightboxClasses" 
+      v-bind:class="lightboxClasses"
       v-if="isVisible" 
       @click="closeModal"
       v-bind:style="lightboxStyles">
@@ -361,6 +361,11 @@ export default {
     fullScreen: {
       type: Boolean,
       default: false,
+    },
+
+    thumbsPosition: {
+      type: String,
+      default: 'right',
     }
   },
 
@@ -692,7 +697,7 @@ export default {
     
     // swipe to left effect
     swipeToLeft() {
-      if(!this.hasPrevious) {
+      if(!this.hasPrevious && this.effect === 'swipe') {
         return this.xSwipeWrapper = -this.imgIndex*this.lightboxInnerWidth - 30*this.imgIndex
       }
 
@@ -701,7 +706,7 @@ export default {
     
     // swipe to right effect
     swipeToRight() {
-      if(!this.hasNext) {
+      if(!this.hasNext && this.effect === 'swipe') {
         return this.xSwipeWrapper = -this.imgIndex*this.lightboxInnerWidth - 30*this.imgIndex
       }
 
@@ -1333,12 +1338,17 @@ export default {
 
     // Lightbox classes
     lightboxClasses() {
-      return {
-        'cool-lightbox--can-zoom': this.canZoom,
-        'cool-lightbox--is-zooming': this.isZooming,
-        'cool-lightbox--show-thumbs': this.showThumbs,
-        'cool-lightbox--is-swipping': this.isDraggingSwipe,
-      }
+      let classesReturn = [
+        { 'cool-lightbox--can-zoom': this.canZoom },
+        { 'cool-lightbox--is-zooming': this.isZooming },
+        { 'cool-lightbox--show-thumbs': this.showThumbs },
+        { 'cool-lightbox--is-swipping': this.isDraggingSwipe }
+      ];
+
+      let classString = 'cool-lightbox--thumbs-'+this.thumbsPosition
+      classesReturn.push(classString)
+
+      return classesReturn
     },
 
     // Buttons classes
@@ -1518,10 +1528,10 @@ $breakpoints: (
   .cool-lightbox__inner {
     padding: 60px 0;
     position: absolute;
-    height: 100%;
     top: 0;
     left: 0;
     right: 0;
+    bottom: 0;
     overflow: hidden;
     transition: none;
     @include breakpoint(phone) {
@@ -1574,15 +1584,57 @@ $breakpoints: (
       opacity: 0;
     }
   }
-  &.cool-lightbox--show-thumbs {
-    .cool-lightbox__inner {
-      right: 102px;
-      @include breakpoint(phone) {
-        right: 212px;
+  &.cool-lightbox--thumbs-right {
+    &.cool-lightbox--show-thumbs {
+      .cool-lightbox__inner {
+        right: 102px;
+        @include breakpoint(phone) {
+          right: 212px;
+        }
+      }
+      .cool-lightbox-thumbs {
+        right: 0;
       }
     }
+  }
+  &.cool-lightbox--thumbs-bottom {
     .cool-lightbox-thumbs {
+      width: 100%;
+      left: 0;
       right: 0;
+      top: auto;
+      height: 70px;
+      bottom: -70px;
+      overflow: auto;
+      @include breakpoint(phone) {
+        bottom: -79px;
+        height: 79px;
+      }
+      .cool-lightbox-thumbs__list {
+        width: 100%;
+        flex-wrap: nowrap;
+        justify-content: center;
+        .cool-lightbox__thumb {
+          width: 100px;
+          flex-shrink: 0;
+          margin-bottom: 0;
+          height: 65px;
+          @include breakpoint(phone) {
+            height: 75px;
+          }
+        }
+      }
+    }
+    &.cool-lightbox--show-thumbs {
+      .cool-lightbox__inner {
+        bottom: 70px;
+        @include breakpoint(phone) {
+          bottom: 79px;
+        }
+      }
+      .cool-lightbox-thumbs {
+        bottom: 0;
+      }
     }
   }
   * {
