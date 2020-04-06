@@ -361,6 +361,11 @@ var script = {
     fullScreen: {
       type: Boolean,
       default: false,
+    },
+
+    thumbsPosition: {
+      type: String,
+      default: 'right',
     }
   },
 
@@ -692,7 +697,7 @@ var script = {
     
     // swipe to left effect
     swipeToLeft: function swipeToLeft() {
-      if(!this.hasPrevious) {
+      if(!this.hasPrevious && this.effect === 'swipe') {
         return this.xSwipeWrapper = -this.imgIndex*this.lightboxInnerWidth - 30*this.imgIndex
       }
 
@@ -701,7 +706,7 @@ var script = {
     
     // swipe to right effect
     swipeToRight: function swipeToRight() {
-      if(!this.hasNext) {
+      if(!this.hasNext && this.effect === 'swipe') {
         return this.xSwipeWrapper = -this.imgIndex*this.lightboxInnerWidth - 30*this.imgIndex
       }
 
@@ -1335,12 +1340,17 @@ var script = {
 
     // Lightbox classes
     lightboxClasses: function lightboxClasses() {
-      return {
-        'cool-lightbox--can-zoom': this.canZoom,
-        'cool-lightbox--is-zooming': this.isZooming,
-        'cool-lightbox--show-thumbs': this.showThumbs,
-        'cool-lightbox--is-swipping': this.isDraggingSwipe,
-      }
+      var classesReturn = [
+        { 'cool-lightbox--can-zoom': this.canZoom },
+        { 'cool-lightbox--is-zooming': this.isZooming },
+        { 'cool-lightbox--show-thumbs': this.showThumbs },
+        { 'cool-lightbox--is-swipping': this.isDraggingSwipe }
+      ];
+
+      var classString = 'cool-lightbox--thumbs-'+this.thumbsPosition;
+      classesReturn.push(classString);
+
+      return classesReturn
     },
 
     // Buttons classes

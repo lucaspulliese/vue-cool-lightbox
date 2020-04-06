@@ -118,6 +118,7 @@ items: [
 | overlayColor | String | Overlay color | rgba(30, 30, 30, .9) | 
 | zIndex | Number | .cool-lightbox z-index | 9999 | 
 | gallery | Boolean | Enable/disable gallery | true | 
+| thumbsPosition | String | Defines thumbs position, could be right or bottom | 'right' | 
 
 ### Slots Supported
 
