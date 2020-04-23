@@ -489,6 +489,16 @@ export default {
 
           // check if user can zoom
           this.checkZoom()
+          
+          // setAspectRatioVideo when is swipe
+          if(this.effect === 'swipe') {
+            this.setAspectRatioVideo();
+          } else {
+
+            if(this.getVideoUrl(this.getItemSrc(prev))) {
+              this.setAspectRatioVideo();
+            }
+          }
         }
 
         // reset zoom
@@ -497,16 +507,6 @@ export default {
         // reset swipe type
         this.swipeType = null
         this.ySwipeWrapper = 0
-
-        // setAspectRatioVideo when is swipe
-        if(this.effect === 'swipe') {
-          this.setAspectRatioVideo();
-        } else {
-
-          if(this.getVideoUrl(this.getItemSrc(prev))) {
-            this.setAspectRatioVideo();
-          }
-        }
 
       })
     }, 
