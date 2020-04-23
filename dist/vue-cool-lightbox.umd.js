@@ -495,6 +495,16 @@
 
             // check if user can zoom
             this$1.checkZoom();
+            
+            // setAspectRatioVideo when is swipe
+            if(this$1.effect === 'swipe') {
+              this$1.setAspectRatioVideo();
+            } else {
+
+              if(this$1.getVideoUrl(this$1.getItemSrc(prev))) {
+                this$1.setAspectRatioVideo();
+              }
+            }
           }
 
           // reset zoom
@@ -503,16 +513,6 @@
           // reset swipe type
           this$1.swipeType = null;
           this$1.ySwipeWrapper = 0;
-
-          // setAspectRatioVideo when is swipe
-          if(this$1.effect === 'swipe') {
-            this$1.setAspectRatioVideo();
-          } else {
-
-            if(this$1.getVideoUrl(this$1.getItemSrc(prev))) {
-              this$1.setAspectRatioVideo();
-            }
-          }
 
         });
       }, 
@@ -1480,7 +1480,7 @@
     /* scoped */
     var __vue_scope_id__ = undefined;
     /* module identifier */
-    var __vue_module_identifier__ = "data-v-33f0bae8";
+    var __vue_module_identifier__ = "data-v-01b835e8";
     /* functional template */
     var __vue_is_functional_template__ = false;
     /* style inject */
