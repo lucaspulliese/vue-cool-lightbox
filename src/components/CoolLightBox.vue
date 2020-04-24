@@ -373,7 +373,7 @@ export default {
     thumbsPosition: {
       type: String,
       default: 'right',
-    }
+    },
   },
 
   watch: {
@@ -415,6 +415,7 @@ export default {
         // swipe effect case remove loop
         if(this.effect === 'swipe') {
           this.loopData = false
+          window.addEventListener('resize', this.xPositionOnResize)
         }
 
         // add img index
@@ -463,6 +464,9 @@ export default {
 
         // remove click event
         window.removeEventListener('click', this.showButtons)
+
+        // remove resize event
+        window.removeEventListener('resize', this.xPositionOnResize)
       }
 
     }, 
@@ -1166,9 +1170,17 @@ export default {
       this.lightboxInnerWidth = width
     },
 
+    // x position on resize event
+    xPositionOnResize() {
+      this.setLightboxInnerWidth()
+      const index = this.imgIndex
+
+      // set x position
+      this.xSwipeWrapper = -index*this.lightboxInnerWidth-30*index
+    },
+
     // set x position by img index
     setXPosition(index) {
-
       // set x position
       this.xSwipeWrapper = -index*this.lightboxInnerWidth-30*index
     },
