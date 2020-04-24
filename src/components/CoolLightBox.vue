@@ -75,9 +75,11 @@
             class="cool-lightbox__slide"
             :class="{ 'cool-lightbox__slide--current': itemIndex === imgIndex }"
           >
-            <div v-if="!getVideoUrl(getItemSrc(itemIndex))" key="image" :style="imgWrapperStyle" class="cool-lightbox__slide__img">
+            <div 
+                v-lazyload
+                v-if="!getVideoUrl(getItemSrc(itemIndex))" key="image" :style="imgWrapperStyle" class="cool-lightbox__slide__img">
               <img 
-                :src="getItemSrc(itemIndex)" 
+                :data-url="getItemSrc(itemIndex)"
                 :key="itemIndex"
                 draggable="false"
 
@@ -242,7 +244,12 @@
 </template>
 
 <script>
+import LazyLoadDirective from "../directives/LazyLoad";
+
 export default {
+  directives: {
+    lazyload: LazyLoadDirective
+  },
 
   data() {
     return {
