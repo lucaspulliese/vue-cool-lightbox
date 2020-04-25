@@ -186,11 +186,11 @@
         <transition name="modal">
           <div v-show="checkIfIsObject(imgIndex) && (items[imgIndex].title || items[imgIndex].description)" key="caption-block" class="cool-lightbox-caption">
             <transition name="cool-lightbox-slide-change" mode="out-in">
-              <h6 key="title" v-if="checkIfIsObject(imgIndex) && items[imgIndex].title">{{ items[imgIndex].title }}</h6>
+              <h6 key="title" v-html="items[imgIndex].title" v-if="checkIfIsObject(imgIndex) && items[imgIndex].title"></h6>
             </transition>
 
             <transition name="cool-lightbox-slide-change" mode="out-in">
-              <p key="description" v-if="checkIfIsObject(imgIndex) && items[imgIndex].description">{{ items[imgIndex].description }}</p>
+              <p key="description" v-html="items[imgIndex].description" v-if="checkIfIsObject(imgIndex) && items[imgIndex].description"></p>
             </transition>
           </div>
           <!--/cool-lightbox-caption-->
@@ -562,7 +562,7 @@ export default {
 
     // check if event is arrow button or toolbar button
     checkIfIsButton(eventEmit) {
-      var elements = '.cool-lightbox-button, .cool-lightbox-button *, .cool-lightbox-toolbar__btn, .cool-lightbox-toolbar__btn *';
+      var elements = '.cool-lightbox-button, .cool-lightbox-button *, .cool-lightbox-toolbar__btn, .cool-lightbox-toolbar__btn *, .cool-lightbox-caption h6, .cool-lightbox-caption p, .cool-lightbox-caption a';
       if (event.target.matches(elements)) {
         return true
       }
@@ -1093,7 +1093,7 @@ export default {
         return false;
       }
 
-      var elements = '.cool-lightbox-thumbs, svg, path, rect, .cool-lightbox-thumbs *, .cool-lightbox-button, .cool-lightbox-toolbar__btn, .cool-lightbox-toolbar__btn *, .cool-lightbox-button *, .cool-lightbox__slide__img *, .cool-lightbox-video';
+      var elements = '.cool-lightbox-thumbs, svg, path, rect, .cool-lightbox-thumbs *, .cool-lightbox-button, .cool-lightbox-toolbar__btn, .cool-lightbox-toolbar__btn *, .cool-lightbox-button *, .cool-lightbox__slide__img *, .cool-lightbox-video, .cool-lightbox-caption h6, .cool-lightbox-caption p, .cool-lightbox-caption a';
       if (!event.target.matches(elements)) {
         this.close()
       }
@@ -1851,10 +1851,8 @@ $breakpoints: (
   opacity: 1;
   line-height: 1.5;
   padding: 18px 28px 16px 24px;
-  pointer-events: none;
   right: 0;
   text-align: center;
-  z-index: 99996;
   direction: ltr;
   position: absolute;
   transition: opacity .25s ease,visibility 0s ease .25s;
@@ -1862,6 +1860,10 @@ $breakpoints: (
   background: linear-gradient(0deg,rgba(0,0,0,.75) 0,rgba(0,0,0,.3) 50%,rgba(0,0,0,.15) 65%,rgba(0,0,0,.075) 75.5%,rgba(0,0,0,.037) 82.85%,rgba(0,0,0,.019) 88%,transparent);
   @include breakpoint(phone) {
     padding: 22px 30px 23px 30px;
+  }
+  a {
+    color: #eee;
+    text-decoration: underline;
   }
   h6 {
     font-size: 14px;
@@ -1878,6 +1880,12 @@ $breakpoints: (
     color: #ccc;
     @include breakpoint(phone) {
       font-size: 15px;
+    }
+    a {
+      color: #ccc;
+      &:hover {
+        color: #eee;
+      }
     }
   }
 }
