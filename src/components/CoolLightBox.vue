@@ -116,7 +116,7 @@
               </iframe>
 
               <video class="cool-lightbox-video" v-if="checkIsMp4(getItemSrc(itemIndex))" :style="aspectRatioVideo" :key="checkIsMp4(getItemSrc(itemIndex))" controls="" controlslist="nodownload" poster="">
-                <source :src="checkIsMp4(getItemSrc(itemIndex))" type="video/mp4">
+                <source :src="checkIsMp4(getItemSrc(itemIndex))" :type="'video/'+getVideoExt(getItemSrc(imgIndex))">
                 Sorry, your browser doesn't support embedded videos
               </video> 
             </div>
@@ -170,7 +170,7 @@
                   </iframe>
 
                   <video class="cool-lightbox-video" v-if="checkIsMp4(getItemSrc(imgIndex))" :style="aspectRatioVideo" :key="checkIsMp4(getItemSrc(imgIndex))" controls="" controlslist="nodownload" poster="">
-                    <source :src="checkIsMp4(getItemSrc(imgIndex))" type="video/mp4">
+                    <source :src="checkIsMp4(getItemSrc(imgIndex))" :type="'video/'+getVideoExt(getItemSrc(imgIndex))">
                     Sorry, your browser doesn't support embedded videos
                   </video> 
                 </transition>
@@ -1277,14 +1277,41 @@ export default {
       return false
     },
 
+    // check if video is mp4
     checkIsMp4(url) {
       if(this.imgIndex === null) {
         return false
       }
 
       const str = new String(url);
-      if(str.endsWith('.mp4')){
+      if(str.endsWith('.mp4') || str.endsWith('.mov') || str.endsWith('.webm') || str.endsWith('.ogg') || str.endsWith('.avi')){
         return url
+      }
+
+      return false
+    },
+
+    // if is video get extension
+    getVideoExt(url) {
+      if(this.imgIndex === null) {
+        return false
+      }
+
+      const str = new String(url);
+      if(str.endsWith('.mp4') || str.endsWith('.mov')){
+        return 'mp4'
+      }
+
+      if(str.endsWith('.webm')) {
+        return 'webm'
+      }
+
+      if(str.endsWith('.ogg')) {
+        return 'ogg'
+      }
+      
+      if(str.endsWith('.avi')) {
+        return 'avi'
       }
 
       return false
