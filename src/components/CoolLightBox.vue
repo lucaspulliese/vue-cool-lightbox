@@ -197,6 +197,9 @@
         </transition>
         
         <div class="cool-lightbox-toolbar" :class="buttonsClasses">
+          
+          <slot name="buttons"></slot>
+
           <button type="button" v-if="this.slideshow && items.length > 1" title="Play slideshow" class="cool-lightbox-toolbar__btn" @click="togglePlaySlideshow">
             <svg xmlns="http://www.w3.org/2000/svg" v-if="!isPlayingSlideShow" viewBox="0 0 24 24">
               <path d="M6.5 5.4v13.2l11-6.6z"></path>
@@ -236,6 +239,22 @@
         <!--/cool-lightbox--toolbar-->
       </div>
       <!--/cool-lightbox-inner-->
+
+      <div v-if="isZooming" class="cool-lightbox-zoom">
+        <svg height="469pt" class="cool-lightbox-zoom__icon" viewBox="0 -192 469.33333 469" width="469pt" 
+          xmlns="http://www.w3.org/2000/svg"><path d="m437.332031.167969h-405.332031c-17.664062 
+          0-32 14.335937-32 32v21.332031c0 17.664062 14.335938 32 32 32h405.332031c17.664063 0 32-14.335938 
+          32-32v-21.332031c0-17.664063-14.335937-32-32-32zm0 0"/>
+        </svg>
+        <input type="range" v-model="zoomBar" name="points" min="0" max="50" />
+        <svg height="426.66667pt" class="cool-lightbox-zoom__icon" viewBox="0 0 426.66667 426.66667" width="426.66667pt" xmlns="http://www.w3.org/2000/svg">
+          <path d="m405.332031 192h-170.664062v-170.667969c0-11.773437-9.558594-21.332031-21.335938-21.332031-11.773437 0-21.332031 
+          9.558594-21.332031 21.332031v170.667969h-170.667969c-11.773437 0-21.332031 9.558594-21.332031 21.332031 0 
+          11.777344 9.558594 21.335938 21.332031 21.335938h170.667969v170.664062c0 11.777344 9.558594 21.335938 21.332031 
+          21.335938 11.777344 0 21.335938-9.558594 21.335938-21.335938v-170.664062h170.664062c11.777344 0 21.335938-9.558594 
+          21.335938-21.335938 0-11.773437-9.558594-21.332031-21.335938-21.332031zm0 0"/>
+        </svg>
+      </div>
 
     </div>
     <!--/cool-lightbox-->
@@ -294,6 +313,7 @@ export default {
       canZoom: false,
       isZooming: false,
       transition: 'all .3s ease',
+      zoomBar: 0,
 
       // slideshow playing data
       isPlayingSlideShow: false,
@@ -377,6 +397,20 @@ export default {
   },
 
   watch: {
+    zoomBar(newVal, prevVal) {
+      let item;
+      if(this.isZooming) {
+        if(this.effect == 'swipe') {
+          item = this.$refs.items[this.imgIndex].childNodes[0]
+        } else {
+          item = this.$refs.items.childNodes[0]
+        }
+
+        const newZoom = 1.6 + newVal/10;
+        item.style.transform  = 'translate3d(calc(-50% + '+this.left+'px), calc(-50% + '+this.top+'px), 0px) scale3d('+newZoom+', '+newZoom+', '+newZoom+')';
+      }
+    },
+
     showThumbs(prev, val) {
       let widthGalleryBlock = 212;
       let swipeAnimation = 'all .3s ease'
@@ -916,7 +950,9 @@ export default {
         this.canZoom = false
         
         const item = e.target.parentNode
-        item.style.transform  = 'translate3d(calc(-50% + '+this.left+'px), calc(-50% + '+this.top+'px), 0px) scale3d(1.6, 1.6, 1.6)';
+        const newZoom = 1.6 + this.zoomBar/10;
+        item.style.transform  = 'translate3d(calc(-50% + '+this.left+'px), calc(-50% + '+this.top+'px), 0px) scale3d('+newZoom+', '+newZoom+', '+newZoom+')';
+    
       }
       e.stopPropagation()
     },
@@ -951,6 +987,7 @@ export default {
       if(isZooming) {
         if(!this.isDraging) { 
           this.isZooming = false
+          this.zoomBar = 0
         }
       } else {
         this.isZooming = true
@@ -984,6 +1021,7 @@ export default {
       this.scale = 1
       this.left = 0
       this.top = 0
+      this.zoomBar = 0
       this.canZoom = false
       this.isZooming = false
       this.swipeType = null
@@ -998,6 +1036,8 @@ export default {
         } else {
           item = this.$refs.items.childNodes[0]
         }
+
+        console.log('aj')
         // reset styles
         item.style.transform  = 'translate3d(calc(-50% + '+this.left+'px), calc(-50% + '+this.top+'px), 0px) scale3d(1, 1, 1)';
 
@@ -1093,7 +1133,7 @@ export default {
         return false;
       }
 
-      var elements = '.cool-lightbox-thumbs, svg, path, rect, .cool-lightbox-thumbs *, .cool-lightbox-button, .cool-lightbox-toolbar__btn, .cool-lightbox-toolbar__btn *, .cool-lightbox-button *, .cool-lightbox__slide__img *, .cool-lightbox-video, .cool-lightbox-caption h6, .cool-lightbox-caption p, .cool-lightbox-caption a';
+      var elements = '.cool-lightbox-zoom, .cool-lightbox-zoom *, .cool-lightbox-thumbs, svg, path, rect, .cool-lightbox-thumbs *, .cool-lightbox-button, .cool-lightbox-toolbar__btn, .cool-lightbox-toolbar__btn *, .cool-lightbox-button *, .cool-lightbox__slide__img *, .cool-lightbox-video, .cool-lightbox-caption h6, .cool-lightbox-caption p, .cool-lightbox-caption a';
       if (!event.target.matches(elements)) {
         this.close()
       }
@@ -1452,6 +1492,116 @@ $breakpoints: (
   justify-content: center;
   right: 0;
   transition: all .3s ease;
+  .cool-lightbox-zoom {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    display: flex;
+    background-color: rgba(15, 15, 15, 0.8);
+    border-radius: 8px;
+    padding: 0px 12px;
+    align-items: center;
+    transform: translateX(-50%);
+    input[type=range] {
+      -webkit-appearance: none;
+      margin: 10px 0;
+      width: 105px;
+      background: transparent;
+    }
+    input[type=range]:focus {
+      outline: none;
+    }
+    input[type=range]::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 4px;
+      cursor: pointer;
+      animate: 0.2s;
+      box-shadow: 0px 0px 0px #000000;
+      background: #e6e6e6;
+      border-radius: 11px;
+      border: 0px solid #000000;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      box-shadow: 1px 1px 1px #000000;
+      border: 1px solid #000000;
+      height: 12px;
+      width: 12px;
+      border-radius: 13px;
+      background: #ffffff;
+      cursor: pointer;
+      -webkit-appearance: none;
+      margin-top: -4.5px;
+    }
+    input[type=range]:focus::-webkit-slider-runnable-track {
+      background: #e6e6e6;
+    }
+    input[type=range]::-moz-range-track {
+      width: 100%;
+      height: 4px;
+      cursor: pointer;
+      animate: 0.2s;
+      box-shadow: 0px 0px 0px #000000;
+      background: #e6e6e6;
+      border-radius: 11px;
+      border: 0px solid #000000;
+    }
+    input[type=range]::-moz-range-thumb {
+      box-shadow: 1px 1px 1px #000000;
+      border: 1px solid #000000;
+      height: 12px;
+      width: 12px;
+      border-radius: 13px;
+      background: #ffffff;
+      cursor: pointer;
+    }
+    input[type=range]::-ms-track {
+      width: 100%;
+      height: 4px;
+      cursor: pointer;
+      animate: 0.2s;
+      background: transparent;
+      border-color: transparent;
+      color: transparent;
+    }
+    input[type=range]::-ms-fill-lower {
+      background: #e6e6e6;
+      border: 0px solid #000000;
+      border-radius: 22px;
+      box-shadow: 0px 0px 0px #000000;
+    }
+    input[type=range]::-ms-fill-upper {
+      background: #e6e6e6;
+      border: 0px solid #000000;
+      border-radius: 22px;
+      box-shadow: 0px 0px 0px #000000;
+    }
+    input[type=range]::-ms-thumb {
+      box-shadow: 1px 1px 1px #000000;
+      border: 1px solid #000000;
+      height: 12px;
+      width: 12px;
+      border-radius: 13px;
+      background: #ffffff;
+      cursor: pointer;
+    }
+    input[type=range]:focus::-ms-fill-lower {
+      background: #e6e6e6;
+    }
+    input[type=range]:focus::-ms-fill-upper {
+      background: #e6e6e6;
+    }
+    .cool-lightbox-zoom__icon {
+      height: 15px;
+      width: 15px;
+      color: #FFF;
+      &:first-of-type {
+        margin-right: 10px;
+      }
+      &:last-of-type {
+        margin-left: 10px;
+      }
+    }
+  }
   .cool-lightbox-thumbs {
     position: absolute;
     height: 100vh;
