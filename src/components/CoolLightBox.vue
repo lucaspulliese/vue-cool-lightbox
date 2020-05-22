@@ -183,7 +183,7 @@
         </div>
         <!--/cool-lightbox__wrapper-->
 
-        <transition name="modal">
+        <transition name="cool-lightbox-modal">
           <div v-show="checkIfIsObject(imgIndex) && (items[imgIndex].title || items[imgIndex].description)" key="caption-block" class="cool-lightbox-caption">
             <transition name="cool-lightbox-slide-change" mode="out-in">
               <h6 key="title" v-html="items[imgIndex].title" v-if="checkIfIsObject(imgIndex) && items[imgIndex].title"></h6>
@@ -198,8 +198,6 @@
         
         <div class="cool-lightbox-toolbar" :class="buttonsClasses">
           
-          <slot name="buttons"></slot>
-
           <button type="button" v-if="this.slideshow && items.length > 1" title="Play slideshow" class="cool-lightbox-toolbar__btn" @click="togglePlaySlideshow">
             <svg xmlns="http://www.w3.org/2000/svg" v-if="!isPlayingSlideShow" viewBox="0 0 24 24">
               <path d="M6.5 5.4v13.2l11-6.6z"></path>
@@ -240,21 +238,24 @@
       </div>
       <!--/cool-lightbox-inner-->
 
-      <div v-if="isZooming" class="cool-lightbox-zoom">
-        <svg height="469pt" class="cool-lightbox-zoom__icon" viewBox="0 -192 469.33333 469" width="469pt" 
-          xmlns="http://www.w3.org/2000/svg"><path d="m437.332031.167969h-405.332031c-17.664062 
-          0-32 14.335937-32 32v21.332031c0 17.664062 14.335938 32 32 32h405.332031c17.664063 0 32-14.335938 
-          32-32v-21.332031c0-17.664063-14.335937-32-32-32zm0 0"/>
-        </svg>
-        <input type="range" v-model="zoomBar" name="points" min="0" max="50" />
-        <svg height="426.66667pt" class="cool-lightbox-zoom__icon" viewBox="0 0 426.66667 426.66667" width="426.66667pt" xmlns="http://www.w3.org/2000/svg">
-          <path d="m405.332031 192h-170.664062v-170.667969c0-11.773437-9.558594-21.332031-21.335938-21.332031-11.773437 0-21.332031 
-          9.558594-21.332031 21.332031v170.667969h-170.667969c-11.773437 0-21.332031 9.558594-21.332031 21.332031 0 
-          11.777344 9.558594 21.335938 21.332031 21.335938h170.667969v170.664062c0 11.777344 9.558594 21.335938 21.332031 
-          21.335938 11.777344 0 21.335938-9.558594 21.335938-21.335938v-170.664062h170.664062c11.777344 0 21.335938-9.558594 
-          21.335938-21.335938 0-11.773437-9.558594-21.332031-21.335938-21.332031zm0 0"/>
-        </svg>
-      </div>
+
+      <transition name="cool-lightbox-modal">
+        <div v-if="isZooming && useZoomBar" class="cool-lightbox-zoom">
+          <svg height="469pt" class="cool-lightbox-zoom__icon" viewBox="0 -192 469.33333 469" width="469pt" 
+            xmlns="http://www.w3.org/2000/svg"><path d="m437.332031.167969h-405.332031c-17.664062 
+            0-32 14.335937-32 32v21.332031c0 17.664062 14.335938 32 32 32h405.332031c17.664063 0 32-14.335938 
+            32-32v-21.332031c0-17.664063-14.335937-32-32-32zm0 0"/>
+          </svg>
+          <input type="range" v-model="zoomBar" name="points" min="0" max="50" />
+          <svg height="426.66667pt" class="cool-lightbox-zoom__icon" viewBox="0 0 426.66667 426.66667" width="426.66667pt" xmlns="http://www.w3.org/2000/svg">
+            <path d="m405.332031 192h-170.664062v-170.667969c0-11.773437-9.558594-21.332031-21.335938-21.332031-11.773437 0-21.332031 
+            9.558594-21.332031 21.332031v170.667969h-170.667969c-11.773437 0-21.332031 9.558594-21.332031 21.332031 0 
+            11.777344 9.558594 21.335938 21.332031 21.335938h170.667969v170.664062c0 11.777344 9.558594 21.335938 21.332031 
+            21.335938 11.777344 0 21.335938-9.558594 21.335938-21.335938v-170.664062h170.664062c11.777344 0 21.335938-9.558594 
+            21.335938-21.335938 0-11.773437-9.558594-21.332031-21.335938-21.332031zm0 0"/>
+          </svg>
+        </div>
+      </transition>
 
     </div>
     <!--/cool-lightbox-->
@@ -360,6 +361,11 @@ export default {
       default: 3000,
     },
     
+    useZoomBar: {
+      type: Boolean,
+      default: false,
+    },
+    
     srcName: {
       type: String,
       default: 'src',
@@ -394,6 +400,11 @@ export default {
       type: String,
       default: 'right',
     },
+
+    youtubeCookies: {
+      type: Boolean,
+      default: true,
+    }
   },
 
   watch: {
@@ -1037,7 +1048,6 @@ export default {
           item = this.$refs.items.childNodes[0]
         }
 
-        console.log('aj')
         // reset styles
         item.style.transform  = 'translate3d(calc(-50% + '+this.left+'px), calc(-50% + '+this.top+'px), 0px) scale3d(1, 1, 1)';
 
@@ -1287,7 +1297,13 @@ export default {
 
       // if is youtube video
       if(ytId) {
-        return 'https://www.youtube.com/embed/'+ytId
+
+        // check if allows youtube cookies
+        if(this.youtubeCookies) {
+          return 'https://www.youtube.com/embed/'+ytId
+        }
+
+        return 'https://www.youtube-nocookie.com/embed/'+ytId
       }
 
       return false
