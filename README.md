@@ -119,6 +119,8 @@ items: [
 | zIndex | Number | .cool-lightbox z-index | 9999 | 
 | gallery | Boolean | Enable/disable gallery | true | 
 | thumbsPosition | String | Defines thumbs position, could be right or bottom | 'right' | 
+| youtubeCookies | Boolean | if is setted to false it will use https://www.youtube-nocookie.com/embed/YOUTUBE_ID for youtube videos | true | 
+| useZoomBar | Boolean | enables a zoom bar similar with the zoom as in Slack | false | 
 
 ### Slots Supported
 

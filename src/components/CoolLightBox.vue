@@ -1513,6 +1513,7 @@ $breakpoints: (
     bottom: 15px;
     left: 50%;
     display: flex;
+    z-index: 99999;
     background-color: rgba(15, 15, 15, 0.8);
     border-radius: 8px;
     padding: 0px 12px;
