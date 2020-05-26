@@ -77,7 +77,7 @@
           >
             <div 
                 v-lazyload
-                v-if="!getVideoUrl(getItemSrc(itemIndex))" key="image" :style="imgWrapperStyle" class="cool-lightbox__slide__img">
+                v-if="!getVideoUrl(getItemSrc(itemIndex)) && !getPDFurl(getItemSrc(itemIndex))" key="image" :style="imgWrapperStyle" class="cool-lightbox__slide__img">
               <img 
                 :data-url="getItemSrc(itemIndex)"
                 :key="itemIndex"
@@ -107,7 +107,7 @@
               <iframe
                 class="cool-lightbox-video" 
                 :src="getVideoUrl(getItemSrc(itemIndex))" 
-                v-if="!checkIsMp4(getItemSrc(itemIndex))" 
+                v-if="!checkIsMp4(getItemSrc(itemIndex)) && !getPDFurl(getItemSrc(itemIndex))" 
                 :style="aspectRatioVideo" 
                 :key="itemIndex" 
                 frameborder="0" 
@@ -115,7 +115,18 @@
                 allowfullscreen>
               </iframe>
 
-              <video class="cool-lightbox-video" v-if="checkIsMp4(getItemSrc(itemIndex))" :style="aspectRatioVideo" :key="checkIsMp4(getItemSrc(itemIndex))" controls="" controlslist="nodownload" poster="">
+              <iframe
+                class="cool-lightbox-pdf" 
+                :src="getPDFurl(getItemSrc(itemIndex))" 
+                v-if="getPDFurl(getItemSrc(itemIndex))" 
+                :key="itemIndex" 
+                frameborder="0" 
+                allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
+                allowfullscreen>
+              </iframe>
+
+
+              <video class="cool-lightbox-video" v-if="checkIsMp4(getItemSrc(itemIndex)) && !getPDFurl(getItemSrc(itemIndex))" :style="aspectRatioVideo" :key="checkIsMp4(getItemSrc(itemIndex))" controls="" controlslist="nodownload" poster="">
                 <source :src="checkIsMp4(getItemSrc(itemIndex))" :type="'video/'+getVideoExt(getItemSrc(imgIndex))">
                 Sorry, your browser doesn't support embedded videos
               </video> 
@@ -362,6 +373,11 @@ export default {
     },
     
     useZoomBar: {
+      type: Boolean,
+      default: false,
+    },
+
+    closeOnClickOutsideMobile: {
       type: Boolean,
       default: false,
     },
@@ -1135,8 +1151,10 @@ export default {
 
     // close event click outside
     closeModal(event) {
-      if(window.innerWidth < 700) {
-        return false;
+      if(!this.closeOnClickOutsideMobile) {
+        if(window.innerWidth < 700) {
+          return false;
+        }
       }
 
       if(this.IsSwipping) {
@@ -1251,6 +1269,19 @@ export default {
       } else {
         this.paddingBottom = 60
       }
+    },
+
+    getPDFurl(url) {
+      if(this.imgIndex === null) {
+        return false
+      }
+
+      const str = new String(url);
+      if(str.endsWith('.pdf')){
+        return url
+      }
+
+      return false
     },
 
     // check if is video
@@ -1910,6 +1941,9 @@ $breakpoints: (
         padding: 31px 6px 31px 26px;
       }
     }
+  }
+  .cool-lightbox-pdf {
+    max-width: 100%;
   }
   .cool-lightbox__iframe {
     width: 100%;
