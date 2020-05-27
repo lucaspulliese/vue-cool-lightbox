@@ -121,10 +121,8 @@
                 v-if="getPDFurl(getItemSrc(itemIndex))" 
                 :key="itemIndex" 
                 frameborder="0" 
-                allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
                 allowfullscreen>
               </iframe>
-
 
               <video class="cool-lightbox-video" v-if="checkIsMp4(getItemSrc(itemIndex)) && !getPDFurl(getItemSrc(itemIndex))" :style="aspectRatioVideo" :key="checkIsMp4(getItemSrc(itemIndex))" controls="" controlslist="nodownload" poster="">
                 <source :src="checkIsMp4(getItemSrc(itemIndex))" :type="'video/'+getVideoExt(getItemSrc(imgIndex))">
@@ -143,7 +141,7 @@
             class="cool-lightbox__slide cool-lightbox__slide--current"
           >
             <transition name="cool-lightbox-slide-change" mode="out-in">
-              <div v-if="!getVideoUrl(getItemSrc(imgIndex))" key="image" :style="imgWrapperStyle" class="cool-lightbox__slide__img">
+              <div v-if="!getVideoUrl(getItemSrc(imgIndex)) && !getPDFurl(getItemSrc(imgIndex))" key="image" :style="imgWrapperStyle" class="cool-lightbox__slide__img">
                 <transition name="cool-lightbox-slide-change" mode="out-in">
                 <img 
                   :src="getItemSrc(imgIndex)" 
@@ -172,7 +170,7 @@
                   <iframe
                     class="cool-lightbox-video" 
                     :src="getVideoUrl(getItemSrc(imgIndex))" 
-                    v-if="!checkIsMp4(getItemSrc(imgIndex))" 
+                    v-if="!checkIsMp4(getItemSrc(imgIndex)) && !getPDFurl(getItemSrc(imgIndex))" 
                     :style="aspectRatioVideo" 
                     :key="getVideoUrl(getItemSrc(imgIndex))" 
                     frameborder="0" 
@@ -180,7 +178,16 @@
                     allowfullscreen>
                   </iframe>
 
-                  <video class="cool-lightbox-video" v-if="checkIsMp4(getItemSrc(imgIndex))" :style="aspectRatioVideo" :key="checkIsMp4(getItemSrc(imgIndex))" controls="" controlslist="nodownload" poster="">
+                  <iframe
+                    class="cool-lightbox-pdf" 
+                    :src="getPDFurl(getItemSrc(imgIndex))" 
+                    v-if="getPDFurl(getItemSrc(imgIndex))" 
+                    :key="imgIndex" 
+                    frameborder="0" 
+                    allowfullscreen>
+                  </iframe>
+
+                  <video class="cool-lightbox-video" v-if="checkIsMp4(getItemSrc(imgIndex)) && !getPDFurl(getItemSrc(imgIndex))" :style="aspectRatioVideo" :key="checkIsMp4(getItemSrc(imgIndex))" controls="" controlslist="nodownload" poster="">
                     <source :src="checkIsMp4(getItemSrc(imgIndex))" :type="'video/'+getVideoExt(getItemSrc(imgIndex))">
                     Sorry, your browser doesn't support embedded videos
                   </video> 
@@ -292,6 +299,9 @@ export default {
       swipeType: null,
       IsSwipping: false,
       isDraggingSwipe: false,
+
+      // use for mouse wheel
+      prevTime: 0,
 
       // swipe effect
       xSwipeWrapper: 0,
@@ -420,6 +430,11 @@ export default {
     youtubeCookies: {
       type: Boolean,
       default: true,
+    },
+
+    enableWheelEvent: {
+      type: Boolean,
+      default: false,
     }
   },
 
@@ -485,6 +500,11 @@ export default {
 
         // add events listener
         window.addEventListener('keydown', this.eventListener)
+
+        // add wheel event
+        if(this.enableWheelEvent) {
+          window.addEventListener('wheel', this.wheelEvent)
+        }
         
         // only in mobile
         if(window.innerWidth < 700) {
@@ -528,6 +548,11 @@ export default {
 
         // remove resize event
         window.removeEventListener('resize', this.xPositionOnResize)
+        
+        // remove wheel event
+        if(this.enableWheelEvent) {
+          window.removeEventListener('wheel', this.wheelEvent)
+        }
       }
 
     }, 
@@ -1147,6 +1172,24 @@ export default {
       this.$emit("close", this.imgIndex);
       this.showThumbs = false;
       this.imgIndex = null;
+    },
+
+    wheelEvent(event) {
+      const delay = 350;
+      const currentTime = new Date().getTime();
+      let direction = event.deltaY > 0 ? 'top' : 'down';
+
+      if (currentTime - this.prevTime < delay) return;
+
+      this.prevTime = currentTime;
+
+      switch (direction) {
+        case 'top':
+          return this.changeIndexToPrev();
+          break;
+        case 'down':
+          return this.changeIndexToNext();
+      }
     },
 
     // close event click outside
