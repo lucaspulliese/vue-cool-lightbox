@@ -125,7 +125,7 @@
               </iframe>
 
               <video class="cool-lightbox-video" v-if="checkIsMp4(getItemSrc(itemIndex)) && !getPDFurl(getItemSrc(itemIndex))" :style="aspectRatioVideo" :key="checkIsMp4(getItemSrc(itemIndex))" controls="" controlslist="nodownload" poster="">
-                <source :src="checkIsMp4(getItemSrc(itemIndex))" :type="'video/'+getVideoExt(getItemSrc(imgIndex))">
+                <source :src="checkIsMp4(getItemSrc(itemIndex))" :type="'video/'+getVideoExt(getItemSrc(itemIndex))">
                 Sorry, your browser doesn't support embedded videos
               </video> 
             </div>
