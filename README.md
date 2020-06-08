@@ -96,10 +96,11 @@ items: [
 
 | Attribute | required | type | Description |
 |:------| :------: | :------: |:------|
-| src | yes | string |media source, it can be an image or a Youtube / Vimeo / Mp4 video |
+| src | yes | string | media source, it can be an image or a Youtube / Vimeo / Mp4 video |
 | title | no | string | the image title |
 | description | no | string | the image description |
 | thumb | no | string | thumb url used in thumbs block |
+| mediaType | no | string | thumb url used in thumbs block |
 
 ### Props Supported
 
@@ -121,6 +122,9 @@ items: [
 | thumbsPosition | String | Defines thumbs position, could be right or bottom | 'right' | 
 | youtubeCookies | Boolean | if is setted to false it will use https://www.youtube-nocookie.com/embed/YOUTUBE_ID for youtube videos | true | 
 | useZoomBar | Boolean | enables a zoom bar similar with the zoom as in Slack | false | 
+| enableWheelEvent | Boolean | enables change slides on mouse wheel events | false | 
+| closeOnClickOutsideMobile | Boolean | enables close lightbox when the user clicks outside the image/video/iframe on mobile devices | false | 
+| srcMediaType | String | media type src for each item | 'mediaType' | 
 
 ### Slots Supported
 
