@@ -35,6 +35,11 @@ export default {
           src: 'https://upload.wikimedia.org/wikipedia/commons/b/b2/Rote_Ruhrarmee_1920.jpg'
         },
         {
+          mediaType: "iframe",
+          src: 'http://www.africau.edu/images/default/sample.pdf'
+        },
+        {
+          mediaType: "image",
           src: 'https://www.cheatsheet.com/wp-content/uploads/2019/04/Planet-Earth.jpg',
         },
         {
