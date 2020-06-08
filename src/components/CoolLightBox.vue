@@ -117,8 +117,8 @@
 
               <iframe
                 class="cool-lightbox-pdf" 
-                :src="getPDFurl(getItemSrc(itemIndex))" 
-                v-if="getMediaType(itemIndex) === 'iframe'" 
+                :src="getItemSrc(itemIndex)" 
+                v-if="(getMediaType(itemIndex) === 'iframe') || (getPDFurl(getItemSrc(itemIndex)))" 
                 :key="itemIndex" 
                 frameborder="0" 
                 allowfullscreen>
@@ -141,7 +141,7 @@
             class="cool-lightbox__slide cool-lightbox__slide--current"
           >
             <transition name="cool-lightbox-slide-change" mode="out-in">
-              <div v-if="getMediaType(itemIndex) === 'image'" key="image" :style="imgWrapperStyle" class="cool-lightbox__slide__img">
+              <div v-if="getMediaType(imgIndex) === 'image'" key="image" :style="imgWrapperStyle" class="cool-lightbox__slide__img">
                 <transition name="cool-lightbox-slide-change" mode="out-in">
                 <img 
                   :src="getItemSrc(imgIndex)" 
@@ -170,7 +170,7 @@
                   <iframe
                     class="cool-lightbox-video" 
                     :src="getVideoUrl(getItemSrc(imgIndex))" 
-                    v-if="!checkIsMp4(getItemSrc(imgIndex)) && getMediaType(itemIndex) === 'video'" 
+                    v-if="!checkIsMp4(getItemSrc(imgIndex)) && getMediaType(imgIndex) === 'video'" 
                     :style="aspectRatioVideo" 
                     :key="getVideoUrl(getItemSrc(imgIndex))" 
                     frameborder="0" 
@@ -180,14 +180,14 @@
 
                   <iframe
                     class="cool-lightbox-pdf" 
-                    :src="getPDFurl(getItemSrc(imgIndex))" 
-                    v-if="getMediaType(itemIndex) === 'iframe'" 
+                    :src="getItemSrc(imgIndex)" 
+                    v-if="(getMediaType(imgIndex) === 'iframe') || (getPDFurl(getItemSrc(imgIndex)))"
                     :key="imgIndex" 
                     frameborder="0" 
                     allowfullscreen>
                   </iframe>
 
-                  <video class="cool-lightbox-video" v-if="checkIsMp4(getItemSrc(imgIndex)) && getMediaType(itemIndex) === 'video'" :style="aspectRatioVideo" :key="checkIsMp4(getItemSrc(imgIndex))" controls="" controlslist="nodownload" poster="">
+                  <video class="cool-lightbox-video" v-if="checkIsMp4(getItemSrc(imgIndex)) && getMediaType(imgIndex) === 'video'" :style="aspectRatioVideo" :key="checkIsMp4(getItemSrc(imgIndex))" controls="" controlslist="nodownload" poster="">
                     <source :src="checkIsMp4(getItemSrc(imgIndex))" :type="'video/'+getVideoExt(getItemSrc(imgIndex))">
                     Sorry, your browser doesn't support embedded videos
                   </video> 
@@ -902,18 +902,21 @@ export default {
         return false
       }
 
-      const item = this.items[imgIndex]
       if(this.checkIfIsObject(imgIndex)) {
+        
+        const item = this.items[imgIndex]
         //item type is specified, so return it
         if (item[this.srcMediaType]) {
           return item[this.srcMediaType]
-        } else if (this.getVideoUrl(this.getItemSrc(imgIndex))) {
-          return 'video'
-        } else if (this.getPDFurl(this.getItemSrc(imgIndex))) { 
-          return 'iframe'
-        } else {
-          return 'image'
         }
+      }
+    
+      if (this.getVideoUrl(this.getItemSrc(imgIndex))) {
+        return 'video'
+      } else if (this.getPDFurl(this.getItemSrc(imgIndex))) { 
+        return 'iframe'
+      } else {
+        return 'image'
       }
 
       return item
