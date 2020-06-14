@@ -244,7 +244,7 @@
             </svg>
           </button>
 
-          <button type="button" class="cool-lightbox-toolbar__btn" title="Close" @click="close">
+          <button type="button" v-if="showCloseButton" class="cool-lightbox-toolbar__btn" title="Close" @click="close">
             <slot name="close">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                 <path d="M12 10.6L6.6 5.2 5.2 6.6l5.4 5.4-5.4 5.4 1.4 1.4 5.4-5.4 5.4 5.4 1.4-1.4-5.4-5.4 5.4-5.4-1.4-1.4-5.4 5.4z"></path>
@@ -332,7 +332,7 @@ export default {
       lastX: 0,
       lastY: 0,
       isDraging: false,
-      canZoom: false,
+      canZoom: true,
       isZooming: false,
       transition: 'all .3s ease',
       zoomBar: 0,
@@ -440,6 +440,11 @@ export default {
     enableWheelEvent: {
       type: Boolean,
       default: false,
+    },
+
+    showCloseButton: {
+      type: Boolean,
+      default: true,
     }
   },
 
@@ -588,9 +593,6 @@ export default {
 
           // add caption padding to Lightbox wrapper
           this.addCaptionPadding()
-
-          // check if user can zoom
-          this.checkZoom()
           
           // setAspectRatioVideo when is swipe
           if(this.effect === 'swipe') {
@@ -1105,7 +1107,6 @@ export default {
       this.left = 0
       this.top = 0
       this.zoomBar = 0
-      this.canZoom = false
       this.isZooming = false
       this.swipeType = null
       this.transition = 'all .3s ease'
@@ -1126,41 +1127,6 @@ export default {
         this.initialMouseX = 0
         if(window.innerWidth >= 700) {
           this.buttonsVisible = true
-        }
-      }
-    },
-
-    // check if the image is bigger than the viewport
-    checkZoom() {
-      const thisContext = this
-
-      // check if is a video
-      if(this.getVideoUrl(this.getItemSrc(this.imgIndex))) {
-        return this.canZoom = false
-      }
-        
-      // image width and height
-      const img = new Image()
-      img.src = this.itemSrc
-      
-      const coolLightboxWrapper = document.getElementsByClassName('cool-lightbox');
-      let computedStyle = getComputedStyle(coolLightboxWrapper[0])
-      let heightWrapperImage = coolLightboxWrapper[0].clientHeight;  // height with padding
-
-      img.onload = function() {
-        const width = this.width
-        const height = this.height
-        
-        if(height > heightWrapperImage) {
-          thisContext.canZoom = true
-
-          thisContext.imgFullSize = {
-            height: height+'px',
-            width: width+'px'
-          }
-
-        } else { 
-          thisContext.canZoom = false
         }
       }
     },

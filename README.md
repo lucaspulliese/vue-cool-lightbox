@@ -100,7 +100,7 @@ items: [
 | title | no | string | the image title |
 | description | no | string | the image description |
 | thumb | no | string | thumb url used in thumbs block |
-| mediaType | no | string | thumb url used in thumbs block |
+| mediaType | no | string | defines media type |
 
 ### Props Supported
 
