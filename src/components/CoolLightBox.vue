@@ -445,6 +445,11 @@ export default {
     showCloseButton: {
       type: Boolean,
       default: true,
+    },
+    
+    disableZoom: {
+      type: Boolean,
+      default: false,
     }
   },
 
@@ -1044,6 +1049,10 @@ export default {
 
     // zoom image event
     zoomImage(indexImage) {
+      if(this.disableZoom) {
+        return false
+      }
+
       if(window.innerWidth < 700) {
         return false
       }
@@ -1512,7 +1521,7 @@ export default {
     // Lightbox classes
     lightboxClasses() {
       let classesReturn = [
-        { 'cool-lightbox--can-zoom': this.canZoom },
+        { 'cool-lightbox--can-zoom': this.canZoom && !this.disableZoom },
         { 'cool-lightbox--is-zooming': this.isZooming },
         { 'cool-lightbox--show-thumbs': this.showThumbs },
         { 'cool-lightbox--is-swipping': this.isDraggingSwipe }

@@ -207,6 +207,11 @@
       showCloseButton: {
         type: Boolean,
         default: true,
+      },
+      
+      disableZoom: {
+        type: Boolean,
+        default: false,
       }
     },
 
@@ -804,6 +809,10 @@
 
       // zoom image event
       zoomImage: function zoomImage(indexImage) {
+        if(this.disableZoom) {
+          return false
+        }
+
         if(window.innerWidth < 700) {
           return false
         }
@@ -1273,7 +1282,7 @@
       // Lightbox classes
       lightboxClasses: function lightboxClasses() {
         var classesReturn = [
-          { 'cool-lightbox--can-zoom': this.canZoom },
+          { 'cool-lightbox--can-zoom': this.canZoom && !this.disableZoom },
           { 'cool-lightbox--is-zooming': this.isZooming },
           { 'cool-lightbox--show-thumbs': this.showThumbs },
           { 'cool-lightbox--is-swipping': this.isDraggingSwipe }
@@ -1406,7 +1415,7 @@
     /* scoped */
     var __vue_scope_id__ = undefined;
     /* module identifier */
-    var __vue_module_identifier__ = "data-v-f5d80e3c";
+    var __vue_module_identifier__ = "data-v-d7596558";
     /* functional template */
     var __vue_is_functional_template__ = false;
     /* style inject */

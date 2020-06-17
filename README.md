@@ -126,6 +126,7 @@ items: [
 | closeOnClickOutsideMobile | Boolean | enables close lightbox when the user clicks outside the image/video/iframe on mobile devices | false | 
 | srcMediaType | String | media type src for each item | 'mediaType' | 
 | showCloseButton | Boolean | show or hide close button | true | 
+| disableZoom | Boolean | disable lightbox zoom | false | 
 
 
 ### Slots Supported
