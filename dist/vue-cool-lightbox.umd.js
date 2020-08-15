@@ -1181,7 +1181,13 @@
         }
 
         var str = new String(url);
-        if(str.endsWith('.mp4') || str.endsWith('.mov') || str.endsWith('.webm') || str.endsWith('.ogg') || str.endsWith('.avi')){
+        if(
+          (str.indexOf('.mp4') !== -1) || 
+          (str.indexOf('.mov') !== -1) || 
+          (str.indexOf('.webm') !== -1) || 
+          (str.indexOf('.ogg') !== -1) || 
+          (str.indexOf('.avi') !== -1)
+        ) {
           return url
         }
 
@@ -1195,19 +1201,19 @@
         }
 
         var str = new String(url);
-        if(str.endsWith('.mp4') || str.endsWith('.mov')){
+        if(str.indexOf('.mp4') !== -1 || str.indexOf('.mov') !== -1){
           return 'mp4'
         }
 
-        if(str.endsWith('.webm')) {
+        if(str.indexOf('.webm') !== -1) {
           return 'webm'
         }
 
-        if(str.endsWith('.ogg')) {
+        if(str.indexOf('.ogg') !== -1) {
           return 'ogg'
         }
         
-        if(str.endsWith('.avi')) {
+        if(str.indexOf('.avi') !== -1) {
           return 'avi'
         }
 
@@ -1415,7 +1421,7 @@
     /* scoped */
     var __vue_scope_id__ = undefined;
     /* module identifier */
-    var __vue_module_identifier__ = "data-v-d7596558";
+    var __vue_module_identifier__ = "data-v-70f9ff43";
     /* functional template */
     var __vue_is_functional_template__ = false;
     /* style inject */

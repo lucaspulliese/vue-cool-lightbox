@@ -1420,7 +1420,13 @@ export default {
       }
 
       const str = new String(url);
-      if(str.endsWith('.mp4') || str.endsWith('.mov') || str.endsWith('.webm') || str.endsWith('.ogg') || str.endsWith('.avi')){
+      if(
+        (str.indexOf('.mp4') !== -1) || 
+        (str.indexOf('.mov') !== -1) || 
+        (str.indexOf('.webm') !== -1) || 
+        (str.indexOf('.ogg') !== -1) || 
+        (str.indexOf('.avi') !== -1)
+      ) {
         return url
       }
 
@@ -1434,19 +1440,19 @@ export default {
       }
 
       const str = new String(url);
-      if(str.endsWith('.mp4') || str.endsWith('.mov')){
+      if(str.indexOf('.mp4') !== -1 || str.indexOf('.mov') !== -1){
         return 'mp4'
       }
 
-      if(str.endsWith('.webm')) {
+      if(str.indexOf('.webm') !== -1) {
         return 'webm'
       }
 
-      if(str.endsWith('.ogg')) {
+      if(str.indexOf('.ogg') !== -1) {
         return 'ogg'
       }
       
-      if(str.endsWith('.avi')) {
+      if(str.indexOf('.avi') !== -1) {
         return 'avi'
       }
 
