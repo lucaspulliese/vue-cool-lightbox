@@ -75,7 +75,6 @@ export default {
 
 body,
 html {
-  height: 100%; /* REMOVING THIS FIXES THE ISSUE */
-  scroll-behavior: smooth;
+  height: 100%;
 }
 </style>

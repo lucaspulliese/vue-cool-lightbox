@@ -73,6 +73,7 @@ var script = {
       imageLoading: false,
       showThumbs: false,
       isFullScreenMode: false,
+      scrollPosition: 0,
 
       // aspect ratio videos
       aspectRatioVideo: {
@@ -248,6 +249,9 @@ var script = {
 
     index: function index(prev, val) {
       var self = this;
+      
+      // body scroll lock
+      var $body = document.querySelector('body');
 
       if(prev !== null) {
         
@@ -286,8 +290,14 @@ var script = {
           }, 200);
         }
 
-        // remove scroll
-        document.getElementsByTagName('body')[0].style = 'overflow: hidden';
+        // enable body scroll lock
+        this.scrollPosition = window.pageYOffset;
+        $body.style.overflow = 'hidden';
+        $body.style.position = 'fixed';
+        $body.style.top = "-" + (this.scrollPosition) + "px";
+        $body.style.width = '100%';
+        
+        $body.style.height = window.innerHeight+'px';
 
       } else {
 
@@ -311,8 +321,15 @@ var script = {
         // remove events listener
         window.removeEventListener('keydown', this.eventListener);
 
-        // remove styles avoid scroll
-        document.getElementsByTagName('body')[0].style.overflow = '';
+        // disable body scroll lock
+        $body.style.removeProperty('overflow');
+        $body.style.removeProperty('position');
+        $body.style.removeProperty('height');
+        $body.style.removeProperty('top');
+        $body.style.removeProperty('width');
+        window.scrollTo(0, this.scrollPosition);
+        
+        this.scrollPosition = 0;
 
         // remove click event
         window.removeEventListener('click', this.showButtons);
