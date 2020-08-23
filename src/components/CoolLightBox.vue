@@ -106,6 +106,8 @@
             <div v-else key="video" class="cool-lightbox__iframe">
               <iframe
                 class="cool-lightbox-video" 
+                v-autoplayObserver
+                :data-autoplay="setAutoplay(itemIndex)"
                 :src="getVideoUrl(getItemSrc(itemIndex))" 
                 v-if="!checkIsMp4(getItemSrc(itemIndex)) && getMediaType(itemIndex) === 'video'" 
                 :style="aspectRatioVideo" 
@@ -124,7 +126,15 @@
                 allowfullscreen>
               </iframe>
 
-              <video class="cool-lightbox-video" v-if="checkIsMp4(getItemSrc(itemIndex)) && getMediaType(itemIndex) === 'video'" :style="aspectRatioVideo" :key="checkIsMp4(getItemSrc(itemIndex))" controls="" controlslist="nodownload" poster="">
+              <video 
+                v-autoplayObserver
+                :data-autoplay="setAutoplay(itemIndex)"
+                class="cool-lightbox-video" 
+                v-if="checkIsMp4(getItemSrc(itemIndex)) && getMediaType(itemIndex) === 'video'" 
+                :style="aspectRatioVideo" :key="checkIsMp4(getItemSrc(itemIndex))" 
+                controls="" 
+                controlslist="nodownload" l
+                poster="">
                 <source :src="checkIsMp4(getItemSrc(itemIndex))" :type="'video/'+getVideoExt(getItemSrc(itemIndex))">
                 Sorry, your browser doesn't support embedded videos
               </video> 
@@ -169,6 +179,8 @@
                 <transition name="cool-lightbox-slide-change" mode="out-in">
                   <iframe
                     class="cool-lightbox-video" 
+                    v-autoplayObserver
+                    :data-autoplay="setAutoplay(imgIndex)"
                     :src="getVideoUrl(getItemSrc(imgIndex))" 
                     v-if="!checkIsMp4(getItemSrc(imgIndex)) && getMediaType(imgIndex) === 'video'" 
                     :style="aspectRatioVideo" 
@@ -187,7 +199,14 @@
                     allowfullscreen>
                   </iframe>
 
-                  <video class="cool-lightbox-video" v-if="checkIsMp4(getItemSrc(imgIndex)) && getMediaType(imgIndex) === 'video'" :style="aspectRatioVideo" :key="checkIsMp4(getItemSrc(imgIndex))" controls="" controlslist="nodownload" poster="">
+                  <video class="cool-lightbox-video" 
+                    v-autoplayObserver
+                    :data-autoplay="setAutoplay(imgIndex)"
+                    v-if="checkIsMp4(getItemSrc(imgIndex)) && getMediaType(imgIndex) === 'video'" 
+                    :style="aspectRatioVideo" :key="checkIsMp4(getItemSrc(imgIndex))" 
+                    controls="" 
+                    controlslist="nodownload" 
+                    poster="">
                     <source :src="checkIsMp4(getItemSrc(imgIndex))" :type="'video/'+getVideoExt(getItemSrc(imgIndex))">
                     Sorry, your browser doesn't support embedded videos
                   </video> 
@@ -283,10 +302,12 @@
 
 <script>
 import LazyLoadDirective from "../directives/LazyLoad";
+import AutoplayObserver from "../directives/AutoplayObserver";
 
 export default {
   directives: {
-    lazyload: LazyLoadDirective
+    lazyload: LazyLoadDirective,
+    autoplayObserver: AutoplayObserver,
   },
 
   data() {
@@ -451,7 +472,12 @@ export default {
     disableZoom: {
       type: Boolean,
       default: false,
-    }
+    },
+
+    dir: {
+      type: String,
+      default: 'ltr',
+    },
   },
 
   watch: {
@@ -481,9 +507,21 @@ export default {
       this.swipeAnimation = swipeAnimation
 
       if(prev) {
-        this.xSwipeWrapper = -this.imgIndex*(window.innerWidth - widthGalleryBlock) - 30*this.imgIndex
+
+        if(this.dir === 'rtl') {
+          this.xSwipeWrapper = this.imgIndex*(window.innerWidth - widthGalleryBlock) + 30*this.imgIndex
+        } else {
+          this.xSwipeWrapper = -this.imgIndex*(window.innerWidth - widthGalleryBlock) - 30*this.imgIndex
+        }
+
       } else {
-        this.xSwipeWrapper = -this.imgIndex*window.innerWidth - 30*this.imgIndex
+        
+        if(this.dir === 'rtl') {
+          this.xSwipeWrapper = this.imgIndex*window.innerWidth + 30*this.imgIndex
+        } else {
+          this.xSwipeWrapper = -this.imgIndex*window.innerWidth - 30*this.imgIndex
+        }
+
       }
 
       setTimeout(function() {
@@ -639,6 +677,14 @@ export default {
   },
 
   methods: {
+    setAutoplay(itemIndex) {
+      if(this.checkIfIsObject(itemIndex) && this.items[itemIndex].hasOwnProperty('autoplay') && this.items[itemIndex].autoplay) {
+        return true;
+      }
+
+      return false;
+    },
+
     toggleFullScreenMode() {
       if(this.isFullScreenMode) {
         this.closeFullscreen()
@@ -732,7 +778,12 @@ export default {
         // swipe
         if(this.swipeType == 'h') {
           // swipe wrapper
-          this.xSwipeWrapper = -(windowWidth*this.imgIndex) + currentPosX - this.initialMouseX - 30*this.imgIndex 
+          if(this.dir === 'rtl') {
+            this.xSwipeWrapper = (windowWidth*this.imgIndex) + currentPosX - this.initialMouseX + 30*this.imgIndex
+          } else {
+            this.xSwipeWrapper = -(windowWidth*this.imgIndex) + currentPosX - this.initialMouseX - 30*this.imgIndex
+          }
+
         } else {
           this.ySwipeWrapper = currentPosY - this.initialMouseY
         }
@@ -795,11 +846,17 @@ export default {
 
         // if the swipe is to the right
         if((this.endMouseX - this.initialMouseX) < -40) {
+          if(this.dir === 'rtl') {
+            return this.swipeToLeft()
+          }
           return this.swipeToRight()
         } 
 
         // if the swipe is to the left
         if((this.endMouseX - this.initialMouseX) > 40) {
+          if(this.dir === 'rtl') {
+            return this.swipeToRight()
+          }
           return this.swipeToLeft();
         }
       }
@@ -824,6 +881,11 @@ export default {
     // swipe to left effect
     swipeToLeft() {
       if(!this.hasPrevious && this.effect === 'swipe') {
+
+        if(this.dir === 'rtl') {
+          return this.xSwipeWrapper = this.imgIndex*this.lightboxInnerWidth + 30*this.imgIndex
+        }
+
         return this.xSwipeWrapper = -this.imgIndex*this.lightboxInnerWidth - 30*this.imgIndex
       }
 
@@ -833,6 +895,11 @@ export default {
     // swipe to right effect
     swipeToRight() {
       if(!this.hasNext && this.effect === 'swipe') {
+
+        if(this.dir === 'rtl') {
+          return this.xSwipeWrapper = this.imgIndex*this.lightboxInnerWidth + 30*this.imgIndex
+        }
+
         return this.xSwipeWrapper = -this.imgIndex*this.lightboxInnerWidth - 30*this.imgIndex
       }
 
@@ -1309,14 +1376,25 @@ export default {
       this.setLightboxInnerWidth()
       const index = this.imgIndex
 
+      if(this.dir === 'rtl') {
+        this.xSwipeWrapper = index*this.lightboxInnerWidth+30*index
+        return;
+      }
+
       // set x position
       this.xSwipeWrapper = -index*this.lightboxInnerWidth-30*index
     },
 
     // set x position by img index
     setXPosition(index) {
+      if(this.dir === 'rtl') {
+        this.xSwipeWrapper = index*this.lightboxInnerWidth+30*index
+        return
+      }
+
       // set x position
       this.xSwipeWrapper = -index*this.lightboxInnerWidth-30*index
+      return; 
     },
 
     // index change
