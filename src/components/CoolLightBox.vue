@@ -43,7 +43,7 @@
         <div class="cool-lightbox__progressbar" :style="stylesInterval"></div>
 
         <div class="cool-lightbox__navigation">
-          <button type="button" class="cool-lightbox-button cool-lightbox-button--prev" title="Previous" :class="buttonsClasses" v-show="(hasPrevious || loopData) && items.length > 1" @click="onPrevClick">
+          <button type="button" class="cool-lightbox-button cool-lightbox-button--prev" title="Previous" :class="buttonsClasses" v-show="(hasPreviousButton || loopData) && items.length > 1" @click="onPrevClick">
             <slot name="icon-previous">
               <div class="cool-lightbox-button__icon">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11.28 15.7l-1.34 1.37L5 12l4.94-5.07 1.34 1.38-2.68 2.72H19v1.94H8.6z"></path></svg>
@@ -51,7 +51,7 @@
             </slot>
           </button>
 
-          <button type="button" class="cool-lightbox-button cool-lightbox-button--next" title="Next" :class="buttonsClasses" v-show="(hasNext || loopData) && items.length > 1" @click="onNextClick(false)">
+          <button type="button" class="cool-lightbox-button cool-lightbox-button--next" title="Next" :class="buttonsClasses" v-show="(hasNextButton || loopData) && items.length > 1" @click="onNextClick(false)">
             <slot name="icon-next">
               <div class="cool-lightbox-button__icon">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.4 12.97l-2.68 2.72 1.34 1.38L19 12l-4.94-5.07-1.34 1.38 2.68 2.72H5v1.94z"></path></svg>
@@ -875,6 +875,12 @@ export default {
       
       this.swipeType = null
       const windowWidth = this.lightboxInnerWidth
+
+      if(this.dir === 'rtl') {
+        this.xSwipeWrapper = this.imgIndex*windowWidth + 30*this.imgIndex
+        return;
+      }
+
       this.xSwipeWrapper = -this.imgIndex*windowWidth - 30*this.imgIndex
     },
     
@@ -1059,7 +1065,12 @@ export default {
           'transition': 'none',
         }
         
-        self.onNextClick(true)
+        if(self.dir === 'rtl') {
+          self.onPrevClick(true)
+        } else {
+          self.onNextClick(true)
+        }
+
         if(!self.hasNext && !self.loopData) {
           self.stopSlideShow()
         } else {
@@ -1326,17 +1337,30 @@ export default {
       }
 
       this.setSwipeAnimation()
+
+      if(this.dir === 'rtl') {
+        return this.changeIndexToPrev();
+      }
+
       this.changeIndexToNext()
     },
 
     // prev slide event
-    onPrevClick() {
+    onPrevClick(isFromSlideshow = false) {
       if(this.isZooming) {
         return false;
       }
       
-      this.stopSlideShow();
+      if(!isFromSlideshow) {
+        this.stopSlideShow()
+      }
+      
       this.setSwipeAnimation()
+
+      if(this.dir === 'rtl') {
+        return this.changeIndexToNext();
+      }
+
       this.changeIndexToPrev();
     },
 
@@ -1639,6 +1663,24 @@ export default {
       return {
         'hidden': !this.buttonsVisible,
       }
+    },
+
+    // check if the slide has next element
+    hasNextButton() {
+      if(this.dir === 'rtl') {
+        return (this.imgIndex - 1 >= 0)
+      }
+        
+      return (this.imgIndex + 1 < this.items.length)
+    },
+
+    // check if the slide has previous element 
+    hasPreviousButton() {
+      if(this.dir === 'rtl') {
+        return (this.imgIndex + 1 < this.items.length)
+      }
+
+      return (this.imgIndex - 1 >= 0)
     },
 
     // check if the slide has next element
