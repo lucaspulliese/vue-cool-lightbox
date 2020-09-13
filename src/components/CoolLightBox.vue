@@ -478,6 +478,11 @@ export default {
       type: String,
       default: 'ltr',
     },
+
+    enableScrollLock: {
+      type: Boolean,
+      default: true,
+    },
   },
 
   watch: {
@@ -572,14 +577,16 @@ export default {
           }, 200)
         }
 
-        // enable body scroll lock
-        this.scrollPosition = window.pageYOffset;
-        $body.style.overflow = 'hidden';
-        $body.style.position = 'fixed';
-        $body.style.top = `-${this.scrollPosition}px`;
-        $body.style.width = '100%';
-        
-        $body.style.height = window.innerHeight+'px';
+        if (this.enableScrollLock) {
+          // enable body scroll lock
+          this.scrollPosition = window.pageYOffset;
+          $body.style.overflow = 'hidden';
+          $body.style.position = 'fixed';
+          $body.style.top = `-${this.scrollPosition}px`;
+          $body.style.width = '100%';
+          
+          $body.style.height = window.innerHeight+'px';
+        }
 
       } else {
 
@@ -603,15 +610,17 @@ export default {
         // remove events listener
         window.removeEventListener('keydown', this.eventListener)
 
-        // disable body scroll lock
-        $body.style.removeProperty('overflow');
-        $body.style.removeProperty('position');
-        $body.style.removeProperty('height');
-        $body.style.removeProperty('top');
-        $body.style.removeProperty('width');
-        window.scrollTo(0, this.scrollPosition);
-        
-        this.scrollPosition = 0;
+        if (this.enableScrollLock) {
+          // disable body scroll lock
+          $body.style.removeProperty('overflow');
+          $body.style.removeProperty('position');
+          $body.style.removeProperty('height');
+          $body.style.removeProperty('top');
+          $body.style.removeProperty('width');
+          window.scrollTo(0, this.scrollPosition);
+          
+          this.scrollPosition = 0;
+        }
 
         // remove click event
         window.removeEventListener('click', this.showButtons)

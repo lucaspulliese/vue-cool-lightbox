@@ -289,6 +289,11 @@
         type: String,
         default: 'ltr',
       },
+
+      enableScrollLock: {
+        type: Boolean,
+        default: true,
+      },
     },
 
     watch: {
@@ -383,14 +388,16 @@
             }, 200);
           }
 
-          // enable body scroll lock
-          this.scrollPosition = window.pageYOffset;
-          $body.style.overflow = 'hidden';
-          $body.style.position = 'fixed';
-          $body.style.top = "-" + (this.scrollPosition) + "px";
-          $body.style.width = '100%';
-          
-          $body.style.height = window.innerHeight+'px';
+          if (this.enableScrollLock) {
+            // enable body scroll lock
+            this.scrollPosition = window.pageYOffset;
+            $body.style.overflow = 'hidden';
+            $body.style.position = 'fixed';
+            $body.style.top = "-" + (this.scrollPosition) + "px";
+            $body.style.width = '100%';
+            
+            $body.style.height = window.innerHeight+'px';
+          }
 
         } else {
 
@@ -414,15 +421,17 @@
           // remove events listener
           window.removeEventListener('keydown', this.eventListener);
 
-          // disable body scroll lock
-          $body.style.removeProperty('overflow');
-          $body.style.removeProperty('position');
-          $body.style.removeProperty('height');
-          $body.style.removeProperty('top');
-          $body.style.removeProperty('width');
-          window.scrollTo(0, this.scrollPosition);
-          
-          this.scrollPosition = 0;
+          if (this.enableScrollLock) {
+            // disable body scroll lock
+            $body.style.removeProperty('overflow');
+            $body.style.removeProperty('position');
+            $body.style.removeProperty('height');
+            $body.style.removeProperty('top');
+            $body.style.removeProperty('width');
+            window.scrollTo(0, this.scrollPosition);
+            
+            this.scrollPosition = 0;
+          }
 
           // remove click event
           window.removeEventListener('click', this.showButtons);
@@ -1609,7 +1618,7 @@
     /* scoped */
     var __vue_scope_id__ = undefined;
     /* module identifier */
-    var __vue_module_identifier__ = "data-v-667f4069";
+    var __vue_module_identifier__ = "data-v-c6e25f40";
     /* functional template */
     var __vue_is_functional_template__ = false;
     /* style inject */
