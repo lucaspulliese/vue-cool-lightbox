@@ -63,7 +63,6 @@ export default {
 <style>
 .images-wrapper {
   display: flex;
-  height: 100000px;
 }
 
 .image {
@@ -75,6 +74,5 @@ export default {
 
 body,
 html {
-  height: 100%;
 }
 </style>

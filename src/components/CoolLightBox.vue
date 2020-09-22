@@ -2,7 +2,8 @@
   <transition name="cool-lightbox-modal">
     <div class="cool-lightbox" 
       v-bind:class="lightboxClasses"
-      v-if="isVisible" 
+      v-show="isVisible" 
+      ref="coolLightbox"
       @click="closeModal"
       v-bind:style="lightboxStyles">
 
@@ -303,6 +304,7 @@
 <script>
 import LazyLoadDirective from "../directives/LazyLoad";
 import AutoplayObserver from "../directives/AutoplayObserver";
+import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
 
 export default {
   directives: {
@@ -338,7 +340,6 @@ export default {
       imageLoading: false,
       showThumbs: false,
       isFullScreenMode: false,
-      scrollPosition: 0,
 
       // aspect ratio videos
       aspectRatioVideo: {
@@ -578,14 +579,7 @@ export default {
         }
 
         if (this.enableScrollLock) {
-          // enable body scroll lock
-          this.scrollPosition = window.pageYOffset;
-          $body.style.overflow = 'hidden';
-          $body.style.position = 'fixed';
-          $body.style.top = `-${this.scrollPosition}px`;
-          $body.style.width = '100%';
-          
-          $body.style.height = window.innerHeight+'px';
+          disableBodyScroll(this.$refs.coolLightbox);
         }
 
       } else {
@@ -611,15 +605,7 @@ export default {
         window.removeEventListener('keydown', this.eventListener)
 
         if (this.enableScrollLock) {
-          // disable body scroll lock
-          $body.style.removeProperty('overflow');
-          $body.style.removeProperty('position');
-          $body.style.removeProperty('height');
-          $body.style.removeProperty('top');
-          $body.style.removeProperty('width');
-          window.scrollTo(0, this.scrollPosition);
-          
-          this.scrollPosition = 0;
+          enableBodyScroll(this.$refs.coolLightbox);
         }
 
         // remove click event

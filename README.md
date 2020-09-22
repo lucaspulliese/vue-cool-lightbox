@@ -1,6 +1,6 @@
 # Vue-cool-lightbox
 
-Vue-cool-lightbox is a pretty Vue.js lightbox component without any dependencies, inspired by [fancybox](http://fancyapps.com/fancybox/3/) with zoom, swipe, captions and videos supported.
+Vue-cool-lightbox is a pretty Vue.js lightbox component, inspired by [fancybox](http://fancyapps.com/fancybox/3/) with zoom, swipe, captions and videos supported.
 
 ![Vue CoolLightbox screenshot](http://lucaspulliese.com/wp-content/themes/theme/images/screenshot-vue-cool-lightbox.jpg)
 

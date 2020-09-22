@@ -23,9 +23,13 @@ var config;
 if (argv.format === "iife") {
   config = {
     input: "src/index.js",
+    external: [ 'body-scroll-lock' ],
     output: {
       name: "CoolLightBox",
-      exports: "named"
+      exports: "named",
+      globals: {
+        'body-scroll-lock': 'bodyScrollLock'
+      }
     },
     plugins: [
       replace({
@@ -49,9 +53,13 @@ if (argv.format === "iife") {
 if (argv.format === "es") {
   config = {
     input: "src/index.js",
+    external: [ 'body-scroll-lock' ],
     output: {
       name: "CoolLightBox",
-      exports: "named"
+      exports: "named",
+      globals: {
+        'body-scroll-lock': 'bodyScrollLock'
+      }
     },
     plugins: [
       replace({
@@ -75,9 +83,13 @@ if (argv.format === "es") {
 if (argv.format === "umd") {
   config = {
     input: "src/index.js",
+    external: [ 'body-scroll-lock' ],
     output: {
       name: "CoolLightBox",
-      exports: "named"
+      exports: "named",
+      globals: {
+        'body-scroll-lock': 'bodyScrollLock'
+      }
     },
     plugins: [
       replace({
