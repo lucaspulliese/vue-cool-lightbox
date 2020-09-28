@@ -388,6 +388,7 @@
           }
 
           if (this.enableScrollLock) {
+            this.setCompensateForScrollbar();
             bodyScrollLock.disableBodyScroll(this.$refs.coolLightbox);
           }
 
@@ -414,6 +415,7 @@
           window.removeEventListener('keydown', this.eventListener);
 
           if (this.enableScrollLock) {
+            this.removeCompensateForScrollbar();
             bodyScrollLock.enableBodyScroll(this.$refs.coolLightbox);
           }
 
@@ -481,6 +483,28 @@
     },
 
     methods: {
+      removeCompensateForScrollbar: function removeCompensateForScrollbar() {
+        document.body.classList.remove("compensate-for-scrollbar");
+        document.getElementById("coollightbox-style-noscroll").remove();
+      },
+
+      setCompensateForScrollbar: function setCompensateForScrollbar() {
+        var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+        if (
+          !isMobile &&
+          document.body.scrollHeight > window.innerHeight
+        ) {
+          document.getElementsByTagName('head')[0].insertAdjacentHTML('beforeend',
+            '<style id="coollightbox-style-noscroll" type="text/css">.compensate-for-scrollbar{margin-right:' +
+              (window.innerWidth - document.documentElement.clientWidth) +
+            "px;}</style>"
+          );
+
+          document.body.classList.add("compensate-for-scrollbar");
+        }
+      }, 
+
       setAutoplay: function setAutoplay(itemIndex) {
         if(this.checkIfIsObject(itemIndex) && this.items[itemIndex].hasOwnProperty('autoplay') && this.items[itemIndex].autoplay) {
           return true;
@@ -1602,7 +1626,7 @@
     /* scoped */
     var __vue_scope_id__ = undefined;
     /* module identifier */
-    var __vue_module_identifier__ = "data-v-6d53da4c";
+    var __vue_module_identifier__ = "data-v-453f3e98";
     /* functional template */
     var __vue_is_functional_template__ = false;
     /* style inject */

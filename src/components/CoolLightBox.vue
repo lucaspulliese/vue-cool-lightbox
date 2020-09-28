@@ -579,6 +579,7 @@ export default {
         }
 
         if (this.enableScrollLock) {
+          this.setCompensateForScrollbar();
           disableBodyScroll(this.$refs.coolLightbox);
         }
 
@@ -605,6 +606,7 @@ export default {
         window.removeEventListener('keydown', this.eventListener)
 
         if (this.enableScrollLock) {
+          this.removeCompensateForScrollbar();
           enableBodyScroll(this.$refs.coolLightbox);
         }
 
@@ -672,6 +674,28 @@ export default {
   },
 
   methods: {
+    removeCompensateForScrollbar() {
+      document.body.classList.remove("compensate-for-scrollbar");
+      document.getElementById("coollightbox-style-noscroll").remove();
+    },
+
+    setCompensateForScrollbar() {
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+      if (
+        !isMobile &&
+        document.body.scrollHeight > window.innerHeight
+      ) {
+        document.getElementsByTagName('head')[0].insertAdjacentHTML('beforeend',
+          '<style id="coollightbox-style-noscroll" type="text/css">.compensate-for-scrollbar{margin-right:' +
+            (window.innerWidth - document.documentElement.clientWidth) +
+          "px;}</style>"
+        );
+
+        document.body.classList.add("compensate-for-scrollbar");
+      }
+    }, 
+
     setAutoplay(itemIndex) {
       if(this.checkIfIsObject(itemIndex) && this.items[itemIndex].hasOwnProperty('autoplay') && this.items[itemIndex].autoplay) {
         return true;
