@@ -485,7 +485,10 @@
     methods: {
       removeCompensateForScrollbar: function removeCompensateForScrollbar() {
         document.body.classList.remove("compensate-for-scrollbar");
-        document.getElementById("coollightbox-style-noscroll").remove();
+        var noscrollStyle = document.getElementById("coollightbox-style-noscroll");
+        if(noscrollStyle !== null) {
+          document.getElementById("coollightbox-style-noscroll").remove();
+        }
       },
 
       setCompensateForScrollbar: function setCompensateForScrollbar() {
@@ -1626,7 +1629,7 @@
     /* scoped */
     var __vue_scope_id__ = undefined;
     /* module identifier */
-    var __vue_module_identifier__ = "data-v-453f3e98";
+    var __vue_module_identifier__ = "data-v-74d0587f";
     /* functional template */
     var __vue_is_functional_template__ = false;
     /* style inject */

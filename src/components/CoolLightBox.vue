@@ -676,7 +676,10 @@ export default {
   methods: {
     removeCompensateForScrollbar() {
       document.body.classList.remove("compensate-for-scrollbar");
-      document.getElementById("coollightbox-style-noscroll").remove();
+      const noscrollStyle = document.getElementById("coollightbox-style-noscroll");
+      if(noscrollStyle !== null) {
+        document.getElementById("coollightbox-style-noscroll").remove();
+      }
     },
 
     setCompensateForScrollbar() {
