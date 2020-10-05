@@ -2,7 +2,7 @@
   <transition name="cool-lightbox-modal">
     <div class="cool-lightbox" 
       v-bind:class="lightboxClasses"
-      v-show="isVisible" 
+      v-if="isVisible" 
       ref="coolLightbox"
       @click="closeModal"
       v-bind:style="lightboxStyles">
@@ -579,8 +579,10 @@ export default {
         }
 
         if (this.enableScrollLock) {
-          this.setCompensateForScrollbar();
-          disableBodyScroll(this.$refs.coolLightbox);
+          setTimeout(function() {
+            self.setCompensateForScrollbar();
+            disableBodyScroll(self.$refs.coolLightbox);
+          }, 50);
         }
 
       } else {
@@ -606,8 +608,8 @@ export default {
         window.removeEventListener('keydown', this.eventListener)
 
         if (this.enableScrollLock) {
-          this.removeCompensateForScrollbar();
-          enableBodyScroll(this.$refs.coolLightbox);
+          self.removeCompensateForScrollbar();
+          enableBodyScroll(self.$refs.coolLightbox);
         }
 
         // remove click event
