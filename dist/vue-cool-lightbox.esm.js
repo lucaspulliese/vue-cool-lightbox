@@ -480,6 +480,13 @@ var script = {
     }, 
   },
 
+  beforeDestroy: function beforeDestroy () {
+    if (this.enableScrollLock) {
+      this.removeCompensateForScrollbar();
+      enableBodyScroll(this.$refs.coolLightbox);
+    }
+  },
+
   methods: {
     removeCompensateForScrollbar: function removeCompensateForScrollbar() {
       document.body.classList.remove("compensate-for-scrollbar");

@@ -675,6 +675,13 @@ export default {
     }, 
   },
 
+  beforeDestroy () {
+    if (this.enableScrollLock) {
+      this.removeCompensateForScrollbar();
+      enableBodyScroll(this.$refs.coolLightbox);
+    }
+  },
+
   methods: {
     removeCompensateForScrollbar() {
       document.body.classList.remove("compensate-for-scrollbar");

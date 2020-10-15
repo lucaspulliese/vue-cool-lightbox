@@ -484,6 +484,13 @@
       }, 
     },
 
+    beforeDestroy: function beforeDestroy () {
+      if (this.enableScrollLock) {
+        this.removeCompensateForScrollbar();
+        bodyScrollLock.enableBodyScroll(this.$refs.coolLightbox);
+      }
+    },
+
     methods: {
       removeCompensateForScrollbar: function removeCompensateForScrollbar() {
         document.body.classList.remove("compensate-for-scrollbar");
@@ -1631,7 +1638,7 @@
     /* scoped */
     var __vue_scope_id__ = undefined;
     /* module identifier */
-    var __vue_module_identifier__ = "data-v-c07ca5d4";
+    var __vue_module_identifier__ = "data-v-69b01b88";
     /* functional template */
     var __vue_is_functional_template__ = false;
     /* style inject */
