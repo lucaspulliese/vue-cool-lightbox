@@ -642,6 +642,11 @@ export default {
         }
 
         if(prev !== null) {
+          if(prev !== val) {
+            if(!this.getYoutubeUrl(this.getItemSrc(prev))) {
+              this.stopVideos();
+            }
+          }
 
           // if is an image change imageLoading to true
           if(!this.getVideoUrl(this.getItemSrc(prev))) {
@@ -683,6 +688,26 @@ export default {
   },
 
   methods: {
+    stopVideos() {
+      const videos = document.getElementsByClassName("cool-lightbox-video");
+      const isVideoPlaying = video => !!(video.currentTime > 0 && !video.paused && !video.ended && video.readyState > 2);
+      if(videos.length > 0) {
+        videos.forEach(video => {
+          const type = video.tagName;
+          
+          if(type === 'IFRAME') {
+            var iframeSrc = video.src;
+            return video.src = iframeSrc;
+          }
+
+          if(isVideoPlaying(video)) {
+            return video.pause();
+          }
+
+        });
+      }
+    }, 
+
     removeCompensateForScrollbar() {
       document.body.classList.remove("compensate-for-scrollbar");
       const noscrollStyle = document.getElementById("coollightbox-style-noscroll");

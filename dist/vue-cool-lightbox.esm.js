@@ -447,6 +447,11 @@ var script = {
         }
 
         if(prev !== null) {
+          if(prev !== val) {
+            if(!this$1.getYoutubeUrl(this$1.getItemSrc(prev))) {
+              this$1.stopVideos();
+            }
+          }
 
           // if is an image change imageLoading to true
           if(!this$1.getVideoUrl(this$1.getItemSrc(prev))) {
@@ -488,6 +493,26 @@ var script = {
   },
 
   methods: {
+    stopVideos: function stopVideos() {
+      var videos = document.getElementsByClassName("cool-lightbox-video");
+      var isVideoPlaying = function (video) { return !!(video.currentTime > 0 && !video.paused && !video.ended && video.readyState > 2); };
+      if(videos.length > 0) {
+        videos.forEach(function (video) {
+          var type = video.tagName;
+          
+          if(type === 'IFRAME') {
+            var iframeSrc = video.src;
+            return video.src = iframeSrc;
+          }
+
+          if(isVideoPlaying(video)) {
+            return video.pause();
+          }
+
+        });
+      }
+    }, 
+
     removeCompensateForScrollbar: function removeCompensateForScrollbar() {
       document.body.classList.remove("compensate-for-scrollbar");
       var noscrollStyle = document.getElementById("coollightbox-style-noscroll");
