@@ -83,6 +83,7 @@
                 :data-url="getItemSrc(itemIndex)"
                 :key="itemIndex"
                 draggable="false"
+                :alt="getItemAlt(itemIndex)"
 
                 @load="imageLoaded"
                 @click="zoomImage(itemIndex)"
@@ -158,6 +159,7 @@
                   :src="getItemSrc(imgIndex)" 
                   :key="imgIndex"
                   draggable="false"
+                  :alt="getItemAlt(imgIndex)"
 
                   @load="imageLoaded"
                   @click="zoomImage"
@@ -643,7 +645,7 @@ export default {
 
         if(prev !== null) {
           if(prev !== val) {
-            if(!this.getYoutubeUrl(this.getItemSrc(prev))) {
+            if(!this.getYoutubeUrl(this.getItemSrc(prev)) && !this.getVimeoUrl(this.getItemSrc(prev))) {
               this.stopVideos();
             }
           }
@@ -692,7 +694,7 @@ export default {
       const videos = document.getElementsByClassName("cool-lightbox-video");
       const isVideoPlaying = video => !!(video.currentTime > 0 && !video.paused && !video.ended && video.readyState > 2);
       if(videos.length > 0) {
-        videos.forEach(video => {
+        Array.prototype.forEach.call(videos, video => {
           const type = video.tagName;
           
           if(type === 'IFRAME') {
@@ -1032,6 +1034,19 @@ export default {
       return item
     },
     
+    getItemAlt(imgIndex) {
+      if(imgIndex === null) {
+        return false
+      }
+
+      const item = this.items[imgIndex]
+      if(this.checkIfIsObject(imgIndex)) {
+        return item.alt;
+      }
+
+      return null
+    },
+
     getItemThumb(imgIndex) {
       if(imgIndex === null) {
         return false
