@@ -685,7 +685,9 @@ export default {
   beforeDestroy () {
     if (this.enableScrollLock) {
       this.removeCompensateForScrollbar();
-      enableBodyScroll(this.$refs.coolLightbox);
+      if(this.$refs.coolLightbox) {
+        enableBodyScroll(this.$refs.coolLightbox);
+      }
     }
   },
 
