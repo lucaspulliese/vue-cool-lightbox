@@ -1,7 +1,7 @@
 {
   "name": "vue-cool-lightbox",
   "description": "A pretty Vue.js component to display an image gallery lightbox inspired by fancybox",
-  "version": "2.6.8",
+  "version": "2.6.9",
   "private": false,
   "author": "Lucas Pulliese <lucaspulliese10@gmail.com>",
   "license": "MIT",

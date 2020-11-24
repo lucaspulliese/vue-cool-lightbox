@@ -1011,7 +1011,6 @@ var script = {
         var item = e.target.parentNode;
         var newZoom = 1.6 + this.zoomBar/10;
         item.style.transform  = 'translate3d(calc(-50% + '+this.left+'px), calc(-50% + '+this.top+'px), 0px) scale3d('+newZoom+', '+newZoom+', '+newZoom+')';
-    
       }
       e.stopPropagation();
     },
@@ -1100,7 +1099,11 @@ var script = {
         }
 
         // reset styles
-        item.style.transform  = 'translate3d(calc(-50% + '+this.left+'px), calc(-50% + '+this.top+'px), 0px) scale3d(1, 1, 1)';
+        if(this.disableZoom) {
+          item.style.transform  = 'translate3d(calc(-50% + '+this.left+'px), calc(-50% + '+this.top+'px), 0px)';
+        } else {
+          item.style.transform  = 'translate3d(calc(-50% + '+this.left+'px), calc(-50% + '+this.top+'px), 0px) scale3d(1, 1, 1)';
+        }
 
         this.initialMouseX = 0;
         if(window.innerWidth >= 700) {
@@ -1524,6 +1527,7 @@ var script = {
     lightboxClasses: function lightboxClasses() {
       var classesReturn = [
         { 'cool-lightbox--can-zoom': this.canZoom && !this.disableZoom },
+        { 'cool-lightbox--zoom-disabled': this.disableZoom},
         { 'cool-lightbox--is-zooming': this.isZooming },
         { 'cool-lightbox--show-thumbs': this.showThumbs },
         { 'cool-lightbox--is-swipping': this.isDraggingSwipe }

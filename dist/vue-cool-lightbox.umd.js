@@ -1015,7 +1015,6 @@
           var item = e.target.parentNode;
           var newZoom = 1.6 + this.zoomBar/10;
           item.style.transform  = 'translate3d(calc(-50% + '+this.left+'px), calc(-50% + '+this.top+'px), 0px) scale3d('+newZoom+', '+newZoom+', '+newZoom+')';
-      
         }
         e.stopPropagation();
       },
@@ -1104,7 +1103,11 @@
           }
 
           // reset styles
-          item.style.transform  = 'translate3d(calc(-50% + '+this.left+'px), calc(-50% + '+this.top+'px), 0px) scale3d(1, 1, 1)';
+          if(this.disableZoom) {
+            item.style.transform  = 'translate3d(calc(-50% + '+this.left+'px), calc(-50% + '+this.top+'px), 0px)';
+          } else {
+            item.style.transform  = 'translate3d(calc(-50% + '+this.left+'px), calc(-50% + '+this.top+'px), 0px) scale3d(1, 1, 1)';
+          }
 
           this.initialMouseX = 0;
           if(window.innerWidth >= 700) {
@@ -1528,6 +1531,7 @@
       lightboxClasses: function lightboxClasses() {
         var classesReturn = [
           { 'cool-lightbox--can-zoom': this.canZoom && !this.disableZoom },
+          { 'cool-lightbox--zoom-disabled': this.disableZoom},
           { 'cool-lightbox--is-zooming': this.isZooming },
           { 'cool-lightbox--show-thumbs': this.showThumbs },
           { 'cool-lightbox--is-swipping': this.isDraggingSwipe }
@@ -1678,7 +1682,7 @@
     /* scoped */
     var __vue_scope_id__ = undefined;
     /* module identifier */
-    var __vue_module_identifier__ = "data-v-51197c43";
+    var __vue_module_identifier__ = "data-v-24d93fe6";
     /* functional template */
     var __vue_is_functional_template__ = false;
     /* style inject */

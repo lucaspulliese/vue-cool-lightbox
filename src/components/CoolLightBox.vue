@@ -1210,7 +1210,6 @@ export default {
         const item = e.target.parentNode
         const newZoom = 1.6 + this.zoomBar/10;
         item.style.transform  = 'translate3d(calc(-50% + '+this.left+'px), calc(-50% + '+this.top+'px), 0px) scale3d('+newZoom+', '+newZoom+', '+newZoom+')';
-    
       }
       e.stopPropagation()
     },
@@ -1299,7 +1298,11 @@ export default {
         }
 
         // reset styles
-        item.style.transform  = 'translate3d(calc(-50% + '+this.left+'px), calc(-50% + '+this.top+'px), 0px) scale3d(1, 1, 1)';
+        if(this.disableZoom) {
+          item.style.transform  = 'translate3d(calc(-50% + '+this.left+'px), calc(-50% + '+this.top+'px), 0px)';
+        } else {
+          item.style.transform  = 'translate3d(calc(-50% + '+this.left+'px), calc(-50% + '+this.top+'px), 0px) scale3d(1, 1, 1)';
+        }
 
         this.initialMouseX = 0
         if(window.innerWidth >= 700) {
@@ -1720,6 +1723,7 @@ export default {
     lightboxClasses() {
       let classesReturn = [
         { 'cool-lightbox--can-zoom': this.canZoom && !this.disableZoom },
+        { 'cool-lightbox--zoom-disabled': this.disableZoom},
         { 'cool-lightbox--is-zooming': this.isZooming },
         { 'cool-lightbox--show-thumbs': this.showThumbs },
         { 'cool-lightbox--is-swipping': this.isDraggingSwipe }
@@ -2073,6 +2077,13 @@ $breakpoints: (
       }
     }
   }
+  &.cool-lightbox--zoom-disabled {
+    .cool-lightbox__slide {
+      .cool-lightbox__slide__img {
+        transform: translate3d(-50%, -50%, 0px);
+      }
+    }
+  }
   &.cool-lightbox--can-zoom {
     .cool-lightbox__slide {
       img {
@@ -2285,6 +2296,11 @@ $breakpoints: (
       max-height: 100%;
       margin: auto;
       z-index: 9999;
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      -ms-transform: translateZ(0);
+      -webkit-transform: translateZ(0); 
+      transform: translateZ(0);
       box-shadow: 0 0 1.5rem rgba(0,0,0,.45);
     }
   }
