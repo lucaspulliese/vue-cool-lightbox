@@ -111,7 +111,7 @@
                 v-autoplayObserver
                 :data-autoplay="setAutoplay(itemIndex)"
                 :src="getVideoUrl(getItemSrc(itemIndex))" 
-                v-if="!checkIsMp4(getItemSrc(itemIndex)) && getMediaType(itemIndex) === 'video'" 
+                v-if="(!checkIsMp4(getItemSrc(itemIndex)) && getMediaType(itemIndex) === 'video')" 
                 :style="aspectRatioVideo" 
                 :key="itemIndex" 
                 frameborder="0" 
@@ -132,12 +132,12 @@
                 v-autoplayObserver
                 :data-autoplay="setAutoplay(itemIndex)"
                 class="cool-lightbox-video" 
-                v-if="checkIsMp4(getItemSrc(itemIndex)) && getMediaType(itemIndex) === 'video'" 
+                v-if="checkIsMp4(getItemSrc(itemIndex)) || getMediaType(itemIndex) === 'webVideo'" 
                 :style="aspectRatioVideo" :key="checkIsMp4(getItemSrc(itemIndex))" 
                 controls="" 
                 controlslist="nodownload" l
                 poster="">
-                <source :src="checkIsMp4(getItemSrc(itemIndex))" :type="'video/'+getVideoExt(getItemSrc(itemIndex))">
+                <source :src="checkIsMp4(getItemSrc(itemIndex))" :type="'video/'+(getVideoExt(getItemSrc(itemIndex)) ? getVideoExt(getItemSrc(itemIndex)) : getExtFromItem(itemIndex))">
                 Sorry, your browser doesn't support embedded videos
               </video> 
             </div>
@@ -185,7 +185,7 @@
                     v-autoplayObserver
                     :data-autoplay="setAutoplay(imgIndex)"
                     :src="getVideoUrl(getItemSrc(imgIndex))" 
-                    v-if="!checkIsMp4(getItemSrc(imgIndex)) && getMediaType(imgIndex) === 'video'" 
+                    v-if="(!checkIsMp4(getItemSrc(imgIndex)) && getMediaType(imgIndex) === 'video')" 
                     :style="aspectRatioVideo" 
                     :key="getVideoUrl(getItemSrc(imgIndex))" 
                     frameborder="0" 
@@ -205,12 +205,12 @@
                   <video class="cool-lightbox-video" 
                     v-autoplayObserver
                     :data-autoplay="setAutoplay(imgIndex)"
-                    v-if="checkIsMp4(getItemSrc(imgIndex)) && getMediaType(imgIndex) === 'video'" 
+                    v-if="checkIsMp4(getItemSrc(imgIndex)) || getMediaType(imgIndex) === 'webVideo'" 
                     :style="aspectRatioVideo" :key="checkIsMp4(getItemSrc(imgIndex))" 
                     controls="" 
                     controlslist="nodownload" 
                     poster="">
-                    <source :src="checkIsMp4(getItemSrc(imgIndex))" :type="'video/'+getVideoExt(getItemSrc(imgIndex))">
+                    <source :src="checkIsMp4(getItemSrc(imgIndex))" :type="'video/'+(getVideoExt(getItemSrc(imgIndex)) ? getVideoExt(getItemSrc(imgIndex)) : getExtFromItem(imgIndex))">
                     Sorry, your browser doesn't support embedded videos
                   </video> 
                 </transition>
@@ -692,6 +692,23 @@ export default {
   },
 
   methods: {
+    getExtFromItem(imgIndex) {
+      if(imgIndex === null) {
+        return false
+      }
+
+      if(this.checkIfIsObject(imgIndex)) {
+        const item = this.items[imgIndex]
+
+        //item extension is specified, so return it
+        if (item['ext']) {
+          return item['ext']
+        }
+
+        return 'mp4';
+      }
+    },
+
     stopVideos() {
       const videos = document.getElementsByClassName("cool-lightbox-video");
       const isVideoPlaying = video => !!(video.currentTime > 0 && !video.paused && !video.ended && video.readyState > 2);
@@ -1075,6 +1092,7 @@ export default {
       if(this.checkIfIsObject(imgIndex)) {
         
         const item = this.items[imgIndex]
+
         //item type is specified, so return it
         if (item[this.srcMediaType]) {
           return item[this.srcMediaType]
