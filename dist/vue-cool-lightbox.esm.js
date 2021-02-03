@@ -314,6 +314,10 @@ var script = {
         swipeAnimation = null;
       }
 
+      if (this.thumbsPosition === 'bottom') {
+        widthGalleryBlock = 0;
+      }
+
       var self = this;
       this.swipeAnimation = swipeAnimation;
 

@@ -318,6 +318,10 @@
           swipeAnimation = null;
         }
 
+        if (this.thumbsPosition === 'bottom') {
+          widthGalleryBlock = 0;
+        }
+
         var self = this;
         this.swipeAnimation = swipeAnimation;
 
@@ -1700,7 +1704,7 @@
     /* scoped */
     var __vue_scope_id__ = undefined;
     /* module identifier */
-    var __vue_module_identifier__ = "data-v-85b8c73a";
+    var __vue_module_identifier__ = "data-v-5f552372";
     /* functional template */
     var __vue_is_functional_template__ = false;
     /* style inject */
