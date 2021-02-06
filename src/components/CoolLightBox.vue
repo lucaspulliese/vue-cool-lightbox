@@ -511,6 +511,10 @@ export default {
         swipeAnimation = null
       }
 
+      if (this.thumbsPosition === 'bottom') {
+        widthGalleryBlock = 0;
+      }
+
       const self = this
       this.swipeAnimation = swipeAnimation
 
