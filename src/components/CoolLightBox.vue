@@ -79,8 +79,8 @@
             <div 
                 v-lazyload
                 v-if="getMediaType(itemIndex) === 'image'" key="image" :style="imgWrapperStyle" class="cool-lightbox__slide__img">
-              <img
-                :data-url="getItemSrc(itemIndex)"
+              <img v-if="!isItemPicture(itemIndex)"
+                :data-src="getItemSrc(itemIndex)"
                 :data-srcset="getItemSrcSet(itemIndex)"
                 :data-sizes="getItemSizes(itemIndex)"
                 :key="itemIndex"
@@ -97,6 +97,33 @@
                 @touchmove="handleMouseMove($event)"
                 @touchend="handleMouseUp($event)"
                 />
+              <picture v-else>
+                <source
+                    v-for="(source, sourceIndex) in getPictureSources(itemIndex)"
+                    :data-srcset="source.srcset"
+                    :type="source.type"
+                    :data-sizes="source.sizes || getItemSizes(imgIndex)"
+                    :key="sourceIndex"
+                >
+                <img
+                     :data-src="getItemSrc(itemIndex)"
+                     :data-srcset="getItemSrcSet(itemIndex)"
+                     :data-sizes="getItemSizes(itemIndex)"
+                     :key="itemIndex"
+                     draggable="false"
+                     :alt="getItemAlt(itemIndex)"
+
+                     @load="imageLoaded"
+                     @click="zoomImage(itemIndex)"
+                     @mousedown="handleMouseDown($event)"
+                     @mouseup="handleMouseUp($event)"
+                     @mousemove="handleMouseMove($event)"
+
+                     @touchstart="handleMouseDown($event)"
+                     @touchmove="handleMouseMove($event)"
+                     @touchend="handleMouseUp($event)"
+                />
+              </picture>
               
               <div v-show="imageLoading" class="cool-lightbox-loading-wrapper">
                 <slot name="loading">
@@ -156,22 +183,48 @@
           >
             <transition name="cool-lightbox-slide-change" mode="out-in">
               <div v-if="getMediaType(imgIndex) === 'image'" key="image" :style="imgWrapperStyle" class="cool-lightbox__slide__img">
-                <transition name="cool-lightbox-slide-change" mode="out-in">
-                <img 
-                  :src="getItemSrc(imgIndex)"
-                  :srcset="getItemSrcSet(imgIndex)"
-                  :sizes="getItemSizes(imgIndex)"
-                  :key="imgIndex"
-                  draggable="false"
-                  :alt="getItemAlt(imgIndex)"
+                <transition name="cool-lightbox-slide-change" mode="out-in" v-if="!isItemPicture(imgIndex)">
+                  <img
+                      :src="getItemSrc(imgIndex)"
+                      :srcset="getItemSrcSet(imgIndex)"
+                      :sizes="getItemSizes(imgIndex)"
+                      :key="imgIndex"
+                      draggable="false"
+                      :alt="getItemAlt(imgIndex)"
 
-                  @load="imageLoaded"
-                  @click="zoomImage"
-                  @mousedown="handleMouseDown($event)"
-                  @mouseup="handleMouseUp($event)"
-                  @mousemove="handleMouseMove($event)"
+                      @load="imageLoaded"
+                      @click="zoomImage"
+                      @mousedown="handleMouseDown($event)"
+                      @mouseup="handleMouseUp($event)"
+                      @mousemove="handleMouseMove($event)"
                   />
                 </transition>
+                <transition v-else name="cool-lightbox-slide-change" mode="out-in">
+                  <picture>
+                    <source
+                        v-for="(source, sourceIndex) in getPictureSources(imgIndex)"
+                        :srcset="source.srcset"
+                        :type="source.type"
+                        :sizes="source.sizes || getItemSizes(imgIndex)"
+                        :key="sourceIndex"
+                    >
+                    <img
+                        :src="getItemSrc(imgIndex)"
+                        :srcset="getItemSrcSet(imgIndex)"
+                        :sizes="getItemSizes(imgIndex)"
+                        :key="imgIndex"
+                        draggable="false"
+                        :alt="getItemAlt(imgIndex)"
+
+                        @load="imageLoaded"
+                        @click="zoomImage(imgIndex)"
+                        @mousedown="handleMouseDown($event)"
+                        @mouseup="handleMouseUp($event)"
+                        @mousemove="handleMouseMove($event)"
+                    />
+                  </picture>
+                </transition>
+
                 
                 <div v-show="imageLoading" class="cool-lightbox-loading-wrapper">
                   <slot name="loading">
@@ -1051,6 +1104,29 @@ export default {
 
       return itemUrl
     },
+
+    isItemPicture(imgIndex) {
+      if(imgIndex === null) {
+        return false
+      }
+
+      const item = this.items[imgIndex]
+      if(this.checkIfIsObject(imgIndex)) {
+        return item.picture
+      }
+
+      return false
+    },
+
+    getPictureSources(imgIndex) {
+      if(imgIndex === null) {
+        return false
+      }
+
+      const picture = this.items[imgIndex].picture
+
+      return picture.sources ? picture.sources : []
+    },
     
     // get item src
     getItemSrc(imgIndex) {
@@ -1264,7 +1340,9 @@ export default {
         this.lastY = e.clientY
         this.canZoom = false
         
-        const item = e.target.parentNode
+        const item = e.target.parentNode.nodeName === 'PICTURE'
+            ? e.target.parentNode.parentNode
+            : e.target.parentNode
         const newZoom = 1.6 + this.zoomBar/10;
         item.style.transform  = 'translate3d(calc(-50% + '+this.left+'px), calc(-50% + '+this.top+'px), 0px) scale3d('+newZoom+', '+newZoom+', '+newZoom+')';
       }
@@ -2359,6 +2437,16 @@ $breakpoints: (
       -webkit-transform: translateZ(0); 
       transform: translateZ(0);
       box-shadow: 0 0 1.5rem rgba(0,0,0,.45);
+    }
+
+    picture {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      max-height: 100%;
+      height: 100%;
+      margin: auto;
+      z-index: 9999;
     }
   }
 }
