@@ -79,8 +79,10 @@
             <div 
                 v-lazyload
                 v-if="getMediaType(itemIndex) === 'image'" key="image" :style="imgWrapperStyle" class="cool-lightbox__slide__img">
-              <img 
+              <img
                 :data-url="getItemSrc(itemIndex)"
+                :data-srcset="getItemSrcSet(itemIndex)"
+                :data-sizes="getItemSizes(itemIndex)"
                 :key="itemIndex"
                 draggable="false"
                 :alt="getItemAlt(itemIndex)"
@@ -156,7 +158,9 @@
               <div v-if="getMediaType(imgIndex) === 'image'" key="image" :style="imgWrapperStyle" class="cool-lightbox__slide__img">
                 <transition name="cool-lightbox-slide-change" mode="out-in">
                 <img 
-                  :src="getItemSrc(imgIndex)" 
+                  :src="getItemSrc(imgIndex)"
+                  :srcset="getItemSrcSet(imgIndex)"
+                  :sizes="getItemSizes(imgIndex)"
                   :key="imgIndex"
                   draggable="false"
                   :alt="getItemAlt(imgIndex)"
@@ -420,6 +424,11 @@ export default {
     srcName: {
       type: String,
       default: 'src',
+    },
+
+    srcSetName: {
+      type: String,
+      default: 'srcset'
     },
     
     srcThumb: {
@@ -1055,6 +1064,32 @@ export default {
       }
 
       return item
+    },
+
+    getItemSrcSet(imgIndex) {
+      if(imgIndex === null) {
+        return false
+      }
+
+      const item = this.items[imgIndex]
+      if(this.checkIfIsObject(imgIndex)) {
+        return item[this.srcSetName]
+      }
+
+      return null
+    },
+
+    getItemSizes(imgIndex) {
+      if(imgIndex === null) {
+        return false
+      }
+
+      const item = this.items[imgIndex]
+      if(this.checkIfIsObject(imgIndex)) {
+        return item.sizes
+      }
+
+      return null
     },
     
     getItemAlt(imgIndex) {

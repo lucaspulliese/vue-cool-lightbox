@@ -9,6 +9,14 @@ export default {
           setTimeout(() => el.classList.add("loaded"), 100);
         });
         imageElement.addEventListener("error", () => console.log("error"));
+        const srcset = imageElement.dataset.srcset;
+        const sizes = imageElement.dataset.sizes;
+        if (srcset) {
+          imageElement.srcset = srcset;
+        }
+        if (sizes) {
+          imageElement.sizes = sizes;
+        }
         imageElement.src = imageElement.dataset.url;
       }
     }
