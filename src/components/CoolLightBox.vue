@@ -1454,9 +1454,9 @@ export default {
       el = el[0]
 
       let computedStyle = getComputedStyle(el)
-      if(window.innerWidth < 700) {
+      if(window.innerWidth < 1024) {
 
-        let width = el.clientWidth
+        let width = el.clientWidth;
         let height = Math.round((width/16)*9);
 
         this.aspectRatioVideo.height = height+'px'
@@ -1516,7 +1516,7 @@ export default {
         return false;
       }
 
-      var elements = '.cool-lightbox-zoom, .cool-lightbox-zoom *, .cool-lightbox-thumbs, svg, path, rect, .cool-lightbox-thumbs *, .cool-lightbox-button, .cool-lightbox-toolbar__btn, .cool-lightbox-toolbar__btn *, .cool-lightbox-button *, .cool-lightbox__slide__img *, .cool-lightbox-video, .cool-lightbox-caption h6, .cool-lightbox-caption p, .cool-lightbox-caption a';
+      var elements = '.cool-lightbox__iframe, .cool-lightbox__iframe *, .cool-lightbox-zoom, .cool-lightbox-zoom *, .cool-lightbox-thumbs, svg, path, rect, .cool-lightbox-thumbs *, .cool-lightbox-button, .cool-lightbox-toolbar__btn, .cool-lightbox-toolbar__btn *, .cool-lightbox-button *, .cool-lightbox__slide__img *, .cool-lightbox-video, .cool-lightbox-caption h6, .cool-lightbox-caption p, .cool-lightbox-caption a';
       if (!event.target.matches(elements)) {
         this.close()
       }
@@ -1634,8 +1634,13 @@ export default {
 
     // index change
     onIndexChange(index) {
-      this.imgIndex = index
-      this.$emit('on-change', index)
+      const self = this;
+      this.imgIndex = index;
+      this.$emit('on-change', index);
+
+      setTimeout(function() {
+        self.$emit('on-change-end', index);
+      }, 400);
     },
 
     // caption size 

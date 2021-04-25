@@ -4,6 +4,7 @@
       effect="fade"
       :items="items" 
       :index="index"
+      @on-change-end="plyr"
       @close="index = null">
     </CoolLightBox>
 
@@ -20,6 +21,8 @@
 </template>
 
 <script>
+import Plyr from 'plyr'
+import 'plyr/dist/plyr.css'
 import CoolLightBox from './components/CoolLightBox.vue'
 
 export default {
@@ -61,7 +64,7 @@ export default {
           src: 'https://www.cheatsheet.com/wp-content/uploads/2019/04/Planet-Earth.jpg',
         },
         {
-          src: 'https://www.youtube.com/watch?v=NvEGPTdNlS0'
+          src: 'https://file-examples-com.github.io/uploads/2017/04/file_example_MP4_480_1_5MG.mp4'
         }
       ],
       index: null
@@ -71,6 +74,9 @@ export default {
     CoolLightBox
   },
   methods: {
+    plyr() {
+      return Plyr.setup('.cool-lightbox-video')
+    },
     setIndex(index) {
       this.index = index
     }

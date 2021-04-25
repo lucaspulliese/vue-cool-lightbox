@@ -32,6 +32,7 @@
   "homepage": "https://vue-cool-lightbox.lucaspulliese.com",
   "dependencies": {
     "body-scroll-lock": "^3.1.5",
+    "plyr": "^3.6.7",
     "vue": "^2.6.10"
   },
   "main": "dist/vue-cool-lightbox.umd.js",
