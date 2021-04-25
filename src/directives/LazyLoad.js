@@ -1,15 +1,28 @@
+const attributes = ['srcset', 'sizes', 'src'];
+
 export default {
   inserted: el => {
+
     function loadImage() {
-      const imageElement = Array.from(el.children).find(
-        el => el.nodeName === "IMG"
-      );
+      const imageElement = findChild(el, 'img')
+      const pictureElement = findChild(el, 'picture')
       if (imageElement) {
-        imageElement.addEventListener("load", () => {
-          setTimeout(() => el.classList.add("loaded"), 100);
-        });
-        imageElement.addEventListener("error", () => console.log("error"));
-        imageElement.src = imageElement.dataset.url;
+        setLoadListeners(imageElement)
+        swapAttributes(imageElement)
+      } else if (pictureElement) {
+        const pictureImg = findChild(pictureElement, 'img');
+        const pictureSources = Array.from(pictureElement.children).filter(
+            child => child.nodeName === "SOURCE"
+        );
+        if (pictureImg) {
+          setLoadListeners(pictureImg)
+          if (pictureSources.length) {
+            pictureSources.forEach(source => {
+              swapAttributes(source)
+            })
+          }
+          swapAttributes(pictureImg)
+        }
       }
     }
 
@@ -37,3 +50,26 @@ export default {
     }
   }
 };
+
+function swapAttributes(el) {
+  attributes.forEach((attribute) => {
+    const dataAttribute = el.dataset[attribute];
+    if (dataAttribute) {
+      el[attribute] = dataAttribute;
+      el.removeAttribute(`data-${attribute}`)
+    }
+  })
+}
+
+function setLoadListeners(el) {
+  el.addEventListener("load", () => {
+    setTimeout(() => el.classList.add("loaded"), 100);
+  });
+  el.addEventListener("error", () => console.log("error"));
+}
+
+function findChild(parent, nodeName) {
+  return Array.from(parent.children).find(
+      el => el.nodeName === nodeName.toUpperCase()
+  );
+}
