@@ -651,8 +651,8 @@
       },
 
       // check if event is arrow button or toolbar button
-      checkIfIsButton: function checkIfIsButton(eventEmit) {
-        var elements = '.cool-lightbox-button, .cool-lightbox-button *, .cool-lightbox-toolbar__btn, .cool-lightbox-toolbar__btn *, .cool-lightbox-caption h6, .cool-lightbox-caption p, .cool-lightbox-caption a';
+      checkIfIsButton: function checkIfIsButton(event) {
+        var elements = '.cool-lightbox__iframe *, .cool-lightbox-button, .cool-lightbox-button *, .cool-lightbox-toolbar__btn, .cool-lightbox-toolbar__btn *, .cool-lightbox-caption h6, .cool-lightbox-caption p, .cool-lightbox-caption a';
         if (event.target.matches(elements)) {
           return true
         }
@@ -1232,13 +1232,12 @@
 
       // Aspect Ratio responsive video
       setAspectRatioVideo: function setAspectRatioVideo() {
-
         var thisContext = this;
         var el = document.getElementsByClassName('cool-lightbox__inner');
         el = el[0];
 
         var computedStyle = getComputedStyle(el);
-        if(window.innerWidth < 700) {
+        if(window.innerWidth < 1440) {
 
           var width = el.clientWidth;
           var height = Math.round((width/16)*9);
@@ -1299,7 +1298,7 @@
           return false;
         }
 
-        var elements = '.cool-lightbox-zoom, .cool-lightbox-zoom *, .cool-lightbox-thumbs, svg, path, rect, .cool-lightbox-thumbs *, .cool-lightbox-button, .cool-lightbox-toolbar__btn, .cool-lightbox-toolbar__btn *, .cool-lightbox-button *, .cool-lightbox__slide__img *, .cool-lightbox-video, .cool-lightbox-caption h6, .cool-lightbox-caption p, .cool-lightbox-caption a';
+        var elements = '.cool-lightbox__iframe, .cool-lightbox__iframe *, .cool-lightbox-zoom, .cool-lightbox-zoom *, .cool-lightbox-thumbs, svg, path, rect, .cool-lightbox-thumbs *, .cool-lightbox-button, .cool-lightbox-toolbar__btn, .cool-lightbox-toolbar__btn *, .cool-lightbox-button *, .cool-lightbox__slide__img *, .cool-lightbox-video, .cool-lightbox-caption h6, .cool-lightbox-caption p, .cool-lightbox-caption a';
         if (!event.target.matches(elements)) {
           this.close();
         }
@@ -1421,8 +1420,13 @@
 
       // index change
       onIndexChange: function onIndexChange(index) {
+        var self = this;
         this.imgIndex = index;
         this.$emit('on-change', index);
+
+        setTimeout(function() {
+          self.$emit('on-change-end', index);
+        }, 400);
       },
 
       // caption size 
@@ -1796,7 +1800,7 @@
     /* scoped */
     var __vue_scope_id__ = undefined;
     /* module identifier */
-    var __vue_module_identifier__ = "data-v-01459270";
+    var __vue_module_identifier__ = "data-v-0d4c35ff";
     /* functional template */
     var __vue_is_functional_template__ = false;
     /* style inject */
