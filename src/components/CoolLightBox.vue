@@ -865,8 +865,8 @@ export default {
     },
 
     // check if event is arrow button or toolbar button
-    checkIfIsButton(eventEmit) {
-      var elements = '.cool-lightbox-button, .cool-lightbox-button *, .cool-lightbox-toolbar__btn, .cool-lightbox-toolbar__btn *, .cool-lightbox-caption h6, .cool-lightbox-caption p, .cool-lightbox-caption a';
+    checkIfIsButton(event) {
+      var elements = '.cool-lightbox__iframe *, .cool-lightbox-button, .cool-lightbox-button *, .cool-lightbox-toolbar__btn, .cool-lightbox-toolbar__btn *, .cool-lightbox-caption h6, .cool-lightbox-caption p, .cool-lightbox-caption a';
       if (event.target.matches(elements)) {
         return true
       }
@@ -1448,13 +1448,12 @@ export default {
 
     // Aspect Ratio responsive video
     setAspectRatioVideo() {
-
       const thisContext = this
       let el = document.getElementsByClassName('cool-lightbox__inner');
       el = el[0]
 
       let computedStyle = getComputedStyle(el)
-      if(window.innerWidth < 1024) {
+      if(window.innerWidth < 1440) {
 
         let width = el.clientWidth;
         let height = Math.round((width/16)*9);
@@ -2584,8 +2583,8 @@ $breakpoints: (
 }
 
 @keyframes cool-lightbox-rotate {
-    100% {
-        transform: rotate(360deg);
-    }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 </style>
