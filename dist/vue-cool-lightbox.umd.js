@@ -922,7 +922,7 @@
 
         var item = this.items[imgIndex];
         if(this.checkIfIsObject(imgIndex)) {
-          return item[this.srcName]
+          return item.srcName
         }
 
         return item
@@ -935,7 +935,7 @@
 
         var item = this.items[imgIndex];
         if(this.checkIfIsObject(imgIndex)) {
-          return item[this.srcSetName]
+          return item.srcSetName
         }
 
         return null
@@ -974,7 +974,7 @@
 
         var item = this.items[imgIndex];
         if(this.checkIfIsObject(imgIndex)) {
-          return item[this.srcThumb]
+          return item.srcThumb
         } 
 
         if(this.getVideoUrl(item)) {
@@ -996,7 +996,7 @@
 
           //item type is specified, so return it
           if (item$1[this.srcMediaType]) {
-            return item$1[this.srcMediaType]
+            return item$1.srcMediaType
           }
         }
       
@@ -1431,7 +1431,7 @@
 
       // caption size 
       addCaptionPadding: function addCaptionPadding() {
-        if(this.checkIfIsObject(this.imgIndex) && (this.items[this.imgIndex].title || this.items[this.imgIndex].descripcion)) {
+        if(this.checkIfIsObject(this.imgIndex) && (this.items[this.imgIndex].title || this.items[this.imgIndex].description)) {
           var el = document.getElementsByClassName('cool-lightbox-caption');
           if(el.length > 0) {
             this.paddingBottom = el[0].offsetHeight;
@@ -1639,7 +1639,7 @@
 
         var item = this.items[this.imgIndex];
         if(this.checkIfIsObject(this.imgIndex)) {
-          return item[this.srcName]
+          return item.srcName
         }
 
         return item
@@ -1800,7 +1800,7 @@
     /* scoped */
     var __vue_scope_id__ = undefined;
     /* module identifier */
-    var __vue_module_identifier__ = "data-v-0d4c35ff";
+    var __vue_module_identifier__ = "data-v-3a5df378";
     /* functional template */
     var __vue_is_functional_template__ = false;
     /* style inject */

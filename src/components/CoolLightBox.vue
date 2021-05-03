@@ -1136,7 +1136,7 @@ export default {
 
       const item = this.items[imgIndex]
       if(this.checkIfIsObject(imgIndex)) {
-        return item[this.srcName]
+        return item.srcName
       }
 
       return item
@@ -1149,7 +1149,7 @@ export default {
 
       const item = this.items[imgIndex]
       if(this.checkIfIsObject(imgIndex)) {
-        return item[this.srcSetName]
+        return item.srcSetName
       }
 
       return null
@@ -1188,7 +1188,7 @@ export default {
 
       const item = this.items[imgIndex]
       if(this.checkIfIsObject(imgIndex)) {
-        return item[this.srcThumb]
+        return item.srcThumb
       } 
 
       if(this.getVideoUrl(item)) {
@@ -1210,7 +1210,7 @@ export default {
 
         //item type is specified, so return it
         if (item[this.srcMediaType]) {
-          return item[this.srcMediaType]
+          return item.srcMediaType
         }
       }
     
@@ -1644,7 +1644,7 @@ export default {
 
     // caption size 
     addCaptionPadding() {
-      if(this.checkIfIsObject(this.imgIndex) && (this.items[this.imgIndex].title || this.items[this.imgIndex].descripcion)) {
+      if(this.checkIfIsObject(this.imgIndex) && (this.items[this.imgIndex].title || this.items[this.imgIndex].description)) {
         const el = document.getElementsByClassName('cool-lightbox-caption');
         if(el.length > 0) {
           this.paddingBottom = el[0].offsetHeight
@@ -1852,7 +1852,7 @@ export default {
 
       const item = this.items[this.imgIndex]
       if(this.checkIfIsObject(this.imgIndex)) {
-        return item[this.srcName]
+        return item.srcName
       }
 
       return item
