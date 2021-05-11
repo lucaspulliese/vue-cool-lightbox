@@ -97,19 +97,19 @@
                 @touchmove="handleMouseMove($event)"
                 @touchend="handleMouseUp($event)"
                 />
-              <picture v-else>
+              <picture :key="itemIndex" v-else>
                 <source
                     v-for="(source, sourceIndex) in getPictureSources(itemIndex)"
                     :data-srcset="source.srcset"
+                    :data-media="source.media"
                     :type="source.type"
                     :data-sizes="source.sizes || getItemSizes(imgIndex)"
-                    :key="sourceIndex"
+                    :key="`source-${imgIndex}-${sourceIndex}`"
                 >
                 <img
                      :data-src="getItemSrc(itemIndex)"
                      :data-srcset="getItemSrcSet(itemIndex)"
                      :data-sizes="getItemSizes(itemIndex)"
-                     :key="itemIndex"
                      draggable="false"
                      :alt="getItemAlt(itemIndex)"
 
@@ -200,19 +200,19 @@
                   />
                 </transition>
                 <transition v-else name="cool-lightbox-slide-change" mode="out-in">
-                  <picture>
+                  <picture :key="imgIndex">
                     <source
                         v-for="(source, sourceIndex) in getPictureSources(imgIndex)"
                         :srcset="source.srcset"
                         :type="source.type"
+                        :media="source.media"
                         :sizes="source.sizes || getItemSizes(imgIndex)"
-                        :key="sourceIndex"
+                        :key="`source-${imgIndex}-${sourceIndex}`"
                     >
                     <img
                         :src="getItemSrc(imgIndex)"
                         :srcset="getItemSrcSet(imgIndex)"
                         :sizes="getItemSizes(imgIndex)"
-                        :key="imgIndex"
                         draggable="false"
                         :alt="getItemAlt(imgIndex)"
 
