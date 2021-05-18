@@ -1,4 +1,4 @@
-const attributes = ['srcset', 'sizes', 'src'];
+const attributes = ['media', 'srcset', 'sizes', 'src'];
 
 export default {
   inserted: el => {
