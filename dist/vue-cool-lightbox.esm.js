@@ -419,14 +419,10 @@ var script = {
           window.addEventListener('wheel', this.wheelEvent);
         }
         
-        // only in mobile
-        if(window.innerWidth < 700) {
-
-          // add click event
-          setTimeout(function() {
-            window.addEventListener('click', self.showButtons);
-          }, 200);
-        }
+        // add click event
+        setTimeout(function() {
+          window.addEventListener('click', self.showButtons);
+        }, 200);
 
         if (this.enableScrollLock) {
           setTimeout(function() {
@@ -1073,7 +1069,7 @@ var script = {
 
     // show buttons event
     showButtons: function showButtons(event) {
-      if (!this.checkIfIsButton(event)) {
+      if (this.disableZoom && !this.checkIfIsButton(event)) {
         var self = this;
         setTimeout(function() {
           self.buttonsVisible = !self.buttonsVisible;
@@ -1090,16 +1086,20 @@ var script = {
 
     // handle mouse down event
     handleMouseDown: function handleMouseDown(e) {
-      if (!this.checkMouseEventPropButton(e.button)) { return }
-      this.lastX = e.clientX;
-      this.lastY = e.clientY;
-      this.isDraging = true;
+      if (!( e.type === 'touchstart' && this.isZooming || e.type === 'mousedown' && this.checkMouseEventPropButton(e.button))) { return }
+      this.lastX = (e.type === 'touchstart' ? e.touches[0] : e).clientX;
+      this.lastY = (e.type === 'touchstart' ? e.touches[0] : e).clientY;
+
+      if (this.isZooming) {
+        this.isDraging = true;
+      }
+
       e.stopPropagation();
     },
 
     // handle mouse up event
     handleMouseUp: function handleMouseUp(e) {
-      if (!this.checkMouseEventPropButton(e.button)) { return }
+      if (!(e.type === 'touchend' && this.isZooming || e.type === 'mouseup' && this.checkMouseEventPropButton(e.button))) { return }
       this.isDraging = false;
       this.lastX = this.lastY = 0;
 
@@ -1112,12 +1112,14 @@ var script = {
 
     // handle mouse move event
     handleMouseMove: function handleMouseMove(e) {
-      if (!this.checkMouseEventPropButton(e.button)) { return }
+      if (!(e.type === "touchmove" && this.isZooming || e.type === "mousemove" && this.checkMouseEventPropButton(e.button))) { return }
       if (this.isDraging) {
-        this.top = this.top - this.lastY + e.clientY;
-        this.left = this.left - this.lastX + e.clientX;
-        this.lastX = e.clientX;
-        this.lastY = e.clientY;
+        var clientX = (e.type === 'touchmove' ? e.touches[0] : e).clientX;
+        var clientY = (e.type === 'touchmove' ? e.touches[0] : e).clientY;
+        this.top = this.top - this.lastY + clientY;
+        this.left = this.left - this.lastX + clientX;
+        this.lastX = clientX;
+        this.lastY = clientY;
         this.canZoom = false;
         
         var item = e.target.parentNode.nodeName === 'PICTURE'
@@ -1132,10 +1134,6 @@ var script = {
     // zoom image event
     zoomImage: function zoomImage(indexImage) {
       if(this.disableZoom) {
-        return false
-      }
-
-      if(window.innerWidth < 700) {
         return false
       }
 

@@ -637,14 +637,10 @@ export default {
           window.addEventListener('wheel', this.wheelEvent)
         }
         
-        // only in mobile
-        if(window.innerWidth < 700) {
-
-          // add click event
-          setTimeout(function() {
-            window.addEventListener('click', self.showButtons)
-          }, 200)
-        }
+        // add click event
+        setTimeout(function() {
+          window.addEventListener('click', self.showButtons)
+        }, 200)
 
         if (this.enableScrollLock) {
           setTimeout(function() {
@@ -1293,7 +1289,7 @@ export default {
 
     // show buttons event
     showButtons(event) {
-      if (!this.checkIfIsButton(event)) {
+      if (this.disableZoom && !this.checkIfIsButton(event)) {
         const self = this
         setTimeout(function() {
           self.buttonsVisible = !self.buttonsVisible
@@ -1310,16 +1306,20 @@ export default {
 
     // handle mouse down event
     handleMouseDown(e) {
-      if (!this.checkMouseEventPropButton(e.button)) return
-      this.lastX = e.clientX
-      this.lastY = e.clientY
-      this.isDraging = true
+      if (!( e.type === 'touchstart' && this.isZooming || e.type === 'mousedown' && this.checkMouseEventPropButton(e.button))) { return }
+      this.lastX = (e.type === 'touchstart' ? e.touches[0] : e).clientX
+      this.lastY = (e.type === 'touchstart' ? e.touches[0] : e).clientY
+
+      if (this.isZooming) {
+        this.isDraging = true;
+      }
+
       e.stopPropagation()
     },
 
     // handle mouse up event
     handleMouseUp(e) {
-      if (!this.checkMouseEventPropButton(e.button)) return
+      if (!(e.type === 'touchend' && this.isZooming || e.type === 'mouseup' && this.checkMouseEventPropButton(e.button))) { return }
       this.isDraging = false
       this.lastX = this.lastY = 0
 
@@ -1332,12 +1332,14 @@ export default {
 
     // handle mouse move event
     handleMouseMove(e) {
-      if (!this.checkMouseEventPropButton(e.button)) return
+      if (!(e.type === "touchmove" && this.isZooming || e.type === "mousemove" && this.checkMouseEventPropButton(e.button))) { return }
       if (this.isDraging) {
-        this.top = this.top - this.lastY + e.clientY
-        this.left = this.left - this.lastX + e.clientX
-        this.lastX = e.clientX
-        this.lastY = e.clientY
+        const clientX = (e.type === 'touchmove' ? e.touches[0] : e).clientX
+        const clientY = (e.type === 'touchmove' ? e.touches[0] : e).clientY
+        this.top = this.top - this.lastY + clientY
+        this.left = this.left - this.lastX + clientX
+        this.lastX = clientX
+        this.lastY = clientY
         this.canZoom = false
         
         const item = e.target.parentNode.nodeName === 'PICTURE'
@@ -1352,10 +1354,6 @@ export default {
     // zoom image event
     zoomImage(indexImage) {
       if(this.disableZoom) {
-        return false
-      }
-
-      if(window.innerWidth < 700) {
         return false
       }
 
