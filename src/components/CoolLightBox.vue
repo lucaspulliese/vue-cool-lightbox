@@ -91,6 +91,7 @@
                 @click="zoomImage(itemIndex)"
                 @mousedown="handleMouseDown($event)"
                 @mouseup="handleMouseUp($event)"
+                @mouseleave="handleMouseLeave($event)"
                 @mousemove="handleMouseMove($event)"
 
                 @touchstart="handleMouseDown($event)"
@@ -117,6 +118,7 @@
                      @click="zoomImage(itemIndex)"
                      @mousedown="handleMouseDown($event)"
                      @mouseup="handleMouseUp($event)"
+                     @mouseleave="handleMouseLeave($event)"
                      @mousemove="handleMouseMove($event)"
 
                      @touchstart="handleMouseDown($event)"
@@ -196,6 +198,7 @@
                       @click="zoomImage"
                       @mousedown="handleMouseDown($event)"
                       @mouseup="handleMouseUp($event)"
+                      @mouseleave="handleMouseLeave($event)"
                       @mousemove="handleMouseMove($event)"
                   />
                 </transition>
@@ -220,6 +223,7 @@
                         @click="zoomImage(imgIndex)"
                         @mousedown="handleMouseDown($event)"
                         @mouseup="handleMouseUp($event)"
+                        @mouseleave="handleMouseLeave($event)"
                         @mousemove="handleMouseMove($event)"
                     />
                   </picture>
@@ -1320,6 +1324,19 @@ export default {
     // handle mouse up event
     handleMouseUp(e) {
       if (!(e.type === 'touchend' && this.isZooming || e.type === 'mouseup' && this.checkMouseEventPropButton(e.button))) { return }
+      this.isDraging = false
+      this.lastX = this.lastY = 0
+
+      // Fix drag zoom out
+      const thisContext = this
+      setTimeout(function() {
+        thisContext.canZoom = true
+      }, 100)
+    },
+
+    // handle mouse leave event
+    handleMouseLeave(e) {
+      if (!(e.type === 'mouseleave' && this.isZooming)) { return }
       this.isDraging = false
       this.lastX = this.lastY = 0
 
