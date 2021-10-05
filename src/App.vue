@@ -33,6 +33,11 @@ export default {
         {
           title: 'Rocky mountain under blue and white sky',
           description: 'Photo by Guillaume Briard',
+          src: 'https://api-staging.qoala.app/api/smartphone/public/document/coba-upload-fd13c9dd55d20e71.MOV',
+        },
+        {
+          title: 'Rocky mountain under blue and white sky',
+          description: 'Photo by Guillaume Briard',
           src: 'https://www.cheatsheet.com/wp-content/uploads/2019/04/Planet-Earth.jpg',
         },
         {
