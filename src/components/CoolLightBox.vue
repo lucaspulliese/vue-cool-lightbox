@@ -168,7 +168,19 @@
                 poster="">
                 <source :src="checkIsMp4(getItemSrc(itemIndex))" :type="'video/'+(getVideoExt(getItemSrc(itemIndex)) ? getVideoExt(getItemSrc(itemIndex)) : getExtFromItem(itemIndex))">
                 Sorry, your browser doesn't support embedded videos
-              </video> 
+              </video>
+
+              <audio
+                  v-autoplayObserver
+                :data-autoplay="setAutoplay(itemIndex)"
+                class="cool-lightbox-video"
+                v-if="checkIsAudio(getItemSrc(itemIndex))"
+                :style="aspectRatioVideo" :key="checkIsAudio(getItemSrc(itemIndex))"
+                controls=""
+                controlslist="nodownload">
+                <source :src="checkIsAudio(getItemSrc(itemIndex))" :type="'audio/'+getAudioExt(getItemSrc(itemIndex))">
+                Sorry, your browser does not support the audio element
+              </audio>
             </div>
             <!--/cool-lightbox__iframe-->
           </div>
@@ -269,7 +281,19 @@
                     poster="">
                     <source :src="checkIsMp4(getItemSrc(imgIndex))" :type="'video/'+(getVideoExt(getItemSrc(imgIndex)) ? getVideoExt(getItemSrc(imgIndex)) : getExtFromItem(imgIndex))">
                     Sorry, your browser doesn't support embedded videos
-                  </video> 
+                  </video>
+
+                  <audio
+                      v-autoplayObserver
+                      :data-autoplay="setAutoplay(itemIndex)"
+                      class="cool-lightbox-video"
+                      v-if="checkIsAudio(getItemSrc(itemIndex))"
+                      :style="aspectRatioVideo" :key="checkIsAudio(getItemSrc(itemIndex))"
+                      controls=""
+                      controlslist="nodownload">
+                    <source :src="checkIsAudio(getItemSrc(itemIndex))" :type="'audio/'+getAudioExt(getItemSrc(itemIndex))">
+                    Sorry, your browser does not support the audio element
+                  </audio>
                 </transition>
               </div>
               <!--/cool-lightbox__iframe-->
@@ -1788,6 +1812,41 @@ export default {
       
       if(str.indexOf('.avi') !== -1) {
         return 'avi'
+      }
+
+      return false
+    },
+
+    checkIsAudio(url) {
+      if(this.imgIndex === null) {
+        return false
+      }
+
+      const str = new String(url);
+      if(
+          (str.indexOf('.mp3') !== -1) ||
+          (str.indexOf('.ogg') !== -1) ||
+          (str.indexOf('.wav') !== -1)
+      ) {
+        return url
+      }
+
+      return false
+    },
+
+    // if is video get extension
+    getAudioExt(url) {
+      if(this.imgIndex === null) {
+        return false
+      }
+
+      const str = new String(url);
+      if(str.indexOf('.mp3') !== -1 || str.indexOf('.wav') !== -1){
+        return 'mpeg'
+      }
+
+      if(str.indexOf('.ogg') !== -1) {
+        return 'ogg'
       }
 
       return false
