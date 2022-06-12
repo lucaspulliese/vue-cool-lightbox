@@ -1769,14 +1769,21 @@ export default {
       }
 
       const str = new String(url);
-      if(
-        (str.indexOf('.mp4') !== -1) || 
-        (str.indexOf('.mov') !== -1) || 
-        (str.indexOf('.webm') !== -1) || 
-        (str.indexOf('.ogg') !== -1) || 
-        (str.indexOf('.avi') !== -1)
-      ) {
-        return url
+      const videoExtensions = [
+        '.mp4',
+        '.mov',
+        '.webm',
+        '.ogg',
+        '.avi'
+      ];
+      const isValidExtension = videoExtensions.filter((videoExtension) => {
+        return (
+          str.indexOf(videoExtension) !== -1
+          || str.indexOf(videoExtension.toUpperCase()) !== -1
+        );
+      }).length > 0;
+      if (isValidExtension) {
+        return url;
       }
 
       return false
