@@ -1,21 +1,21 @@
 <template>
   <transition name="cool-lightbox-modal">
-    <div class="cool-lightbox" 
+    <div class="cool-lightbox"
       v-bind:class="lightboxClasses"
-      v-if="isVisible" 
+      v-if="isVisible"
       ref="coolLightbox"
       @click="closeModal"
       v-bind:style="lightboxStyles">
 
       <div v-if="gallery" class="cool-lightbox-thumbs">
         <div class="cool-lightbox-thumbs__list">
-          <button 
+          <button
             type="button"
             v-for="(item, itemIndex) in items"
             :key="itemIndex"
-            :class="{ 
+            :class="{
               active: itemIndex === imgIndex,
-              'is-video': getMediaType(itemIndex) === 'video' 
+              'is-video': getMediaType(itemIndex) === 'video'
             }"
             @click="imgIndex = itemIndex"
             class="cool-lightbox__thumb">
@@ -30,11 +30,11 @@
       </div>
       <!--/cool-lightbox-thumbs-->
 
-      <div 
-        class="cool-lightbox__inner" 
+      <div
+        class="cool-lightbox__inner"
         :style="innerStyles"
 
-        @mousedown="startSwipe" 
+        @mousedown="startSwipe"
         @mousemove="continueSwipe"
         @mouseup="endSwipe"
         @touchstart="startSwipe"
@@ -44,7 +44,7 @@
         <div class="cool-lightbox__progressbar" :style="stylesInterval"></div>
 
         <div class="cool-lightbox__navigation">
-          <button type="button" class="cool-lightbox-button cool-lightbox-button--prev" title="Previous" :class="buttonsClasses" v-show="(hasPreviousButton || loopData) && items.length > 1" @click="onPrevClick">
+          <button type="button" class="cool-lightbox-button cool-lightbox-button--prev" :title="translations.previous" :class="buttonsClasses" v-show="(hasPreviousButton || loopData) && items.length > 1" @click="onPrevClick">
             <slot name="icon-previous">
               <div class="cool-lightbox-button__icon">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11.28 15.7l-1.34 1.37L5 12l4.94-5.07 1.34 1.38-2.68 2.72H19v1.94H8.6z"></path></svg>
@@ -52,7 +52,7 @@
             </slot>
           </button>
 
-          <button type="button" class="cool-lightbox-button cool-lightbox-button--next" title="Next" :class="buttonsClasses" v-show="(hasNextButton || loopData) && items.length > 1" @click="onNextClick(false)">
+          <button type="button" class="cool-lightbox-button cool-lightbox-button--next" :title="translations.next" :class="buttonsClasses" v-show="(hasNextButton || loopData) && items.length > 1" @click="onNextClick(false)">
             <slot name="icon-next">
               <div class="cool-lightbox-button__icon">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.4 12.97l-2.68 2.72 1.34 1.38L19 12l-4.94-5.07-1.34 1.38 2.68 2.72H5v1.94z"></path></svg>
@@ -62,21 +62,21 @@
         </div>
         <!--/cool-lightbox__navigation-->
 
-        <div v-if="effect === 'swipe'" 
+        <div v-if="effect === 'swipe'"
           class="cool-lightbox__wrapper cool-lightbox__wrapper--swipe"
           :style="{
             transform: 'translate3d('+xSwipeWrapper+'px, '+ySwipeWrapper+'px, 0)',
             transition: swipeAnimation
           }"
           >
-          <div 
+          <div
             v-for="(item, itemIndex) in items"
             :key="itemIndex"
             ref="items"
             class="cool-lightbox__slide"
             :class="{ 'cool-lightbox__slide--current': itemIndex === imgIndex }"
           >
-            <div 
+            <div
                 v-lazyload
                 v-if="getMediaType(itemIndex) === 'image'" key="image" :style="imgWrapperStyle" class="cool-lightbox__slide__img">
               <img v-if="!isItemPicture(itemIndex)"
@@ -91,6 +91,7 @@
                 @click="zoomImage(itemIndex)"
                 @mousedown="handleMouseDown($event)"
                 @mouseup="handleMouseUp($event)"
+                @mouseleave="handleMouseLeave($event)"
                 @mousemove="handleMouseMove($event)"
 
                 @touchstart="handleMouseDown($event)"
@@ -117,6 +118,7 @@
                      @click="zoomImage(itemIndex)"
                      @mousedown="handleMouseDown($event)"
                      @mouseup="handleMouseUp($event)"
+                     @mouseleave="handleMouseLeave($event)"
                      @mousemove="handleMouseMove($event)"
 
                      @touchstart="handleMouseDown($event)"
@@ -124,7 +126,7 @@
                      @touchend="handleMouseUp($event)"
                 />
               </picture>
-              
+
               <div v-show="imageLoading" class="cool-lightbox-loading-wrapper">
                 <slot name="loading">
                   <div class="cool-lightbox-loading"></div>
@@ -133,51 +135,51 @@
               <!--/loading-wrapper-->
             </div>
             <!--/imgs-slide-->
-          
+
             <div v-else key="video" class="cool-lightbox__iframe">
               <iframe
-                class="cool-lightbox-video" 
+                class="cool-lightbox-video"
                 v-autoplayObserver
                 :data-autoplay="setAutoplay(itemIndex)"
-                :src="getVideoUrl(getItemSrc(itemIndex))" 
-                v-if="(!checkIsMp4(getItemSrc(itemIndex)) && getMediaType(itemIndex) === 'video')" 
-                :style="aspectRatioVideo" 
-                :key="itemIndex" 
-                frameborder="0" 
-                allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
+                :src="getVideoUrl(getItemSrc(itemIndex))"
+                v-if="(!checkIsMp4(getItemSrc(itemIndex)) && getMediaType(itemIndex) === 'video')"
+                :style="aspectRatioVideo"
+                :key="itemIndex"
+                frameborder="0"
+                allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
                 allowfullscreen>
               </iframe>
 
               <iframe
-                class="cool-lightbox-pdf" 
-                :src="getItemSrc(itemIndex)" 
-                v-if="(getMediaType(itemIndex) === 'iframe') || (getPDFurl(getItemSrc(itemIndex)))" 
-                :key="itemIndex" 
-                frameborder="0" 
+                class="cool-lightbox-pdf"
+                :src="getItemSrc(itemIndex)"
+                v-if="(getMediaType(itemIndex) === 'iframe') || (getPDFurl(getItemSrc(itemIndex)))"
+                :key="itemIndex"
+                frameborder="0"
                 allowfullscreen>
               </iframe>
 
-              <video 
+              <video
                 v-autoplayObserver
                 :data-autoplay="setAutoplay(itemIndex)"
-                class="cool-lightbox-video" 
-                v-if="checkIsMp4(getItemSrc(itemIndex)) || getMediaType(itemIndex) === 'webVideo'" 
-                :style="aspectRatioVideo" :key="checkIsMp4(getItemSrc(itemIndex))" 
-                controls="" 
+                class="cool-lightbox-video"
+                v-if="checkIsMp4(getItemSrc(itemIndex)) || getMediaType(itemIndex) === 'webVideo'"
+                :style="aspectRatioVideo" :key="checkIsMp4(getItemSrc(itemIndex))"
+                controls=""
                 controlslist="nodownload" l
                 poster="">
                 <source :src="checkIsMp4(getItemSrc(itemIndex))" :type="'video/'+(getVideoExt(getItemSrc(itemIndex)) ? getVideoExt(getItemSrc(itemIndex)) : getExtFromItem(itemIndex))">
                 Sorry, your browser doesn't support embedded videos
-              </video> 
+              </video>
             </div>
             <!--/cool-lightbox__iframe-->
           </div>
           <!--/cool-lightbox__slide-->
         </div>
         <!--/cool-lightbox-wrapper-->
-          
+
         <div v-if="effect === 'fade'" class="cool-lightbox__wrapper">
-          <div 
+          <div
             ref="items"
             class="cool-lightbox__slide cool-lightbox__slide--current"
           >
@@ -196,6 +198,7 @@
                       @click="zoomImage"
                       @mousedown="handleMouseDown($event)"
                       @mouseup="handleMouseUp($event)"
+                      @mouseleave="handleMouseLeave($event)"
                       @mousemove="handleMouseMove($event)"
                   />
                 </transition>
@@ -220,12 +223,13 @@
                         @click="zoomImage(imgIndex)"
                         @mousedown="handleMouseDown($event)"
                         @mouseup="handleMouseUp($event)"
+                        @mouseleave="handleMouseLeave($event)"
                         @mousemove="handleMouseMove($event)"
                     />
                   </picture>
                 </transition>
 
-                
+
                 <div v-show="imageLoading" class="cool-lightbox-loading-wrapper">
                   <slot name="loading">
                     <div class="cool-lightbox-loading"></div>
@@ -234,42 +238,42 @@
                 <!--/loading-wrapper-->
               </div>
               <!--/imgs-slide-->
-            
+
               <div v-else key="video" class="cool-lightbox__iframe">
                 <transition name="cool-lightbox-slide-change" mode="out-in">
                   <iframe
-                    class="cool-lightbox-video" 
+                    class="cool-lightbox-video"
                     v-autoplayObserver
                     :data-autoplay="setAutoplay(imgIndex)"
-                    :src="getVideoUrl(getItemSrc(imgIndex))" 
-                    v-if="(!checkIsMp4(getItemSrc(imgIndex)) && getMediaType(imgIndex) === 'video')" 
-                    :style="aspectRatioVideo" 
-                    :key="getVideoUrl(getItemSrc(imgIndex))" 
-                    frameborder="0" 
-                    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
+                    :src="getVideoUrl(getItemSrc(imgIndex))"
+                    v-if="(!checkIsMp4(getItemSrc(imgIndex)) && getMediaType(imgIndex) === 'video')"
+                    :style="aspectRatioVideo"
+                    :key="getVideoUrl(getItemSrc(imgIndex))"
+                    frameborder="0"
+                    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
                     allowfullscreen>
                   </iframe>
 
                   <iframe
-                    class="cool-lightbox-pdf" 
-                    :src="getItemSrc(imgIndex)" 
+                    class="cool-lightbox-pdf"
+                    :src="getItemSrc(imgIndex)"
                     v-if="(getMediaType(imgIndex) === 'iframe') || (getPDFurl(getItemSrc(imgIndex)))"
-                    :key="imgIndex" 
-                    frameborder="0" 
+                    :key="imgIndex"
+                    frameborder="0"
                     allowfullscreen>
                   </iframe>
 
-                  <video class="cool-lightbox-video" 
+                  <video class="cool-lightbox-video"
                     v-autoplayObserver
                     :data-autoplay="setAutoplay(imgIndex)"
-                    v-if="checkIsMp4(getItemSrc(imgIndex)) || getMediaType(imgIndex) === 'webVideo'" 
-                    :style="aspectRatioVideo" :key="checkIsMp4(getItemSrc(imgIndex))" 
-                    controls="" 
-                    controlslist="nodownload" 
+                    v-if="checkIsMp4(getItemSrc(imgIndex)) || getMediaType(imgIndex) === 'webVideo'"
+                    :style="aspectRatioVideo" :key="checkIsMp4(getItemSrc(imgIndex))"
+                    controls=""
+                    controlslist="nodownload"
                     poster="">
                     <source :src="checkIsMp4(getItemSrc(imgIndex))" :type="'video/'+(getVideoExt(getItemSrc(imgIndex)) ? getVideoExt(getItemSrc(imgIndex)) : getExtFromItem(imgIndex))">
                     Sorry, your browser doesn't support embedded videos
-                  </video> 
+                  </video>
                 </transition>
               </div>
               <!--/cool-lightbox__iframe-->
@@ -292,10 +296,10 @@
           </div>
           <!--/cool-lightbox-caption-->
         </transition>
-        
+
         <div class="cool-lightbox-toolbar" :class="buttonsClasses">
-          
-          <button type="button" v-if="this.slideshow && items.length > 1" title="Play slideshow" class="cool-lightbox-toolbar__btn" @click="togglePlaySlideshow">
+
+          <button type="button" v-if="this.slideshow && items.length > 1" :title="translations.playSlideShow" class="cool-lightbox-toolbar__btn" @click="togglePlaySlideshow">
             <svg xmlns="http://www.w3.org/2000/svg" v-if="!isPlayingSlideShow" viewBox="0 0 24 24">
               <path d="M6.5 5.4v13.2l11-6.6z"></path>
             </svg>
@@ -307,23 +311,23 @@
             </svg>
           </button>
 
-          <button type="button" @click="showThumbs = !showThumbs" title="Show thumbnails" v-if="items.length > 1 && gallery" class="cool-lightbox-toolbar__btn">
+          <button type="button" @click="showThumbs = !showThumbs" :title="translations.showThumbNails" v-if="items.length > 1 && gallery" class="cool-lightbox-toolbar__btn">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-              <path d="M14.59 14.59h3.76v3.76h-3.76v-3.76zm-4.47 
-              0h3.76v3.76h-3.76v-3.76zm-4.47 0h3.76v3.76H5.65v-3.76zm8.94-4.47h3.76v3.76h-3.76v-3.76zm-4.47 
-              0h3.76v3.76h-3.76v-3.76zm-4.47 0h3.76v3.76H5.65v-3.76zm8.94-4.47h3.76v3.76h-3.76V5.65zm-4.47 
+              <path d="M14.59 14.59h3.76v3.76h-3.76v-3.76zm-4.47
+              0h3.76v3.76h-3.76v-3.76zm-4.47 0h3.76v3.76H5.65v-3.76zm8.94-4.47h3.76v3.76h-3.76v-3.76zm-4.47
+              0h3.76v3.76h-3.76v-3.76zm-4.47 0h3.76v3.76H5.65v-3.76zm8.94-4.47h3.76v3.76h-3.76V5.65zm-4.47
               0h3.76v3.76h-3.76V5.65zm-4.47 0h3.76v3.76H5.65V5.65z">
               </path>
             </svg>
           </button>
-          
-          <button type="button" v-if="fullScreen" @click="toggleFullScreenMode" class="cool-lightbox-toolbar__btn" title="Fullscreen">
+
+          <button type="button" v-if="fullScreen" @click="toggleFullScreenMode" class="cool-lightbox-toolbar__btn" :title="translations.fullScreen">
             <svg width="20px" height="20px" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
               <path d="M4.5 11H3v4h4v-1.5H4.5V11zM3 7h1.5V4.5H7V3H3v4zm10.5 6.5H11V15h4v-4h-1.5v2.5zM11 3v1.5h2.5V7H15V3h-4z"></path>
             </svg>
           </button>
 
-          <button type="button" v-if="showCloseButton" class="cool-lightbox-toolbar__btn" title="Close" @click="close">
+          <button type="button" v-if="showCloseButton" class="cool-lightbox-toolbar__btn" :title="translations.close" @click="close">
             <slot name="close">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                 <path d="M12 10.6L6.6 5.2 5.2 6.6l5.4 5.4-5.4 5.4 1.4 1.4 5.4-5.4 5.4 5.4 1.4-1.4-5.4-5.4 5.4-5.4-1.4-1.4-5.4 5.4z"></path>
@@ -338,17 +342,17 @@
 
       <transition name="cool-lightbox-modal">
         <div v-if="isZooming && useZoomBar" class="cool-lightbox-zoom">
-          <svg height="469pt" class="cool-lightbox-zoom__icon" viewBox="0 -192 469.33333 469" width="469pt" 
-            xmlns="http://www.w3.org/2000/svg"><path d="m437.332031.167969h-405.332031c-17.664062 
-            0-32 14.335937-32 32v21.332031c0 17.664062 14.335938 32 32 32h405.332031c17.664063 0 32-14.335938 
+          <svg height="469pt" class="cool-lightbox-zoom__icon" viewBox="0 -192 469.33333 469" width="469pt"
+            xmlns="http://www.w3.org/2000/svg"><path d="m437.332031.167969h-405.332031c-17.664062
+            0-32 14.335937-32 32v21.332031c0 17.664062 14.335938 32 32 32h405.332031c17.664063 0 32-14.335938
             32-32v-21.332031c0-17.664063-14.335937-32-32-32zm0 0"/>
           </svg>
           <input type="range" v-model="zoomBar" name="points" min="0" max="50" />
           <svg height="426.66667pt" class="cool-lightbox-zoom__icon" viewBox="0 0 426.66667 426.66667" width="426.66667pt" xmlns="http://www.w3.org/2000/svg">
-            <path d="m405.332031 192h-170.664062v-170.667969c0-11.773437-9.558594-21.332031-21.335938-21.332031-11.773437 0-21.332031 
-            9.558594-21.332031 21.332031v170.667969h-170.667969c-11.773437 0-21.332031 9.558594-21.332031 21.332031 0 
-            11.777344 9.558594 21.335938 21.332031 21.335938h170.667969v170.664062c0 11.777344 9.558594 21.335938 21.332031 
-            21.335938 11.777344 0 21.335938-9.558594 21.335938-21.335938v-170.664062h170.664062c11.777344 0 21.335938-9.558594 
+            <path d="m405.332031 192h-170.664062v-170.667969c0-11.773437-9.558594-21.332031-21.335938-21.332031-11.773437 0-21.332031
+            9.558594-21.332031 21.332031v170.667969h-170.667969c-11.773437 0-21.332031 9.558594-21.332031 21.332031 0
+            11.777344 9.558594 21.335938 21.332031 21.335938h170.667969v170.664062c0 11.777344 9.558594 21.335938 21.332031
+            21.335938 11.777344 0 21.335938-9.558594 21.335938-21.335938v-170.664062h170.664062c11.777344 0 21.335938-9.558594
             21.335938-21.335938 0-11.773437-9.558594-21.332031-21.335938-21.332031zm0 0"/>
           </svg>
         </div>
@@ -361,9 +365,9 @@
 </template>
 
 <script>
-import LazyLoadDirective from "../directives/LazyLoad";
-import AutoplayObserver from "../directives/AutoplayObserver";
-import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
+import LazyLoadDirective from '../directives/LazyLoad'
+import AutoplayObserver from '../directives/AutoplayObserver'
+import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock'
 
 export default {
   directives: {
@@ -426,7 +430,7 @@ export default {
       stylesInterval: {
         'display': 'block'
       }
-    };
+    }
   },
 
   props: {
@@ -463,7 +467,7 @@ export default {
       type: Number,
       default: 3000,
     },
-    
+
     useZoomBar: {
       type: Boolean,
       default: false,
@@ -473,7 +477,7 @@ export default {
       type: Boolean,
       default: false,
     },
-    
+
     srcName: {
       type: String,
       default: 'src',
@@ -483,7 +487,7 @@ export default {
       type: String,
       default: 'srcset'
     },
-    
+
     srcThumb: {
       type: String,
       default: 'thumb',
@@ -533,7 +537,7 @@ export default {
       type: Boolean,
       default: true,
     },
-    
+
     disableZoom: {
       type: Boolean,
       default: false,
@@ -548,11 +552,24 @@ export default {
       type: Boolean,
       default: true,
     },
+    translations: {
+      type: Object,
+      default() {
+        return {
+          previous: 'Previous',
+          next: 'Next',
+          showThumbNails: 'Show thumbnails',
+          playSlideShow: 'Play slideshow',
+          fullScreen: 'Fullscreen',
+          close: 'Close',
+        }
+      }
+    }
   },
 
   watch: {
     zoomBar(newVal, prevVal) {
-      let item;
+      let item
       if(this.isZooming) {
         if(this.effect == 'swipe') {
           item = this.$refs.items[this.imgIndex].childNodes[0]
@@ -560,13 +577,13 @@ export default {
           item = this.$refs.items.childNodes[0]
         }
 
-        const newZoom = 1.6 + newVal/10;
-        item.style.transform  = 'translate3d(calc(-50% + '+this.left+'px), calc(-50% + '+this.top+'px), 0px) scale3d('+newZoom+', '+newZoom+', '+newZoom+')';
+        const newZoom = 1.6 + newVal/10
+        item.style.transform  = 'translate3d(calc(-50% + '+this.left+'px), calc(-50% + '+this.top+'px), 0px) scale3d('+newZoom+', '+newZoom+', '+newZoom+')'
       }
     },
 
     showThumbs(prev, val) {
-      let widthGalleryBlock = 212;
+      let widthGalleryBlock = 212
       let swipeAnimation = 'all .3s ease'
       if(window.innerWidth < 767) {
         widthGalleryBlock = 102
@@ -574,7 +591,7 @@ export default {
       }
 
       if (this.thumbsPosition === 'bottom') {
-        widthGalleryBlock = 0;
+        widthGalleryBlock = 0
       }
 
       const self = this
@@ -589,7 +606,7 @@ export default {
         }
 
       } else {
-        
+
         if(this.dir === 'rtl') {
           this.xSwipeWrapper = this.imgIndex*window.innerWidth + 30*this.imgIndex
         } else {
@@ -605,17 +622,17 @@ export default {
 
     index(prev, val) {
       const self = this
-      
+
       // body scroll lock
-      const $body = document.querySelector('body');
+      const $body = document.querySelector('body')
 
       if(prev !== null) {
-        
+
         // swipe type
         this.swipeType = null
         this.initialMouseY = 0
         this.ySwipeWrapper = 0
-        
+
         // set loop from data
         this.loopData = this.loop
 
@@ -637,20 +654,16 @@ export default {
           window.addEventListener('wheel', this.wheelEvent)
         }
         
-        // only in mobile
-        if(window.innerWidth < 700) {
-
-          // add click event
-          setTimeout(function() {
-            window.addEventListener('click', self.showButtons)
-          }, 200)
-        }
+        // add click event
+        setTimeout(function() {
+          window.addEventListener('click', self.showButtons)
+        }, 200)
 
         if (this.enableScrollLock) {
           setTimeout(function() {
-            self.setCompensateForScrollbar();
-            disableBodyScroll(self.$refs.coolLightbox);
-          }, 50);
+            self.setCompensateForScrollbar()
+            disableBodyScroll(self.$refs.coolLightbox)
+          }, 50)
         }
 
       } else {
@@ -676,8 +689,8 @@ export default {
         window.removeEventListener('keydown', this.eventListener)
 
         if (this.enableScrollLock) {
-          self.removeCompensateForScrollbar();
-          enableBodyScroll(self.$refs.coolLightbox);
+          self.removeCompensateForScrollbar()
+          enableBodyScroll(self.$refs.coolLightbox)
         }
 
         // remove click event
@@ -685,18 +698,18 @@ export default {
 
         // remove resize event
         window.removeEventListener('resize', this.xPositionOnResize)
-        
+
         // remove wheel event
         if(this.enableWheelEvent) {
           window.removeEventListener('wheel', this.wheelEvent)
         }
       }
 
-    }, 
-    
+    },
+
     imgIndex(prev, val) {
       const thisContext = this
-      
+
       // when animation is loaded
       this.$nextTick(() => {
 
@@ -704,15 +717,15 @@ export default {
           this.setLightboxInnerWidth()
           this.setXPosition(prev)
         }
-        
+
         if(prev !== null & val === null) {
-          this.$emit("on-open", prev);
+          this.$emit('on-open', prev)
         }
 
         if(prev !== null) {
           if(prev !== val) {
             if(!this.getYoutubeUrl(this.getItemSrc(prev)) && !this.getVimeoUrl(this.getItemSrc(prev))) {
-              this.stopVideos();
+              this.stopVideos()
             }
           }
 
@@ -725,14 +738,14 @@ export default {
 
           // add caption padding to Lightbox wrapper
           this.addCaptionPadding()
-          
+
           // setAspectRatioVideo when is swipe
           if(this.effect === 'swipe') {
-            this.setAspectRatioVideo();
+            this.setAspectRatioVideo()
           } else {
 
             if(this.getVideoUrl(this.getItemSrc(prev))) {
-              this.setAspectRatioVideo();
+              this.setAspectRatioVideo()
             }
           }
         }
@@ -745,14 +758,14 @@ export default {
         this.ySwipeWrapper = 0
 
       })
-    }, 
+    },
   },
 
-  beforeDestroy () {
+  beforeDestroy() {
     if (this.enableScrollLock) {
-      this.removeCompensateForScrollbar();
+      this.removeCompensateForScrollbar()
       if(this.$refs.coolLightbox) {
-        enableBodyScroll(this.$refs.coolLightbox);
+        enableBodyScroll(this.$refs.coolLightbox)
       }
     }
   },
@@ -771,40 +784,40 @@ export default {
           return item['ext']
         }
 
-        return 'mp4';
+        return 'mp4'
       }
     },
 
     stopVideos() {
-      const videos = document.getElementsByClassName("cool-lightbox-video");
-      const isVideoPlaying = video => !!(video.currentTime > 0 && !video.paused && !video.ended && video.readyState > 2);
+      const videos = document.getElementsByClassName('cool-lightbox-video')
+      const isVideoPlaying = video => !!(video.currentTime > 0 && !video.paused && !video.ended && video.readyState > 2)
       if(videos.length > 0) {
         Array.prototype.forEach.call(videos, video => {
-          const type = video.tagName;
-          
+          const type = video.tagName
+
           if(type === 'IFRAME') {
-            var iframeSrc = video.src;
-            return video.src = iframeSrc;
+            var iframeSrc = video.src
+            return video.src = iframeSrc
           }
 
           if(isVideoPlaying(video)) {
-            return video.pause();
+            return video.pause()
           }
 
-        });
+        })
       }
-    }, 
+    },
 
     removeCompensateForScrollbar() {
-      document.body.classList.remove("compensate-for-scrollbar");
-      const noscrollStyle = document.getElementById("coollightbox-style-noscroll");
+      document.body.classList.remove('compensate-for-scrollbar')
+      const noscrollStyle = document.getElementById('coollightbox-style-noscroll')
       if(noscrollStyle !== null) {
-        document.getElementById("coollightbox-style-noscroll").remove();
+        document.getElementById('coollightbox-style-noscroll').remove()
       }
     },
 
     setCompensateForScrollbar() {
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
 
       if (
         !isMobile &&
@@ -813,19 +826,19 @@ export default {
         document.getElementsByTagName('head')[0].insertAdjacentHTML('beforeend',
           '<style id="coollightbox-style-noscroll" type="text/css">.compensate-for-scrollbar{margin-right:' +
             (window.innerWidth - document.documentElement.clientWidth) +
-          "px;}</style>"
-        );
+          'px;}</style>'
+        )
 
-        document.body.classList.add("compensate-for-scrollbar");
+        document.body.classList.add('compensate-for-scrollbar')
       }
-    }, 
+    },
 
     setAutoplay(itemIndex) {
       if(this.checkIfIsObject(itemIndex) && this.items[itemIndex].hasOwnProperty('autoplay') && this.items[itemIndex].autoplay) {
-        return true;
+        return true
       }
 
-      return false;
+      return false
     },
 
     toggleFullScreenMode() {
@@ -840,33 +853,33 @@ export default {
 
     closeFullscreen() {
       if (document.exitFullscreen) {
-        document.exitFullscreen();
+        document.exitFullscreen()
       } else if (document.mozCancelFullScreen) { /* Firefox */
-        document.mozCancelFullScreen();
+        document.mozCancelFullScreen()
       } else if (document.webkitExitFullscreen) { /* Chrome, Safari and Opera */
-        document.webkitExitFullscreen();
+        document.webkitExitFullscreen()
       } else if (document.msExitFullscreen) { /* IE/Edge */
-        document.msExitFullscreen();
+        document.msExitFullscreen()
       }
     },
 
     fullScreenMode() {
       /* Get the documentElement (<html>) to display the page in fullscreen */
-      var elem = document.documentElement;
+      var elem = document.documentElement
       if (elem.requestFullscreen) {
-        elem.requestFullscreen();
+        elem.requestFullscreen()
       } else if (elem.mozRequestFullScreen) { /* Firefox */
-        elem.mozRequestFullScreen();
+        elem.mozRequestFullScreen()
       } else if (elem.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
-        elem.webkitRequestFullscreen();
+        elem.webkitRequestFullscreen()
       } else if (elem.msRequestFullscreen) { /* IE/Edge */
-        elem.msRequestFullscreen();
+        elem.msRequestFullscreen()
       }
     },
 
     // check if event is arrow button or toolbar button
     checkIfIsButton(event) {
-      var elements = '.cool-lightbox__iframe *, .cool-lightbox-button, .cool-lightbox-button *, .cool-lightbox-toolbar__btn, .cool-lightbox-toolbar__btn *, .cool-lightbox-caption h6, .cool-lightbox-caption p, .cool-lightbox-caption a';
+      var elements = '.cool-lightbox__iframe *, .cool-lightbox-button, .cool-lightbox-button *, .cool-lightbox-toolbar__btn, .cool-lightbox-toolbar__btn *, .cool-lightbox-caption h6, .cool-lightbox-caption p, .cool-lightbox-caption a'
       if (event.target.matches(elements)) {
         return true
       }
@@ -877,12 +890,12 @@ export default {
     // start swipe event
     startSwipe(event) {
       if(this.isZooming) {
-        return false;
+        return false
       }
 
       // check if is some button
       if(this.checkIfIsButton(event)) {
-        return false;
+        return false
       }
 
       // clear interval
@@ -891,8 +904,8 @@ export default {
 
       // starts swipe
       this.isDraggingSwipe = true
-      this.initialMouseX = this.getMouseXPosFromEvent(event);
-      this.initialMouseY = this.getMouseYPosFromEvent(event);
+      this.initialMouseX = this.getMouseXPosFromEvent(event)
+      this.initialMouseY = this.getMouseYPosFromEvent(event)
     },
 
     // continue swipe event
@@ -933,8 +946,8 @@ export default {
 
         // mobile caseS
         if(event.type === 'touchmove') {
-          this.endMouseX = this.getMouseXPosFromEvent(event);
-          this.endMouseY = this.getMouseYPosFromEvent(event);
+          this.endMouseX = this.getMouseXPosFromEvent(event)
+          this.endMouseY = this.getMouseYPosFromEvent(event)
         }
       }
     },
@@ -942,14 +955,14 @@ export default {
     // end swipe event
     endSwipe(event) {
       if(this.checkIfIsButton(event) && this.initialMouseX === 0) {
-        return false;
+        return false
       }
 
       // event check is dragging and swipe
       const self = this
       const swipeType = this.swipeType
       this.isDraggingSwipe = false
-      
+
       // horizontal swipe type
       if(this.initialMouseX === 0 && swipeType == 'h') {
         return false
@@ -957,23 +970,23 @@ export default {
 
       // touch end fixes
       if(event.type !== 'touchend') {
-        this.endMouseX = this.getMouseXPosFromEvent(event);
-        this.endMouseY = this.getMouseYPosFromEvent(event);
+        this.endMouseX = this.getMouseXPosFromEvent(event)
+        this.endMouseY = this.getMouseYPosFromEvent(event)
       } else {
         if(this.endMouseX === 0) {
-          return;
+          return
         }
       }
 
-      // check if is dragged 
+      // check if is dragged
       if(
-        ((this.endMouseX - this.initialMouseX === 0) && swipeType == 'h') || 
+        ((this.endMouseX - this.initialMouseX === 0) && swipeType == 'h') ||
         this.isZooming ||
         ((this.endMouseY - this.initialMouseY === 0) && swipeType == 'v')
       ) {
-        return;
-      } 
-      
+        return
+      }
+
       // set swipe animation
       this.setSwipeAnimation()
 
@@ -993,14 +1006,14 @@ export default {
             return this.swipeToLeft()
           }
           return this.swipeToRight()
-        } 
+        }
 
         // if the swipe is to the left
         if((this.endMouseX - this.initialMouseX) > 40) {
           if(this.dir === 'rtl') {
             return this.swipeToRight()
           }
-          return this.swipeToLeft();
+          return this.swipeToLeft()
         }
       }
 
@@ -1014,19 +1027,19 @@ export default {
         } else {
           this.ySwipeWrapper = 0
         }
-      } 
-      
+      }
+
       this.swipeType = null
       const windowWidth = this.lightboxInnerWidth
 
       if(this.dir === 'rtl') {
         this.xSwipeWrapper = this.imgIndex*windowWidth + 30*this.imgIndex
-        return;
+        return
       }
 
       this.xSwipeWrapper = -this.imgIndex*windowWidth - 30*this.imgIndex
     },
-    
+
     // swipe to left effect
     swipeToLeft() {
       if(!this.hasPrevious && this.effect === 'swipe') {
@@ -1040,7 +1053,7 @@ export default {
 
       this.changeIndexToPrev()
     },
-    
+
     // swipe to right effect
     swipeToRight() {
       if(!this.hasNext && this.effect === 'swipe') {
@@ -1058,25 +1071,25 @@ export default {
     // function that return x position from event
     getMouseXPosFromEvent(event) {
       if(event.type.indexOf('mouse') !== -1){
-          return event.clientX;
+        return event.clientX
       }
-      return event.touches[0].clientX;
+      return event.touches[0].clientX
     },
-    
+
     // function that return Y position from event
     getMouseYPosFromEvent(event) {
       if(event.type.indexOf('mouse') !== -1){
-          return event.clientY;
+        return event.clientY
       }
-      return event.touches[0].clientY;
+      return event.touches[0].clientY
     },
 
     // check if the image is cached
     is_cached(src) {
-      var image = new Image();
-      image.src = src;
+      var image = new Image()
+      image.src = src
 
-      return image.complete;
+      return image.complete
     },
 
     // image loaded event
@@ -1127,7 +1140,7 @@ export default {
 
       return picture.sources ? picture.sources : []
     },
-    
+
     // get item src
     getItemSrc(imgIndex) {
       if(imgIndex === null) {
@@ -1167,7 +1180,7 @@ export default {
 
       return null
     },
-    
+
     getItemAlt(imgIndex) {
       if(imgIndex === null) {
         return false
@@ -1175,7 +1188,7 @@ export default {
 
       const item = this.items[imgIndex]
       if(this.checkIfIsObject(imgIndex)) {
-        return item.alt;
+        return item.alt
       }
 
       return null
@@ -1189,7 +1202,7 @@ export default {
       const item = this.items[imgIndex]
       if(this.checkIfIsObject(imgIndex)) {
         return item[this.srcThumb]
-      } 
+      }
 
       if(this.getVideoUrl(item)) {
         return false
@@ -1205,7 +1218,7 @@ export default {
       }
 
       if(this.checkIfIsObject(imgIndex)) {
-        
+
         const item = this.items[imgIndex]
 
         //item type is specified, so return it
@@ -1213,10 +1226,10 @@ export default {
           return item[this.srcMediaType]
         }
       }
-    
+
       if (this.getVideoUrl(this.getItemSrc(imgIndex))) {
         return 'video'
-      } else if (this.getPDFurl(this.getItemSrc(imgIndex))) { 
+      } else if (this.getPDFurl(this.getItemSrc(imgIndex))) {
         return 'iframe'
       } else {
         return 'image'
@@ -1247,7 +1260,7 @@ export default {
     // stop slideshow
     stopSlideShow() {
       this.isPlayingSlideShow = false
-      clearInterval(this.intervalProgress);
+      clearInterval(this.intervalProgress)
       this.stylesInterval = {
         'transform': 'scaleX(0)',
         'transition': 'none',
@@ -1257,9 +1270,9 @@ export default {
     // move event in zoom
     move() {
       const self = this
-      this.progressWidth = 100;
-      this.intervalProgress = setInterval(frame, this.slideshowDuration + 90);
-      
+      this.progressWidth = 100
+      this.intervalProgress = setInterval(frame, this.slideshowDuration + 90)
+
       self.stylesInterval = {
         'transform': 'scaleX(1)',
         'background': this.slideshowColorBar,
@@ -1270,7 +1283,7 @@ export default {
           'transform': 'scaleX(0)',
           'transition': 'none',
         }
-        
+
         if(self.dir === 'rtl') {
           self.onPrevClick(true)
         } else {
@@ -1289,11 +1302,11 @@ export default {
           }, 50)
         }
       }
-    }, 
+    },
 
     // show buttons event
     showButtons(event) {
-      if (!this.checkIfIsButton(event)) {
+      if (this.disableZoom && !this.checkIfIsButton(event)) {
         const self = this
         setTimeout(function() {
           self.buttonsVisible = !self.buttonsVisible
@@ -1310,16 +1323,33 @@ export default {
 
     // handle mouse down event
     handleMouseDown(e) {
-      if (!this.checkMouseEventPropButton(e.button)) return
-      this.lastX = e.clientX
-      this.lastY = e.clientY
-      this.isDraging = true
+      if (!( e.type === 'touchstart' && this.isZooming || e.type === 'mousedown' && this.checkMouseEventPropButton(e.button))) { return }
+      this.lastX = (e.type === 'touchstart' ? e.touches[0] : e).clientX
+      this.lastY = (e.type === 'touchstart' ? e.touches[0] : e).clientY
+
+      if (this.isZooming) {
+        this.isDraging = true;
+      }
+
       e.stopPropagation()
     },
 
     // handle mouse up event
     handleMouseUp(e) {
-      if (!this.checkMouseEventPropButton(e.button)) return
+      if (!(e.type === 'touchend' && this.isZooming || e.type === 'mouseup' && this.checkMouseEventPropButton(e.button))) { return }
+      this.isDraging = false
+      this.lastX = this.lastY = 0
+
+      // Fix drag zoom out
+      const thisContext = this
+      setTimeout(function() {
+        thisContext.canZoom = true
+      }, 100)
+    },
+
+    // handle mouse leave event
+    handleMouseLeave(e) {
+      if (!(e.type === 'mouseleave' && this.isZooming)) { return }
       this.isDraging = false
       this.lastX = this.lastY = 0
 
@@ -1332,19 +1362,21 @@ export default {
 
     // handle mouse move event
     handleMouseMove(e) {
-      if (!this.checkMouseEventPropButton(e.button)) return
+      if (!(e.type === "touchmove" && this.isZooming || e.type === "mousemove" && this.checkMouseEventPropButton(e.button))) { return }
       if (this.isDraging) {
-        this.top = this.top - this.lastY + e.clientY
-        this.left = this.left - this.lastX + e.clientX
-        this.lastX = e.clientX
-        this.lastY = e.clientY
+        const clientX = (e.type === 'touchmove' ? e.touches[0] : e).clientX
+        const clientY = (e.type === 'touchmove' ? e.touches[0] : e).clientY
+        this.top = this.top - this.lastY + clientY
+        this.left = this.left - this.lastX + clientX
+        this.lastX = clientX
+        this.lastY = clientY
         this.canZoom = false
-        
+
         const item = e.target.parentNode.nodeName === 'PICTURE'
-            ? e.target.parentNode.parentNode
-            : e.target.parentNode
-        const newZoom = 1.6 + this.zoomBar/10;
-        item.style.transform  = 'translate3d(calc(-50% + '+this.left+'px), calc(-50% + '+this.top+'px), 0px) scale3d('+newZoom+', '+newZoom+', '+newZoom+')';
+          ? e.target.parentNode.parentNode
+          : e.target.parentNode
+        const newZoom = 1.6 + this.zoomBar/10
+        item.style.transform  = 'translate3d(calc(-50% + '+this.left+'px), calc(-50% + '+this.top+'px), 0px) scale3d('+newZoom+', '+newZoom+', '+newZoom+')'
       }
       e.stopPropagation()
     },
@@ -1352,10 +1384,6 @@ export default {
     // zoom image event
     zoomImage(indexImage) {
       if(this.disableZoom) {
-        return false
-      }
-
-      if(window.innerWidth < 700) {
         return false
       }
 
@@ -1368,20 +1396,20 @@ export default {
       }
 
       // item zoom
-      let item;
+      let item
       if(this.effect == 'swipe') {
         item = this.$refs.items[this.imgIndex].childNodes[0]
       } else {
         item = this.$refs.items.childNodes[0]
       }
-      
+
       // zoom variables
       const isZooming = this.isZooming
       const thisContext = this
 
       // Is zooming check
       if(isZooming) {
-        if(!this.isDraging) { 
+        if(!this.isDraging) {
           this.isZooming = false
           this.zoomBar = 0
         }
@@ -1394,7 +1422,7 @@ export default {
         this.stopSlideShow()
 
         // add scale
-        item.style.transform  = 'translate3d(calc(-50%), calc(-50%), 0px) scale3d(1.6, 1.6, 1.6)';
+        item.style.transform  = 'translate3d(calc(-50%), calc(-50%), 0px) scale3d(1.6, 1.6, 1.6)'
 
         // hide buttons
         this.buttonsVisible = false
@@ -1406,7 +1434,7 @@ export default {
 
       } else {
 
-        // show buttons 
+        // show buttons
         this.buttonsVisible = true
         this.resetZoom()
       }
@@ -1424,8 +1452,8 @@ export default {
 
       // only if index is not null
       if(this.imgIndex != null) {
-        
-        let item;
+
+        let item
         if(this.effect == 'swipe') {
           item = this.$refs.items[this.imgIndex].childNodes[0]
         } else {
@@ -1434,9 +1462,9 @@ export default {
 
         // reset styles
         if(this.disableZoom) {
-          item.style.transform  = 'translate3d(calc(-50% + '+this.left+'px), calc(-50% + '+this.top+'px), 0px)';
+          item.style.transform  = 'translate3d(calc(-50% + '+this.left+'px), calc(-50% + '+this.top+'px), 0px)'
         } else {
-          item.style.transform  = 'translate3d(calc(-50% + '+this.left+'px), calc(-50% + '+this.top+'px), 0px) scale3d(1, 1, 1)';
+          item.style.transform  = 'translate3d(calc(-50% + '+this.left+'px), calc(-50% + '+this.top+'px), 0px) scale3d(1, 1, 1)'
         }
 
         this.initialMouseX = 0
@@ -1449,25 +1477,25 @@ export default {
     // Aspect Ratio responsive video
     setAspectRatioVideo() {
       const thisContext = this
-      let el = document.getElementsByClassName('cool-lightbox__inner');
+      let el = document.getElementsByClassName('cool-lightbox__inner')
       el = el[0]
 
       let computedStyle = getComputedStyle(el)
       if(window.innerWidth < 1440) {
 
-        let width = el.clientWidth;
-        let height = Math.round((width/16)*9);
+        let width = el.clientWidth
+        let height = Math.round((width/16)*9)
 
         this.aspectRatioVideo.height = height+'px'
         this.aspectRatioVideo.width = width+'px'
 
       } else {
-        
-        setTimeout(function() {
-          let height = el.clientHeight;
-          height -= parseFloat(computedStyle.paddingTop) + parseFloat(computedStyle.paddingBottom);
 
-          let width = (height/9)*16;
+        setTimeout(function() {
+          let height = el.clientHeight
+          height -= parseFloat(computedStyle.paddingTop) + parseFloat(computedStyle.paddingBottom)
+
+          let width = (height/9)*16
 
           thisContext.aspectRatioVideo.height = height+'px'
           thisContext.aspectRatioVideo.width = width+'px'
@@ -1478,28 +1506,28 @@ export default {
 
     // close event
     close() {
-      this.stopSlideShow();
-      this.swipeType = null;
-      this.$emit("close", this.imgIndex);
-      this.showThumbs = false;
-      this.imgIndex = null;
+      this.stopSlideShow()
+      this.swipeType = null
+      this.$emit('close', this.imgIndex)
+      this.showThumbs = false
+      this.imgIndex = null
     },
 
     wheelEvent(event) {
-      const delay = 350;
-      const currentTime = new Date().getTime();
-      let direction = event.deltaY > 0 ? 'top' : 'down';
+      const delay = 350
+      const currentTime = new Date().getTime()
+      let direction = event.deltaY > 0 ? 'top' : 'down'
 
-      if (currentTime - this.prevTime < delay) return;
+      if (currentTime - this.prevTime < delay) return
 
-      this.prevTime = currentTime;
+      this.prevTime = currentTime
 
       switch (direction) {
         case 'top':
-          return this.changeIndexToPrev();
-          break;
+          return this.changeIndexToPrev()
+          break
         case 'down':
-          return this.changeIndexToNext();
+          return this.changeIndexToNext()
       }
     },
 
@@ -1507,15 +1535,15 @@ export default {
     closeModal(event) {
       if(!this.closeOnClickOutsideMobile) {
         if(window.innerWidth < 700) {
-          return false;
+          return false
         }
       }
 
       if(this.IsSwipping) {
-        return false;
+        return false
       }
 
-      var elements = '.cool-lightbox__iframe, .cool-lightbox__iframe *, .cool-lightbox-zoom, .cool-lightbox-zoom *, .cool-lightbox-thumbs, svg, path, rect, .cool-lightbox-thumbs *, .cool-lightbox-button, .cool-lightbox-toolbar__btn, .cool-lightbox-toolbar__btn *, .cool-lightbox-button *, .cool-lightbox__slide__img *, .cool-lightbox-video, .cool-lightbox-caption h6, .cool-lightbox-caption p, .cool-lightbox-caption a';
+      var elements = '.cool-lightbox__iframe, .cool-lightbox__iframe *, .cool-lightbox-zoom, .cool-lightbox-zoom *, .cool-lightbox-thumbs, svg, path, rect, .cool-lightbox-thumbs *, .cool-lightbox-button, .cool-lightbox-toolbar__btn, .cool-lightbox-toolbar__btn *, .cool-lightbox-button *, .cool-lightbox__slide__img *, .cool-lightbox-video, .cool-lightbox-caption h6, .cool-lightbox-caption p, .cool-lightbox-caption a'
       if (!event.target.matches(elements)) {
         this.close()
       }
@@ -1528,8 +1556,8 @@ export default {
       this.swipeAnimation = null
 
       // animation swipe
-      this.swipeAnimation = 'all .3s ease';
-      this.swipeInterval = setInterval(interval, 330);
+      this.swipeAnimation = 'all .3s ease'
+      this.swipeInterval = setInterval(interval, 330)
 
       function interval() {
         self.swipeAnimation = null
@@ -1539,7 +1567,7 @@ export default {
     // next slide event
     onNextClick(isFromSlideshow = false) {
       if(this.isZooming) {
-        return false;
+        return false
       }
 
       if(!isFromSlideshow) {
@@ -1549,7 +1577,7 @@ export default {
       this.setSwipeAnimation()
 
       if(this.dir === 'rtl') {
-        return this.changeIndexToPrev();
+        return this.changeIndexToPrev()
       }
 
       this.changeIndexToNext()
@@ -1558,20 +1586,20 @@ export default {
     // prev slide event
     onPrevClick(isFromSlideshow = false) {
       if(this.isZooming) {
-        return false;
+        return false
       }
-      
+
       if(!isFromSlideshow) {
         this.stopSlideShow()
       }
-      
+
       this.setSwipeAnimation()
 
       if(this.dir === 'rtl') {
-        return this.changeIndexToNext();
+        return this.changeIndexToNext()
       }
 
-      this.changeIndexToPrev();
+      this.changeIndexToPrev()
     },
 
     // change to next index
@@ -1600,7 +1628,7 @@ export default {
 
     // set lightbox inner width
     setLightboxInnerWidth() {
-      let el = document.getElementsByClassName('cool-lightbox__inner');
+      let el = document.getElementsByClassName('cool-lightbox__inner')
       let width = el[0].clientWidth
       this.lightboxInnerWidth = width
     },
@@ -1612,7 +1640,7 @@ export default {
 
       if(this.dir === 'rtl') {
         this.xSwipeWrapper = index*this.lightboxInnerWidth+30*index
-        return;
+        return
       }
 
       // set x position
@@ -1628,27 +1656,27 @@ export default {
 
       // set x position
       this.xSwipeWrapper = -index*this.lightboxInnerWidth-30*index
-      return; 
+      return
     },
 
     // index change
     onIndexChange(index) {
-      const self = this;
-      this.imgIndex = index;
-      this.$emit('on-change', index);
+      const self = this
+      this.imgIndex = index
+      this.$emit('on-change', index)
 
       setTimeout(function() {
-        self.$emit('on-change-end', index);
-      }, 400);
+        self.$emit('on-change-end', index)
+      }, 400)
     },
 
-    // caption size 
+    // caption size
     addCaptionPadding() {
       if(this.checkIfIsObject(this.imgIndex) && (this.items[this.imgIndex].title || this.items[this.imgIndex].descripcion)) {
-        const el = document.getElementsByClassName('cool-lightbox-caption');
+        const el = document.getElementsByClassName('cool-lightbox-caption')
         if(el.length > 0) {
           this.paddingBottom = el[0].offsetHeight
-        } 
+        }
       } else {
         this.paddingBottom = 60
       }
@@ -1659,7 +1687,7 @@ export default {
         return false
       }
 
-      const str = new String(url);
+      const str = new String(url)
       if(str.endsWith('.pdf')){
         return url
       }
@@ -1688,13 +1716,13 @@ export default {
 
       return false
     },
-    
+
     // getYoutube ID
     getYoutubeID(url) {
 
       // youtube data
-      const youtubeRegex = /^(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/;
-      const ytId = (url.match(youtubeRegex)) ? RegExp.$1 : false;
+      const youtubeRegex = /^(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/
+      const ytId = (url.match(youtubeRegex)) ? RegExp.$1 : false
 
       if(ytId) {
         return ytId
@@ -1725,9 +1753,9 @@ export default {
 
     // vimeo ID
     getVimeoID(url) {
-      
+
       // if is vimeo video
-      const result = url.match(/(?:www\.|player\.)?vimeo.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|album\/(?:\d+)\/video\/|video\/|)(\d+)(?:[a-zA-Z0-9_\-]+)?/i);
+      const result = url.match(/(?:www\.|player\.)?vimeo.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|album\/(?:\d+)\/video\/|video\/|)(\d+)(?:[a-zA-Z0-9_\-]+)?/i)
       if(result !== null) {
         return result[1]
       }
@@ -1739,7 +1767,7 @@ export default {
     getVimeoUrl(url) {
 
       // if is vimeo video
-      const result = url.match(/(?:www\.|player\.)?vimeo.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|album\/(?:\d+)\/video\/|video\/|)(\d+)(?:[a-zA-Z0-9_\-]+)?/i);
+      const result = url.match(/(?:www\.|player\.)?vimeo.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|album\/(?:\d+)\/video\/|video\/|)(\d+)(?:[a-zA-Z0-9_\-]+)?/i)
       if(result !== null) {
         return '//player.vimeo.com/video/'+result[1]+'?hd=1&show_title=1&show_byline=1&show_portrait=0&fullscreen=1'
       }
@@ -1754,14 +1782,21 @@ export default {
       }
 
       const str = new String(url);
-      if(
-        (str.indexOf('.mp4') !== -1) || 
-        (str.indexOf('.mov') !== -1) || 
-        (str.indexOf('.webm') !== -1) || 
-        (str.indexOf('.ogg') !== -1) || 
-        (str.indexOf('.avi') !== -1)
-      ) {
-        return url
+      const videoExtensions = [
+        '.mp4',
+        '.mov',
+        '.webm',
+        '.ogg',
+        '.avi'
+      ];
+      const isValidExtension = videoExtensions.filter((videoExtension) => {
+        return (
+          str.indexOf(videoExtension) !== -1
+          || str.indexOf(videoExtension.toUpperCase()) !== -1
+        );
+      }).length > 0;
+      if (isValidExtension) {
+        return url;
       }
 
       return false
@@ -1773,7 +1808,7 @@ export default {
         return false
       }
 
-      const str = new String(url);
+      const str = new String(url)
       if(str.indexOf('.mp4') !== -1 || str.indexOf('.mov') !== -1){
         return 'mp4'
       }
@@ -1785,7 +1820,7 @@ export default {
       if(str.indexOf('.ogg') !== -1) {
         return 'ogg'
       }
-      
+
       if(str.indexOf('.avi') !== -1) {
         return 'avi'
       }
@@ -1799,7 +1834,7 @@ export default {
       if(typeof item === 'object' && item !== null) {
         return true
       }
-      return false;
+      return false
     },
 
     // arrows and escape events
@@ -1820,19 +1855,19 @@ export default {
   },
 
   computed: {
-    
+
     // Images wrapper styles to use drag and zoom
     imgWrapperStyle() {
       return {
-        top: `50%`,
-        left: `50%`,
+        top: '50%',
+        left: '50%',
         transition: this.transition,
       }
     },
 
     // lightbox styles
     lightboxStyles() {
-      return { 
+      return {
         'z-index': this.zIndex,
         'background-color': this.overlayColor,
       }
@@ -1866,7 +1901,7 @@ export default {
         { 'cool-lightbox--is-zooming': this.isZooming },
         { 'cool-lightbox--show-thumbs': this.showThumbs },
         { 'cool-lightbox--is-swipping': this.isDraggingSwipe }
-      ];
+      ]
 
       let classString = 'cool-lightbox--thumbs-'+this.thumbsPosition
       classesReturn.push(classString)
@@ -1886,11 +1921,11 @@ export default {
       if(this.dir === 'rtl') {
         return (this.imgIndex - 1 >= 0)
       }
-        
+
       return (this.imgIndex + 1 < this.items.length)
     },
 
-    // check if the slide has previous element 
+    // check if the slide has previous element
     hasPreviousButton() {
       if(this.dir === 'rtl') {
         return (this.imgIndex + 1 < this.items.length)
@@ -1904,12 +1939,12 @@ export default {
       return (this.imgIndex + 1 < this.items.length)
     },
 
-    // check if the slide has previous element 
+    // check if the slide has previous element
     hasPrevious() {
       return (this.imgIndex - 1 >= 0)
     },
   }
-};
+}
 </script>
 
 <style lang="scss">
@@ -1926,19 +1961,19 @@ $breakpoints: (
 
   // If the breakpoint exists in the map.
 	@if map-has-key($breakpoints, $breakpoint) {
-	
+
     // Get the breakpoint value.
     $breakpoint-value: map-get($breakpoints, $breakpoint);
-	
+
 	  //Build the media query
 		@media (min-width: $breakpoint-value) {
 			@content;
 		}
-	} 
+	}
 }
 
 .cool-lightbox {
-  position: fixed; 
+  position: fixed;
   left: 0;
   bottom: 0;
   top: 0;
@@ -2203,7 +2238,7 @@ $breakpoints: (
     display: block;
   }
   &.cool-lightbox--is-swipping {
-    cursor: -webkit-grabbing; 
+    cursor: -webkit-grabbing;
     cursor: grabbing;
     iframe {
       pointer-events: none;
@@ -2236,7 +2271,7 @@ $breakpoints: (
         cursor: move; /* fallback if grab cursor is unsupported */
         cursor: grab;
         cursor: -moz-grab;
-        cursor: -webkit-grab; 
+        cursor: -webkit-grab;
       }
     }
     .cool-lightbox-caption {
@@ -2438,7 +2473,7 @@ $breakpoints: (
       -webkit-backface-visibility: hidden;
       backface-visibility: hidden;
       -ms-transform: translateZ(0);
-      -webkit-transform: translateZ(0); 
+      -webkit-transform: translateZ(0);
       transform: translateZ(0);
       box-shadow: 0 0 1.5rem rgba(0,0,0,.45);
     }
