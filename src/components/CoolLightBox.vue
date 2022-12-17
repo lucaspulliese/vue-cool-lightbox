@@ -894,6 +894,10 @@ export default {
 
     // start swipe event
     startSwipe(event) {
+      if(this.imgIndex == null) {
+        return false
+      }
+      
       if(this.isZooming) {
         return false
       }
