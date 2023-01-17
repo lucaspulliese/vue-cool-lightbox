@@ -7,7 +7,9 @@
       @click="closeModal"
       v-bind:style="lightboxStyles">
 
-      <div v-if="gallery" class="cool-lightbox-thumbs">
+      <div class="focus-bounds visually-hidden" tabindex="0" @focus="topFocus"></div>
+
+      <div v-if="gallery" id="cool-lightbox-thumbs" class="cool-lightbox-thumbs">
         <div class="cool-lightbox-thumbs__list">
           <button
             type="button"
@@ -30,6 +32,8 @@
       </div>
       <!--/cool-lightbox-thumbs-->
 
+      <div v-if="showThumbs" class="focus-bounds visually-hidden" tabindex="0" @focus="bottomThumbFocus"></div>
+
       <div
         class="cool-lightbox__inner"
         :style="innerStyles"
@@ -43,8 +47,12 @@
         >
         <div class="cool-lightbox__progressbar" :style="stylesInterval"></div>
 
+        <div class="focus-bounds visually-hidden" tabindex="0" @focus="topFocus"></div>
+
+        <div v-if="showThumbs" class="focus-bounds visually-hidden" tabindex="0" @focus="thumbFocusFromNav"></div>
+
         <div class="cool-lightbox__navigation">
-          <button type="button" class="cool-lightbox-button cool-lightbox-button--prev" :title="translations.previous" :class="buttonsClasses" v-show="(hasPreviousButton || loopData) && items.length > 1" @click="onPrevClick">
+          <button type="button" class="cool-lightbox-button cool-lightbox-button--prev" :title="translations.previous" :class="buttonsClasses" ref="firstNavButton" v-show="(hasPreviousButton || loopData) && items.length > 1" @click="onPrevClick">
             <slot name="icon-previous">
               <div class="cool-lightbox-button__icon">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11.28 15.7l-1.34 1.37L5 12l4.94-5.07 1.34 1.38-2.68 2.72H19v1.94H8.6z"></path></svg>
@@ -52,7 +60,7 @@
             </slot>
           </button>
 
-          <button type="button" class="cool-lightbox-button cool-lightbox-button--next" :title="translations.next" :class="buttonsClasses" v-show="(hasNextButton || loopData) && items.length > 1" @click="onNextClick(false)">
+          <button type="button" class="cool-lightbox-button cool-lightbox-button--next" :title="translations.next" :class="buttonsClasses" ref="lastNavButton" v-show="(hasNextButton || loopData) && items.length > 1" @click="onNextClick(false)">
             <slot name="icon-next">
               <div class="cool-lightbox-button__icon">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.4 12.97l-2.68 2.72 1.34 1.38L19 12l-4.94-5.07-1.34 1.38 2.68 2.72H5v1.94z"></path></svg>
@@ -299,7 +307,7 @@
 
         <div class="cool-lightbox-toolbar" :class="buttonsClasses">
 
-          <button type="button" v-if="this.slideshow && items.length > 1" :title="translations.playSlideShow" class="cool-lightbox-toolbar__btn" @click="togglePlaySlideshow">
+          <button type="button" v-if="this.slideshow && items.length > 1" :title="translations.playSlideShow" class="cool-lightbox-toolbar__btn" ref="slideshowButton" @click="togglePlaySlideshow">
             <svg xmlns="http://www.w3.org/2000/svg" v-if="!isPlayingSlideShow" viewBox="0 0 24 24">
               <path d="M6.5 5.4v13.2l11-6.6z"></path>
             </svg>
@@ -311,7 +319,7 @@
             </svg>
           </button>
 
-          <button type="button" @click="showThumbs = !showThumbs" :title="translations.showThumbNails" v-if="items.length > 1 && gallery" class="cool-lightbox-toolbar__btn">
+          <button type="button" @click="showThumbs = !showThumbs" :title="translations.showThumbNails" v-if="items.length > 1 && gallery" class="cool-lightbox-toolbar__btn" ref="thumbnailButton" aria-controls="cool-lightbox-thumbs" :aria-expanded="showThumbs ? 'true' : 'false'">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
               <path d="M14.59 14.59h3.76v3.76h-3.76v-3.76zm-4.47
               0h3.76v3.76h-3.76v-3.76zm-4.47 0h3.76v3.76H5.65v-3.76zm8.94-4.47h3.76v3.76h-3.76v-3.76zm-4.47
@@ -321,13 +329,13 @@
             </svg>
           </button>
 
-          <button type="button" v-if="fullScreen" @click="toggleFullScreenMode" class="cool-lightbox-toolbar__btn" :title="translations.fullScreen">
+          <button type="button" v-if="fullScreen" @click="toggleFullScreenMode" class="cool-lightbox-toolbar__btn" ref="fullScreenButton" :title="translations.fullScreen">
             <svg width="20px" height="20px" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
               <path d="M4.5 11H3v4h4v-1.5H4.5V11zM3 7h1.5V4.5H7V3H3v4zm10.5 6.5H11V15h4v-4h-1.5v2.5zM11 3v1.5h2.5V7H15V3h-4z"></path>
             </svg>
           </button>
 
-          <button type="button" v-if="showCloseButton" class="cool-lightbox-toolbar__btn" :title="translations.close" @click="close">
+          <button type="button" v-if="showCloseButton" class="cool-lightbox-toolbar__btn" ref="closeButton" :title="translations.close" @click="close" >
             <slot name="close">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                 <path d="M12 10.6L6.6 5.2 5.2 6.6l5.4 5.4-5.4 5.4 1.4 1.4 5.4-5.4 5.4 5.4 1.4-1.4-5.4-5.4 5.4-5.4-1.4-1.4-5.4 5.4z"></path>
@@ -357,7 +365,7 @@
           </svg>
         </div>
       </transition>
-
+      <div class="focus-bounds visually-hidden" tabindex="0" @focus="bottomFocus"></div>
     </div>
     <!--/cool-lightbox-->
   </transition>
@@ -615,6 +623,11 @@ export default {
 
       }
 
+      if (this.showThumbs) {
+        const activeThumbnail = document.querySelector('.cool-lightbox__thumb.active');
+        activeThumbnail.focus();
+      }
+
       setTimeout(function() {
         self.swipeAnimation = null
       }, 300)
@@ -720,6 +733,11 @@ export default {
 
         if(prev !== null & val === null) {
           this.$emit('on-open', prev)
+
+          // set focus -RS
+          this.hasPreviousButton 
+            ? this.$refs.firstNavButton.focus() 
+            : this.$refs.lastNavButton.focus();
         }
 
         if(prev !== null) {
@@ -1852,6 +1870,38 @@ export default {
           return this.close()
       }
     },
+    topFocus() {
+        if (this.$refs.closeButton) {
+          this.$refs.closeButton.focus();
+        } else if (this.$refs.thumbnailButton) {
+          this.$refs.thumbnailButton.focus();
+        } else if (this.$refs.fullscreenButton) {
+          this.$refs.fullscreenButton.focus();
+        } else if (this.$refs.slideshowButton) {
+          this.$refs.slideshowButton.focus();
+        }
+    },
+    bottomFocus() {
+      if (this.showThumbs) {
+        const firstThumbnail = document.querySelector('.cool-lightbox__thumb');
+        firstThumbnail.focus();
+      } else {
+        this.hasPreviousButton 
+            ? this.$refs.firstNavButton.focus() 
+            : this.$refs.lastNavButton.focus();
+      }
+    },
+    bottomThumbFocus() {
+      this.hasPreviousButton 
+            ? this.$refs.firstNavButton.focus() 
+            : this.$refs.lastNavButton.focus();
+    },
+    thumbFocusFromNav() {
+      const thumbnails = document.querySelectorAll('.cool-lightbox__thumb');
+      const lastThumbnail = thumbnails[thumbnails.length - 1];
+      lastThumbnail.focus();
+      console.log(lastThumbnail);
+    },
   },
 
   computed: {
@@ -2621,5 +2671,13 @@ $breakpoints: (
   100% {
     transform: rotate(360deg);
   }
+}
+
+.visually-hidden {
+	position: absolute;
+	right: 999999999px;
+	width: 0;
+	height: 0;
+	opacity: 0;
 }
 </style>
