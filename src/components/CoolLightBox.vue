@@ -734,7 +734,7 @@ export default {
         if(prev !== null & val === null) {
           this.$emit('on-open', prev)
 
-          // set focus -RS
+          // set focus
           this.hasPreviousButton 
             ? this.$refs.firstNavButton.focus() 
             : this.$refs.lastNavButton.focus();

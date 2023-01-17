@@ -504,7 +504,7 @@ var script = {
         if(prev !== null & val === null) {
           this$1.$emit('on-open', prev);
 
-          // set focus -RS
+          // set focus
           this$1.hasPreviousButton 
             ? this$1.$refs.firstNavButton.focus() 
             : this$1.$refs.lastNavButton.focus();

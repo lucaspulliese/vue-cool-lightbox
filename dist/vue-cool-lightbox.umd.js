@@ -508,7 +508,7 @@
           if(prev !== null & val === null) {
             this$1.$emit('on-open', prev);
 
-            // set focus -RS
+            // set focus
             this$1.hasPreviousButton 
               ? this$1.$refs.firstNavButton.focus() 
               : this$1.$refs.lastNavButton.focus();
@@ -1873,7 +1873,7 @@
     /* scoped */
     var __vue_scope_id__ = undefined;
     /* module identifier */
-    var __vue_module_identifier__ = "data-v-377ea46b";
+    var __vue_module_identifier__ = "data-v-24cc2b39";
     /* functional template */
     var __vue_is_functional_template__ = false;
     /* style inject */
