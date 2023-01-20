@@ -366,6 +366,7 @@
         </div>
       </transition>
       <div class="focus-bounds visually-hidden" tabindex="0" @focus="bottomFocus"></div>
+      <span id="sr-updates" ref="srUpdates" aria-live="polite"></span>
     </div>
     <!--/cool-lightbox-->
   </transition>
@@ -738,6 +739,9 @@ export default {
           this.hasPreviousButton 
             ? this.$refs.firstNavButton.focus() 
             : this.$refs.lastNavButton.focus();
+
+          // announce lightbox open to screen readers
+          this.srSpeak(`Lighbox open with ${this.items.length} items inside. Use left and right arrow keys swipe through images, tab to navigate the lightbox, and escape to exit.`);
         }
 
         if(prev !== null) {
@@ -1870,6 +1874,7 @@ export default {
           return this.close()
       }
     },
+
     topFocus() {
         if (this.$refs.closeButton) {
           this.$refs.closeButton.focus();
@@ -1881,6 +1886,7 @@ export default {
           this.$refs.slideshowButton.focus();
         }
     },
+
     bottomFocus() {
       if (this.showThumbs) {
         const firstThumbnail = document.querySelector('.cool-lightbox__thumb');
@@ -1891,17 +1897,22 @@ export default {
             : this.$refs.lastNavButton.focus();
       }
     },
+
     bottomThumbFocus() {
       this.hasPreviousButton 
             ? this.$refs.firstNavButton.focus() 
             : this.$refs.lastNavButton.focus();
     },
+
     thumbFocusFromNav() {
       const thumbnails = document.querySelectorAll('.cool-lightbox__thumb');
       const lastThumbnail = thumbnails[thumbnails.length - 1];
       lastThumbnail.focus();
       console.log(lastThumbnail);
     },
+
+    srSpeak(text){
+      this.$refs.srUpdates.innerText = text;}
   },
 
   computed: {
@@ -1992,7 +2003,7 @@ export default {
     // check if the slide has previous element
     hasPrevious() {
       return (this.imgIndex - 1 >= 0)
-    },
+    }
   }
 }
 </script>
