@@ -366,7 +366,7 @@
         </div>
       </transition>
       <div class="focus-bounds visually-hidden" tabindex="0" @focus="bottomFocus"></div>
-      <span id="sr-updates" ref="srUpdates" aria-live="polite"></span>
+      <span id="sr-updates" class="visually-hidden" ref="srUpdates" aria-live="polite"></span>
     </div>
     <!--/cool-lightbox-->
   </transition>
