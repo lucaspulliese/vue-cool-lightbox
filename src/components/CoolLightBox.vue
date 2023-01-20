@@ -26,7 +26,7 @@
               <path d="M6.5 5.4v13.2l11-6.6z"></path>
             </svg>
 
-            <img :src="itemThumb(getItemSrc(itemIndex), itemIndex)" alt="" />
+            <img :src="itemThumb(getItemSrc(itemIndex), itemIndex)" :alt="item.alt ? item.alt : 'gallery media item'" />
           </button>
         </div>
       </div>
@@ -366,7 +366,7 @@
         </div>
       </transition>
       <div class="focus-bounds visually-hidden" tabindex="0" @focus="bottomFocus"></div>
-      <span id="sr-updates" class="visually-hidden" ref="srUpdates" aria-live="polite"></span>
+      <span id="sr-updates" ref="srUpdates" aria-live="assertive"></span>
     </div>
     <!--/cool-lightbox-->
   </transition>
@@ -1603,6 +1603,8 @@ export default {
       }
 
       this.changeIndexToNext()
+
+      this.srSpeak(this.items[this.imgIndex].alt ? this.items[this.imgIndex].alt : 'lightbox image');
     },
 
     // prev slide event
@@ -1622,6 +1624,8 @@ export default {
       }
 
       this.changeIndexToPrev()
+
+      this.srSpeak(this.items[this.imgIndex].alt ? this.items[this.imgIndex].alt : 'lightbox media item');
     },
 
     // change to next index
@@ -1912,7 +1916,12 @@ export default {
     },
 
     srSpeak(text){
-      this.$refs.srUpdates.innerText = text;}
+      this.$nextTick(() => {
+        setTimeout(() => {
+          this.$refs.srUpdates.innerText = text;
+        }, 500)
+      }) 
+    }
   },
 
   computed: {
@@ -2684,11 +2693,23 @@ $breakpoints: (
   }
 }
 
+// https://www.a11yproject.com/posts/how-to-hide-content/ 
 .visually-hidden {
-	position: absolute;
-	right: 999999999px;
-	width: 0;
-	height: 0;
-	opacity: 0;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+// aria-live regions do not announce reliably when made invisible
+#sr-updates {
+  // opacity: 0;
+  height: 0;
+  width: 0;
+  position: absolute;
+  left: 99999px;
 }
 </style>
