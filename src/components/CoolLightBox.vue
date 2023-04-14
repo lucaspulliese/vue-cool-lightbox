@@ -569,6 +569,11 @@ export default {
 
   watch: {
     zoomBar(newVal, prevVal) {
+
+      if (this.$refs.items.length === 0 || this.$refs.items[this.imgIndex].childNodes === 0 ) {
+        return false
+      }
+
       let item
       if(this.isZooming) {
         if(this.effect == 'swipe') {
@@ -889,6 +894,10 @@ export default {
 
     // start swipe event
     startSwipe(event) {
+      if(this.imgIndex == null) {
+        return false
+      }
+      
       if(this.isZooming) {
         return false
       }
@@ -1395,6 +1404,10 @@ export default {
         return false
       }
 
+      if (this.$refs.items.length === 0 || this.$refs.items[this.imgIndex].childNodes === 0 ) {
+        return false
+      }
+
       // item zoom
       let item
       if(this.effect == 'swipe') {
@@ -1452,6 +1465,10 @@ export default {
 
       // only if index is not null
       if(this.imgIndex != null) {
+        
+        if (this.$refs.items.length === 0 || this.$refs.items[this.imgIndex].childNodes === 0 ) {
+          return
+        }
 
         let item
         if(this.effect == 'swipe') {

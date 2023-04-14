@@ -351,6 +351,11 @@
 
     watch: {
       zoomBar: function zoomBar(newVal, prevVal) {
+
+        if (this.$refs.items.length === 0 || this.$refs.items[this.imgIndex].childNodes === 0 ) {
+          return false
+        }
+
         var item;
         if(this.isZooming) {
           if(this.effect == 'swipe') {
@@ -671,6 +676,10 @@
 
       // start swipe event
       startSwipe: function startSwipe(event) {
+        if(this.imgIndex == null) {
+          return false
+        }
+        
         if(this.isZooming) {
           return false
         }
@@ -1175,6 +1184,10 @@
           return false
         }
 
+        if (this.$refs.items.length === 0 || this.$refs.items[this.imgIndex].childNodes === 0 ) {
+          return false
+        }
+
         // item zoom
         var item;
         if(this.effect == 'swipe') {
@@ -1232,6 +1245,10 @@
 
         // only if index is not null
         if(this.imgIndex != null) {
+          
+          if (this.$refs.items.length === 0 || this.$refs.items[this.imgIndex].childNodes === 0 ) {
+            return
+          }
 
           var item;
           if(this.effect == 'swipe') {
@@ -1831,7 +1848,7 @@
     /* scoped */
     var __vue_scope_id__ = undefined;
     /* module identifier */
-    var __vue_module_identifier__ = "data-v-942a667c";
+    var __vue_module_identifier__ = "data-v-d2967696";
     /* functional template */
     var __vue_is_functional_template__ = false;
     /* style inject */

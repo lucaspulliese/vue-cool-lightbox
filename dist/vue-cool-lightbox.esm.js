@@ -347,6 +347,11 @@ var script = {
 
   watch: {
     zoomBar: function zoomBar(newVal, prevVal) {
+
+      if (this.$refs.items.length === 0 || this.$refs.items[this.imgIndex].childNodes === 0 ) {
+        return false
+      }
+
       var item;
       if(this.isZooming) {
         if(this.effect == 'swipe') {
@@ -667,6 +672,10 @@ var script = {
 
     // start swipe event
     startSwipe: function startSwipe(event) {
+      if(this.imgIndex == null) {
+        return false
+      }
+      
       if(this.isZooming) {
         return false
       }
@@ -1171,6 +1180,10 @@ var script = {
         return false
       }
 
+      if (this.$refs.items.length === 0 || this.$refs.items[this.imgIndex].childNodes === 0 ) {
+        return false
+      }
+
       // item zoom
       var item;
       if(this.effect == 'swipe') {
@@ -1228,6 +1241,10 @@ var script = {
 
       // only if index is not null
       if(this.imgIndex != null) {
+        
+        if (this.$refs.items.length === 0 || this.$refs.items[this.imgIndex].childNodes === 0 ) {
+          return
+        }
 
         var item;
         if(this.effect == 'swipe') {
