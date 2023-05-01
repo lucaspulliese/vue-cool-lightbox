@@ -31,6 +31,12 @@ export default {
 ## Docs
 You can see the complete documentation with examples here: [https://vue-cool-lightbox.lucaspulliese.com/](https://vue-cool-lightbox.lucaspulliese.com/).
 
+## Supported contents
+- Images
+- Videos
+- Audios (mp3, wav, ogg)
+- iFrames
+
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
