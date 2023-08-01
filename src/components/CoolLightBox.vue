@@ -1687,7 +1687,8 @@ export default {
         return false
       }
 
-      const str = new String(url)
+      const urlObj = new URL(url)
+      const str = new String(urlObj.pathname)
       if(str.endsWith('.pdf')){
         return url
       }
